@@ -38,7 +38,7 @@ func tableOffice365Drive() *plugin.Table {
 
 			// Standard columns
 			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-			// {Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		},
 	}
 }
@@ -46,6 +46,8 @@ func tableOffice365Drive() *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
@@ -60,6 +62,10 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 	}
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveCollectionResponseFromDiscriminatorValue)
+	if err != nil {
+		logger.Error("listOffice365Drives", "create_iterator_instance_error", err)
+		return nil, err
+	}
 
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
@@ -67,13 +73,10 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 		d.StreamListItem(ctx, &Office365DriveInfo{drive})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.QueryStatus.RowsRemaining(ctx) == 0 {
-			return false
-		}
-
-		return true
+		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
+		logger.Error("listOffice365Drives", "paging_error", err)
 		return nil, err
 	}
 

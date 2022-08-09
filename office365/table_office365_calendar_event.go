@@ -3,14 +3,15 @@ package office365
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendarview"
 )
 
 //// TABLE DEFINITION
@@ -20,8 +21,23 @@ func tableOffice365CalendarEvent() *plugin.Table {
 		Name:        "office365_calendar_event",
 		Description: "",
 		List: &plugin.ListConfig{
-			Hydrate:    listOffice365CalendarEvents,
-			KeyColumns: plugin.SingleColumn("user_identifier"),
+			Hydrate: listOffice365CalendarEvents,
+			KeyColumns: []*plugin.KeyColumn{
+				{
+					Name:    "user_identifier",
+					Require: plugin.Required,
+				},
+				{
+					Name:      "start_time",
+					Require:   plugin.Optional,
+					Operators: []string{">", ">=", "=", "<", "<="},
+				},
+				{
+					Name:      "end_time",
+					Require:   plugin.Optional,
+					Operators: []string{">", ">=", "=", "<", "<="},
+				},
+			},
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound", "UnsupportedQueryOption"}),
 			},
@@ -35,6 +51,8 @@ func tableOffice365CalendarEvent() *plugin.Table {
 			{Name: "is_all_day", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsAllDay")},
 			{Name: "is_cancelled", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsCancelled")},
 			{Name: "is_organizer", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsOrganizer")},
+			{Name: "start_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("EventStart").Transform(eventStartTime)},
+			{Name: "end_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("EventEnd").Transform(eventEndTime)},
 
 			// Other fields
 			{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
@@ -53,7 +71,6 @@ func tableOffice365CalendarEvent() *plugin.Table {
 			{Name: "series_master_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetSeriesMasterId")},
 			{Name: "response_requested", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetResponseRequested")},
 			{Name: "show_as", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetShowAs")},
-			// {Name: "type", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetType")},
 			{Name: "web_link", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebLink")},
 			{Name: "is_online_meeting", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsOnlineMeeting")},
 			{Name: "online_meeting_provider", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetOnlineMeetingProvider")},
@@ -76,7 +93,7 @@ func tableOffice365CalendarEvent() *plugin.Table {
 
 			// Standard columns
 			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
-			// {Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		},
 	}
 }
@@ -84,20 +101,86 @@ func tableOffice365CalendarEvent() *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %v", err)
 	}
-
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Events().Get()
-	if err != nil {
-		errObj := getErrorObject(err)
-		return nil, errObj
+
+	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
+
+	var result models.EventCollectionResponseable
+
+	// Filter event using timestamp
+	var startTime, endTime string
+	if d.Quals["start_time"] != nil {
+		for _, q := range d.Quals["start_time"].Quals {
+			givenTime := q.Value.GetTimestampValue().AsTime()
+			startTime = q.Value.GetTimestampValue().AsTime().Format(time.RFC3339)
+
+			switch q.Operator {
+			case ">":
+				startTime = givenTime.Add(time.Second * 1).Format(time.RFC3339)
+			case "<":
+				startTime = givenTime.Add(time.Duration(-1) * time.Second).Format(time.RFC3339)
+			}
+		}
+		input.StartDateTime = &startTime
+	}
+
+	if d.Quals["end_time"] != nil {
+		for _, q := range d.Quals["end_time"].Quals {
+			givenTime := q.Value.GetTimestampValue().AsTime()
+			endTime = q.Value.GetTimestampValue().AsTime().Format(time.RFC3339)
+
+			switch q.Operator {
+			case ">":
+				endTime = givenTime.Add(time.Second * 1).Format(time.RFC3339)
+			case "<":
+				endTime = givenTime.Add(time.Duration(-1) * time.Second).Format(time.RFC3339)
+			}
+		}
+		input.EndDateTime = &endTime
+	}
+
+	currentTime := time.Now().Format(time.RFC3339)
+	if startTime != "" && endTime != "" {
+		input.StartDateTime = &startTime
+		input.EndDateTime = &endTime
+	} else if startTime != "" && endTime == "" {
+		input.StartDateTime = &startTime
+		input.EndDateTime = &currentTime
+	} else if startTime == "" && endTime != "" {
+		input.StartDateTime = &currentTime
+		input.EndDateTime = &endTime
+	}
+
+	if startTime != "" || endTime != "" {
+		options := &calendarview.CalendarViewRequestBuilderGetRequestConfiguration{
+			QueryParameters: input,
+		}
+
+		result, err = client.UsersById(userIdentifier).CalendarView().GetWithRequestConfigurationAndResponseHandler(options, nil)
+		if err != nil {
+			errObj := getErrorObject(err)
+			return nil, errObj
+		}
+	} else {
+		result, err = client.UsersById(userIdentifier).Events().Get()
+		if err != nil {
+			errObj := getErrorObject(err)
+			return nil, errObj
+		}
 	}
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateEventCollectionResponseFromDiscriminatorValue)
+	if err != nil {
+		logger.Error("listOffice365CalendarEvents", "create_iterator_instance_error", err)
+		return nil, err
+	}
 
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
@@ -105,14 +188,41 @@ func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *pl
 		d.StreamListItem(ctx, &Office365CalendarEventInfo{event})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.QueryStatus.RowsRemaining(ctx) == 0 {
-			return false
-		}
-
-		return true
+		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
+		logger.Error("listOffice365CalendarEvents", "paging_error", err)
 		return nil, err
+	}
+
+	return nil, nil
+}
+
+func eventStartTime(_ context.Context, d *transform.TransformData) (interface{}, error) {
+	data := d.HydrateItem.(*Office365CalendarEventInfo)
+	if data == nil {
+		return nil, nil
+	}
+
+	if data.GetStart() != nil {
+		if data.GetStart().GetDateTime() != nil {
+			return data.GetStart().GetDateTime(), nil
+		}
+	}
+
+	return nil, nil
+}
+
+func eventEndTime(_ context.Context, d *transform.TransformData) (interface{}, error) {
+	data := d.HydrateItem.(*Office365CalendarEventInfo)
+	if data == nil {
+		return nil, nil
+	}
+
+	if data.GetEnd() != nil {
+		if data.GetEnd().GetDateTime() != nil {
+			return data.GetEnd().GetDateTime(), nil
+		}
 	}
 
 	return nil, nil

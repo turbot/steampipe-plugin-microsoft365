@@ -80,7 +80,7 @@ func tableOffice365MailMessage() *plugin.Table {
 			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
 			{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
 			{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
-			// {Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		},
 	}
 }
@@ -88,6 +88,8 @@ func tableOffice365MailMessage() *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
@@ -141,6 +143,10 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 	}
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateMessageCollectionResponseFromDiscriminatorValue)
+	if err != nil {
+		logger.Error("listOffice365MailMessages", "create_iterator_instance_error", err)
+		return nil, err
+	}
 
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		message := pageItem.(models.Messageable)
@@ -148,13 +154,10 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 		d.StreamListItem(ctx, &Office365MailMessageInfo{message})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.QueryStatus.RowsRemaining(ctx) == 0 {
-			return false
-		}
-
-		return true
+		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
+		logger.Error("listOffice365MailMessages", "paging_error", err)
 		return nil, err
 	}
 
@@ -165,7 +168,7 @@ func buildMailMessageRequestFields(ctx context.Context, queryColumns []string) [
 	var selectColumns []string
 
 	for _, columnName := range queryColumns {
-		if columnName == "title" || columnName == "filter" || columnName == "user_identifier" || columnName == "_ctx" {
+		if columnName == "title" || columnName == "filter" || columnName == "user_identifier" || columnName == "_ctx" || columnName == "tenant_id" {
 			continue
 		}
 		selectColumns = append(selectColumns, strcase.ToLowerCamel(columnName))
