@@ -6,6 +6,192 @@ type Office365CalendarEventInfo struct {
 	models.Eventable
 }
 
+type Office365DriveInfo struct {
+	models.Driveable
+}
+
+type Office365DriveItemInfo struct {
+	models.DriveItemable
+	DriveID string
+}
+
+type Office365MailMessageInfo struct {
+	models.Messageable
+}
+
+type Office365TeamInfo struct {
+	models.Teamable
+	UserIdentifier string
+}
+
+func (driveItem *Office365DriveItemInfo) DriveItemCreatedBy() map[string]interface{} {
+	if driveItem.GetCreatedBy() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if driveItem.GetCreatedBy().GetApplication() != nil {
+		applicationData := map[string]interface{}{}
+		if driveItem.GetCreatedBy().GetApplication().GetDisplayName() != nil {
+			applicationData["displayName"] = *driveItem.GetCreatedBy().GetApplication().GetDisplayName()
+		}
+		if driveItem.GetCreatedBy().GetApplication().GetId() != nil {
+			applicationData["id"] = *driveItem.GetCreatedBy().GetApplication().GetId()
+		}
+		data["application"] = applicationData
+	}
+	if driveItem.GetCreatedBy().GetUser() != nil {
+		userData := map[string]interface{}{}
+		if driveItem.GetCreatedBy().GetUser().GetDisplayName() != nil {
+			userData["displayName"] = *driveItem.GetCreatedBy().GetUser().GetDisplayName()
+		}
+		if driveItem.GetCreatedBy().GetUser().GetId() != nil {
+			userData["id"] = *driveItem.GetCreatedBy().GetUser().GetId()
+		}
+		data["user"] = userData
+	}
+	if driveItem.GetCreatedBy().GetDevice() != nil {
+		deviceData := map[string]interface{}{}
+		if driveItem.GetCreatedBy().GetDevice().GetDisplayName() != nil {
+			deviceData["displayName"] = *driveItem.GetCreatedBy().GetDevice().GetDisplayName()
+		}
+		if driveItem.GetCreatedBy().GetDevice().GetId() != nil {
+			deviceData["id"] = *driveItem.GetCreatedBy().GetDevice().GetId()
+		}
+		data["device"] = deviceData
+	}
+
+	return data
+}
+
+func (driveItem *Office365DriveItemInfo) DriveItemFile() map[string]interface{} {
+	if driveItem.GetFile() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if driveItem.GetFile().GetMimeType() != nil {
+		data["mimeType"] = *driveItem.GetFile().GetMimeType()
+	}
+	if driveItem.GetFile().GetProcessingMetadata() != nil {
+		data["processingMetadata"] = *driveItem.GetFile().GetProcessingMetadata()
+	}
+	if driveItem.GetFile().GetHashes() != nil {
+		hashData := map[string]interface{}{}
+		if driveItem.GetFile().GetHashes().GetCrc32Hash() != nil {
+			hashData["crc32Hash"] = *driveItem.GetFile().GetHashes().GetCrc32Hash()
+		}
+		if driveItem.GetFile().GetHashes().GetQuickXorHash() != nil {
+			hashData["quickXorHash"] = *driveItem.GetFile().GetHashes().GetQuickXorHash()
+		}
+		if driveItem.GetFile().GetHashes().GetSha1Hash() != nil {
+			hashData["sha1Hash"] = *driveItem.GetFile().GetHashes().GetSha1Hash()
+		}
+		if driveItem.GetFile().GetHashes().GetSha256Hash() != nil {
+			hashData["sha256Hash"] = *driveItem.GetFile().GetHashes().GetSha256Hash()
+		}
+		data["hashes"] = hashData
+	}
+
+	return data
+}
+
+func (driveItem *Office365DriveItemInfo) DriveItemLastModifiedBy() map[string]interface{} {
+	if driveItem.GetLastModifiedBy() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if driveItem.GetLastModifiedBy().GetApplication() != nil {
+		applicationData := map[string]interface{}{}
+		if driveItem.GetLastModifiedBy().GetApplication().GetDisplayName() != nil {
+			applicationData["displayName"] = *driveItem.GetLastModifiedBy().GetApplication().GetDisplayName()
+		}
+		if driveItem.GetLastModifiedBy().GetApplication().GetId() != nil {
+			applicationData["id"] = *driveItem.GetLastModifiedBy().GetApplication().GetId()
+		}
+		data["application"] = applicationData
+	}
+	if driveItem.GetLastModifiedBy().GetUser() != nil {
+		userData := map[string]interface{}{}
+		if driveItem.GetLastModifiedBy().GetUser().GetDisplayName() != nil {
+			userData["displayName"] = *driveItem.GetLastModifiedBy().GetUser().GetDisplayName()
+		}
+		if driveItem.GetLastModifiedBy().GetUser().GetId() != nil {
+			userData["id"] = *driveItem.GetLastModifiedBy().GetUser().GetId()
+		}
+		data["user"] = userData
+	}
+	if driveItem.GetLastModifiedBy().GetDevice() != nil {
+		deviceData := map[string]interface{}{}
+		if driveItem.GetLastModifiedBy().GetDevice().GetDisplayName() != nil {
+			deviceData["displayName"] = *driveItem.GetLastModifiedBy().GetDevice().GetDisplayName()
+		}
+		if driveItem.GetLastModifiedBy().GetDevice().GetId() != nil {
+			deviceData["id"] = *driveItem.GetLastModifiedBy().GetDevice().GetId()
+		}
+		data["device"] = deviceData
+	}
+
+	return data
+}
+
+func (driveItem *Office365DriveItemInfo) DriveItemParentReference() map[string]interface{} {
+	if driveItem.GetParentReference() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if driveItem.GetParentReference().GetDriveId() != nil {
+		data["driveId"] = *driveItem.GetParentReference().GetDriveId()
+	}
+	if driveItem.GetParentReference().GetDriveType() != nil {
+		data["driveType"] = *driveItem.GetParentReference().GetDriveType()
+	}
+	if driveItem.GetParentReference().GetId() != nil {
+		data["id"] = *driveItem.GetParentReference().GetId()
+	}
+	if driveItem.GetParentReference().GetName() != nil {
+		data["name"] = *driveItem.GetParentReference().GetName()
+	}
+	if driveItem.GetParentReference().GetPath() != nil {
+		data["path"] = *driveItem.GetParentReference().GetPath()
+	}
+	if driveItem.GetParentReference().GetShareId() != nil {
+		data["shareId"] = *driveItem.GetParentReference().GetShareId()
+	}
+	if driveItem.GetParentReference().GetSiteId() != nil {
+		data["siteId"] = *driveItem.GetParentReference().GetSiteId()
+	}
+	if driveItem.GetParentReference().GetSharepointIds() != nil {
+		sharePointData := map[string]interface{}{}
+		if driveItem.GetParentReference().GetSharepointIds().GetListId() != nil {
+			sharePointData["listId"] = *driveItem.GetParentReference().GetSharepointIds().GetListId()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetListItemId() != nil {
+			sharePointData["listItemId"] = *driveItem.GetParentReference().GetSharepointIds().GetListItemId()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetListItemUniqueId() != nil {
+			sharePointData["listItemUniqueId"] = *driveItem.GetParentReference().GetSharepointIds().GetListItemUniqueId()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetSiteId() != nil {
+			sharePointData["siteId"] = *driveItem.GetParentReference().GetSharepointIds().GetSiteId()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetSiteUrl() != nil {
+			sharePointData["siteUrl"] = *driveItem.GetParentReference().GetSharepointIds().GetSiteUrl()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetTenantId() != nil {
+			sharePointData["tenantId"] = *driveItem.GetParentReference().GetSharepointIds().GetTenantId()
+		}
+		if driveItem.GetParentReference().GetSharepointIds().GetWebId() != nil {
+			sharePointData["webId"] = *driveItem.GetParentReference().GetSharepointIds().GetWebId()
+		}
+		data["sharePointIds"] = sharePointData
+	}
+
+	return data
+}
+
 func (event *Office365CalendarEventInfo) EventAttendees() []map[string]interface{} {
 	if event.GetAttendees() == nil {
 		return nil
@@ -386,763 +572,242 @@ func (event *Office365CalendarEventInfo) EventStart() map[string]interface{} {
 	return startTimeInfo
 }
 
-// type ADConditionalAccessPolicyInfo struct {
-// 	models.ConditionalAccessPolicyable
-// }
-
-// type ADGroupInfo struct {
-// 	models.Groupable
-// }
-
-// type ADServicePrincipalInfo struct {
-// 	models.ServicePrincipalable
-// }
-
-// type ADSignInReportInfo struct {
-// 	models.SignInable
-// }
-
-// type ADUserInfo struct {
-// 	models.Userable
-// }
-
-// func (application *ADApplicationInfo) ApplicationAPI() map[string]interface{} {
-// 	if application.GetApi() == nil {
-// 		return nil
-// 	}
-
-// 	apiData := map[string]interface{}{
-// 		"knownClientApplications": application.GetApi().GetKnownClientApplications(),
-// 	}
-
-// 	if application.GetApi().GetAcceptMappedClaims() != nil {
-// 		apiData["acceptMappedClaims"] = *application.GetApi().GetAcceptMappedClaims()
-// 	}
-// 	if application.GetApi().GetRequestedAccessTokenVersion() != nil {
-// 		apiData["requestedAccessTokenVersion"] = *application.GetApi().GetRequestedAccessTokenVersion()
-// 	}
-
-// 	oauth2PermissionScopes := []map[string]interface{}{}
-// 	for _, p := range application.GetApi().GetOauth2PermissionScopes() {
-// 		data := map[string]interface{}{}
-// 		if p.GetAdminConsentDescription() != nil {
-// 			data["adminConsentDescription"] = *p.GetAdminConsentDescription()
-// 		}
-// 		if p.GetAdminConsentDisplayName() != nil {
-// 			data["adminConsentDisplayName"] = *p.GetAdminConsentDisplayName()
-// 		}
-// 		if p.GetId() != nil {
-// 			data["id"] = *p.GetId()
-// 		}
-// 		if p.GetIsEnabled() != nil {
-// 			data["isEnabled"] = *p.GetIsEnabled()
-// 		}
-// 		if p.GetOrigin() != nil {
-// 			data["origin"] = *p.GetOrigin()
-// 		}
-// 		if p.GetType() != nil {
-// 			data["type"] = *p.GetType()
-// 		}
-// 		if p.GetUserConsentDescription() != nil {
-// 			data["userConsentDescription"] = p.GetUserConsentDescription()
-// 		}
-// 		if p.GetUserConsentDisplayName() != nil {
-// 			data["userConsentDisplayName"] = p.GetUserConsentDisplayName()
-// 		}
-// 		if p.GetValue() != nil {
-// 			data["value"] = *p.GetValue()
-// 		}
-// 		oauth2PermissionScopes = append(oauth2PermissionScopes, data)
-// 	}
-// 	apiData["oauth2PermissionScopes"] = oauth2PermissionScopes
-
-// 	preAuthorizedApplications := []map[string]interface{}{}
-// 	for _, p := range application.GetApi().GetPreAuthorizedApplications() {
-// 		data := map[string]interface{}{
-// 			"delegatedPermissionIds": p.GetDelegatedPermissionIds(),
-// 		}
-// 		if p.GetAppId() != nil {
-// 			data["appId"] = *p.GetAppId()
-// 		}
-// 		preAuthorizedApplications = append(preAuthorizedApplications, data)
-// 	}
-// 	apiData["preAuthorizedApplications"] = preAuthorizedApplications
-
-// 	return apiData
-// }
-
-// func (application *ADApplicationInfo) ApplicationInfo() map[string]interface{} {
-// 	if application.GetInfo() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"logoUrl":             application.GetInfo().GetLogoUrl(),
-// 		"marketingUrl":        application.GetInfo().GetMarketingUrl(),
-// 		"privacyStatementUrl": application.GetInfo().GetPrivacyStatementUrl(),
-// 		"supportUrl":          application.GetInfo().GetSupportUrl(),
-// 		"termsOfServiceUrl":   application.GetInfo().GetTermsOfServiceUrl(),
-// 	}
-// }
-
-// func (application *ADApplicationInfo) ApplicationKeyCredentials() []map[string]interface{} {
-// 	if application.GetKeyCredentials() == nil {
-// 		return nil
-// 	}
-
-// 	keyCredentials := []map[string]interface{}{}
-// 	for _, p := range application.GetKeyCredentials() {
-// 		keyCredentialData := map[string]interface{}{}
-// 		if p.GetDisplayName() != nil {
-// 			keyCredentialData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetEndDateTime() != nil {
-// 			keyCredentialData["endDateTime"] = *p.GetEndDateTime()
-// 		}
-// 		if p.GetKeyId() != nil {
-// 			keyCredentialData["keyId"] = *p.GetKeyId()
-// 		}
-// 		if p.GetStartDateTime() != nil {
-// 			keyCredentialData["startDateTime"] = *p.GetStartDateTime()
-// 		}
-// 		if p.GetType() != nil {
-// 			keyCredentialData["type"] = *p.GetType()
-// 		}
-// 		if p.GetUsage() != nil {
-// 			keyCredentialData["usage"] = *p.GetUsage()
-// 		}
-// 		if p.GetCustomKeyIdentifier() != nil {
-// 			keyCredentialData["customKeyIdentifier"] = p.GetCustomKeyIdentifier()
-// 		}
-// 		if p.GetKey() != nil {
-// 			keyCredentialData["key"] = p.GetKey()
-// 		}
-// 		keyCredentials = append(keyCredentials, keyCredentialData)
-// 	}
-
-// 	return keyCredentials
-// }
-
-// func (application *ADApplicationInfo) ApplicationParentalControlSettings() map[string]interface{} {
-// 	if application.GetParentalControlSettings() == nil {
-// 		return nil
-// 	}
-
-// 	parentalControlSettingData := map[string]interface{}{
-// 		"countriesBlockedForMinors": application.GetParentalControlSettings().GetCountriesBlockedForMinors(),
-// 	}
-// 	if application.GetParentalControlSettings().GetLegalAgeGroupRule() != nil {
-// 		parentalControlSettingData["legalAgeGroupRule"] = *application.GetParentalControlSettings().GetLegalAgeGroupRule()
-// 	}
-
-// 	return parentalControlSettingData
-// }
-
-// func (application *ADApplicationInfo) ApplicationPasswordCredentials() []map[string]interface{} {
-// 	if application.GetPasswordCredentials() == nil {
-// 		return nil
-// 	}
-
-// 	passwordCredentials := []map[string]interface{}{}
-// 	for _, p := range application.GetPasswordCredentials() {
-// 		passwordCredentialData := map[string]interface{}{}
-// 		if p.GetDisplayName() != nil {
-// 			passwordCredentialData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetHint() != nil {
-// 			passwordCredentialData["hint"] = *p.GetHint()
-// 		}
-// 		if p.GetSecretText() != nil {
-// 			passwordCredentialData["secretText"] = *p.GetSecretText()
-// 		}
-// 		if p.GetKeyId() != nil {
-// 			passwordCredentialData["keyId"] = *p.GetKeyId()
-// 		}
-// 		if p.GetEndDateTime() != nil {
-// 			passwordCredentialData["endDateTime"] = *p.GetEndDateTime()
-// 		}
-// 		if p.GetStartDateTime() != nil {
-// 			passwordCredentialData["startDateTime"] = *p.GetStartDateTime()
-// 		}
-// 		if p.GetCustomKeyIdentifier() != nil {
-// 			passwordCredentialData["customKeyIdentifier"] = p.GetCustomKeyIdentifier()
-// 		}
-// 		passwordCredentials = append(passwordCredentials, passwordCredentialData)
-// 	}
-
-// 	return passwordCredentials
-// }
-
-// func (application *ADApplicationInfo) ApplicationSpa() map[string]interface{} {
-// 	if application.GetSpa() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"redirectUris": application.GetSpa().GetRedirectUris(),
-// 	}
-// }
-
-// func (application *ADApplicationInfo) ApplicationWeb() map[string]interface{} {
-// 	if application.GetWeb() == nil {
-// 		return nil
-// 	}
-
-// 	webData := map[string]interface{}{}
-// 	if application.GetWeb().GetHomePageUrl() != nil {
-// 		webData["homePageUrl"] = *application.GetWeb().GetHomePageUrl()
-// 	}
-// 	if application.GetWeb().GetLogoutUrl() != nil {
-// 		webData["logoutUrl"] = *application.GetWeb().GetLogoutUrl()
-// 	}
-// 	if application.GetWeb().GetRedirectUris() != nil {
-// 		webData["redirectUris"] = application.GetWeb().GetRedirectUris()
-// 	}
-// 	if application.GetWeb().GetImplicitGrantSettings() != nil {
-// 		implicitGrantSettingsData := map[string]*bool{}
-
-// 		if application.GetWeb().GetImplicitGrantSettings().GetEnableAccessTokenIssuance() != nil {
-// 			implicitGrantSettingsData["enableAccessTokenIssuance"] = application.GetWeb().GetImplicitGrantSettings().GetEnableAccessTokenIssuance()
-// 		}
-// 		if application.GetWeb().GetImplicitGrantSettings().GetEnableIdTokenIssuance() != nil {
-// 			implicitGrantSettingsData["enableIdTokenIssuance"] = application.GetWeb().GetImplicitGrantSettings().GetEnableIdTokenIssuance()
-// 		}
-// 		webData["implicitGrantSettings"] = implicitGrantSettingsData
-// 	}
-
-// 	return webData
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsApplications() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-
-// 	if conditionalAccessPolicy.GetConditions().GetApplications() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"excludeApplications":                         conditionalAccessPolicy.GetConditions().GetApplications().GetExcludeApplications(),
-// 		"includeApplications":                         conditionalAccessPolicy.GetConditions().GetApplications().GetIncludeApplications(),
-// 		"includeAuthenticationContextClassReferences": conditionalAccessPolicy.GetConditions().GetApplications().GetIncludeAuthenticationContextClassReferences(),
-// 		"includeUserActions":                          conditionalAccessPolicy.GetConditions().GetApplications().GetIncludeUserActions(),
-// 	}
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsClientAppTypes() []string {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetConditions().GetClientAppTypes()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsLocations() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-
-// 	if conditionalAccessPolicy.GetConditions().GetLocations() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"excludeLocations": conditionalAccessPolicy.GetConditions().GetLocations().GetExcludeLocations(),
-// 		"includeLocations": conditionalAccessPolicy.GetConditions().GetLocations().GetIncludeLocations(),
-// 	}
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsPlatforms() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-
-// 	if conditionalAccessPolicy.GetConditions().GetPlatforms() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"excludePlatforms": conditionalAccessPolicy.GetConditions().GetPlatforms().GetExcludePlatforms(),
-// 		"includePlatforms": conditionalAccessPolicy.GetConditions().GetPlatforms().GetIncludePlatforms(),
-// 	}
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsSignInRiskLevels() []string {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetConditions().GetSignInRiskLevels()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsUsers() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-
-// 	if conditionalAccessPolicy.GetConditions().GetUsers() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"excludeGroups": conditionalAccessPolicy.GetConditions().GetUsers().GetExcludeGroups(),
-// 		"excludeRoles":  conditionalAccessPolicy.GetConditions().GetUsers().GetExcludeRoles(),
-// 		"excludeUsers":  conditionalAccessPolicy.GetConditions().GetUsers().GetExcludeUsers(),
-// 		"includeGroups": conditionalAccessPolicy.GetConditions().GetUsers().GetIncludeGroups(),
-// 		"includeRoles":  conditionalAccessPolicy.GetConditions().GetUsers().GetIncludeRoles(),
-// 		"includeUsers":  conditionalAccessPolicy.GetConditions().GetUsers().GetIncludeUsers(),
-// 	}
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyConditionsUserRiskLevels() []string {
-// 	if conditionalAccessPolicy.GetConditions() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetConditions().GetUserRiskLevels()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyGrantControlsBuiltInControls() []string {
-// 	if conditionalAccessPolicy.GetGrantControls() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetGrantControls().GetBuiltInControls()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyGrantControlsCustomAuthenticationFactors() []string {
-// 	if conditionalAccessPolicy.GetGrantControls() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetGrantControls().GetCustomAuthenticationFactors()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyGrantControlsOperator() *string {
-// 	if conditionalAccessPolicy.GetGrantControls() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetGrantControls().GetOperator()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicyGrantControlsTermsOfUse() []string {
-// 	if conditionalAccessPolicy.GetGrantControls() == nil {
-// 		return nil
-// 	}
-// 	return conditionalAccessPolicy.GetGrantControls().GetTermsOfUse()
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicySessionControlsApplicationEnforcedRestrictions() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetSessionControls() == nil {
-// 		return nil
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetApplicationEnforcedRestrictions() == nil {
-// 		return nil
-// 	}
-
-// 	data := map[string]interface{}{}
-// 	if conditionalAccessPolicy.GetSessionControls().GetApplicationEnforcedRestrictions().GetIsEnabled() != nil {
-// 		data["isEnabled"] = conditionalAccessPolicy.GetSessionControls().GetApplicationEnforcedRestrictions().GetIsEnabled()
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetApplicationEnforcedRestrictions().GetType() != nil {
-// 		data["type"] = conditionalAccessPolicy.GetSessionControls().GetApplicationEnforcedRestrictions().GetType()
-// 	}
-// 	return data
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicySessionControlsCloudAppSecurity() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetSessionControls() == nil {
-// 		return nil
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetCloudAppSecurity() == nil {
-// 		return nil
-// 	}
-
-// 	data := map[string]interface{}{}
-// 	if conditionalAccessPolicy.GetSessionControls().GetCloudAppSecurity().GetIsEnabled() != nil {
-// 		data["isEnabled"] = conditionalAccessPolicy.GetSessionControls().GetCloudAppSecurity().GetIsEnabled()
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetCloudAppSecurity().GetCloudAppSecurityType() != nil {
-// 		data["cloudAppSecurityType"] = conditionalAccessPolicy.GetSessionControls().GetCloudAppSecurity().GetCloudAppSecurityType()
-// 	}
-// 	return data
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicySessionControlsPersistentBrowser() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetSessionControls() == nil {
-// 		return nil
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetPersistentBrowser() == nil {
-// 		return nil
-// 	}
-
-// 	data := map[string]interface{}{}
-// 	if conditionalAccessPolicy.GetSessionControls().GetPersistentBrowser().GetIsEnabled() != nil {
-// 		data["isEnabled"] = conditionalAccessPolicy.GetSessionControls().GetPersistentBrowser().GetIsEnabled()
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetPersistentBrowser().GetMode() != nil {
-// 		data["mode"] = conditionalAccessPolicy.GetSessionControls().GetPersistentBrowser().GetMode()
-// 	}
-// 	return data
-// }
-
-// func (conditionalAccessPolicy *ADConditionalAccessPolicyInfo) ConditionalAccessPolicySessionControlsSignInFrequency() map[string]interface{} {
-// 	if conditionalAccessPolicy.GetSessionControls() == nil {
-// 		return nil
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetSignInFrequency() == nil {
-// 		return nil
-// 	}
-
-// 	data := map[string]interface{}{}
-// 	if conditionalAccessPolicy.GetSessionControls().GetSignInFrequency().GetIsEnabled() != nil {
-// 		data["isEnabled"] = conditionalAccessPolicy.GetSessionControls().GetSignInFrequency().GetIsEnabled()
-// 	}
-// 	if conditionalAccessPolicy.GetSessionControls().GetSignInFrequency().GetValue() != nil {
-// 		data["value"] = conditionalAccessPolicy.GetSessionControls().GetSignInFrequency().GetValue()
-// 	}
-// 	return data
-// }
-
-// func (group *ADGroupInfo) GroupAssignedLabels() []map[string]*string {
-// 	if group.GetAssignedLabels() == nil {
-// 		return nil
-// 	}
-
-// 	assignedLabels := []map[string]*string{}
-// 	for _, i := range group.GetAssignedLabels() {
-// 		label := map[string]*string{
-// 			"labelId":     i.GetLabelId(),
-// 			"displayName": i.GetDisplayName(),
-// 		}
-// 		assignedLabels = append(assignedLabels, label)
-// 	}
-// 	return assignedLabels
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalAddIns() []map[string]interface{} {
-// 	if servicePrincipal.GetAddIns() == nil {
-// 		return nil
-// 	}
-
-// 	addIns := []map[string]interface{}{}
-// 	for _, p := range servicePrincipal.GetAddIns() {
-// 		addInData := map[string]interface{}{}
-// 		if p.GetId() != nil {
-// 			addInData["id"] = *p.GetId()
-// 		}
-// 		if p.GetType() != nil {
-// 			addInData["type"] = *p.GetType()
-// 		}
-
-// 		addInProperties := []map[string]interface{}{}
-// 		for _, k := range p.GetProperties() {
-// 			addInPropertyData := map[string]interface{}{}
-// 			if k.GetKey() != nil {
-// 				addInPropertyData["key"] = *k.GetKey()
-// 			}
-// 			if k.GetValue() != nil {
-// 				addInPropertyData["value"] = *k.GetValue()
-// 			}
-// 			addInProperties = append(addInProperties, addInPropertyData)
-// 		}
-// 		addInData["properties"] = addInProperties
-
-// 		addIns = append(addIns, addInData)
-// 	}
-// 	return addIns
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalAppRoles() []map[string]interface{} {
-// 	if servicePrincipal.GetAppRoles() == nil {
-// 		return nil
-// 	}
-
-// 	appRoles := []map[string]interface{}{}
-// 	for _, p := range servicePrincipal.GetAppRoles() {
-// 		appRoleData := map[string]interface{}{
-// 			"allowedMemberTypes": p.GetAllowedMemberTypes(),
-// 		}
-// 		if p.GetDescription() != nil {
-// 			appRoleData["description"] = *p.GetDescription()
-// 		}
-// 		if p.GetDisplayName() != nil {
-// 			appRoleData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetId() != nil {
-// 			appRoleData["id"] = *p.GetId()
-// 		}
-// 		if p.GetIsEnabled() != nil {
-// 			appRoleData["isEnabled"] = *p.GetIsEnabled()
-// 		}
-// 		if p.GetOrigin() != nil {
-// 			appRoleData["origin"] = *p.GetOrigin()
-// 		}
-// 		if p.GetValue() != nil {
-// 			appRoleData["value"] = *p.GetValue()
-// 		}
-// 		appRoles = append(appRoles, appRoleData)
-// 	}
-// 	return appRoles
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalInfo() map[string]interface{} {
-// 	if servicePrincipal.GetInfo() == nil {
-// 		return nil
-// 	}
-
-// 	return map[string]interface{}{
-// 		"logoUrl":             servicePrincipal.GetInfo().GetLogoUrl(),
-// 		"marketingUrl":        servicePrincipal.GetInfo().GetMarketingUrl(),
-// 		"privacyStatementUrl": servicePrincipal.GetInfo().GetPrivacyStatementUrl(),
-// 		"supportUrl":          servicePrincipal.GetInfo().GetSupportUrl(),
-// 		"termsOfServiceUrl":   servicePrincipal.GetInfo().GetTermsOfServiceUrl(),
-// 	}
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalKeyCredentials() []map[string]interface{} {
-// 	if servicePrincipal.GetKeyCredentials() == nil {
-// 		return nil
-// 	}
-
-// 	keyCredentials := []map[string]interface{}{}
-// 	for _, p := range servicePrincipal.GetKeyCredentials() {
-// 		keyCredentialData := map[string]interface{}{}
-// 		if p.GetDisplayName() != nil {
-// 			keyCredentialData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetEndDateTime() != nil {
-// 			keyCredentialData["endDateTime"] = *p.GetEndDateTime()
-// 		}
-// 		if p.GetKeyId() != nil {
-// 			keyCredentialData["keyId"] = *p.GetKeyId()
-// 		}
-// 		if p.GetStartDateTime() != nil {
-// 			keyCredentialData["startDateTime"] = *p.GetStartDateTime()
-// 		}
-// 		if p.GetType() != nil {
-// 			keyCredentialData["type"] = *p.GetType()
-// 		}
-// 		if p.GetUsage() != nil {
-// 			keyCredentialData["usage"] = *p.GetUsage()
-// 		}
-// 		if p.GetCustomKeyIdentifier() != nil {
-// 			keyCredentialData["customKeyIdentifier"] = p.GetCustomKeyIdentifier()
-// 		}
-// 		if p.GetKey() != nil {
-// 			keyCredentialData["key"] = p.GetKey()
-// 		}
-// 		keyCredentials = append(keyCredentials, keyCredentialData)
-// 	}
-// 	return keyCredentials
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalOauth2PermissionScopes() []map[string]interface{} {
-// 	if servicePrincipal.GetOauth2PermissionScopes() == nil {
-// 		return nil
-// 	}
-
-// 	oauth2PermissionScopes := []map[string]interface{}{}
-// 	for _, p := range servicePrincipal.GetOauth2PermissionScopes() {
-// 		data := map[string]interface{}{}
-// 		if p.GetAdminConsentDescription() != nil {
-// 			data["adminConsentDescription"] = *p.GetAdminConsentDescription()
-// 		}
-// 		if p.GetAdminConsentDisplayName() != nil {
-// 			data["adminConsentDisplayName"] = *p.GetAdminConsentDisplayName()
-// 		}
-// 		if p.GetId() != nil {
-// 			data["id"] = *p.GetId()
-// 		}
-// 		if p.GetIsEnabled() != nil {
-// 			data["isEnabled"] = *p.GetIsEnabled()
-// 		}
-// 		if p.GetType() != nil {
-// 			data["type"] = *p.GetType()
-// 		}
-// 		if p.GetOrigin() != nil {
-// 			data["origin"] = *p.GetOrigin()
-// 		}
-// 		if p.GetUserConsentDescription() != nil {
-// 			data["userConsentDescription"] = p.GetUserConsentDescription()
-// 		}
-// 		if p.GetUserConsentDisplayName() != nil {
-// 			data["userConsentDisplayName"] = p.GetUserConsentDisplayName()
-// 		}
-// 		if p.GetValue() != nil {
-// 			data["value"] = p.GetValue()
-// 		}
-// 		oauth2PermissionScopes = append(oauth2PermissionScopes, data)
-// 	}
-// 	return oauth2PermissionScopes
-// }
-
-// func (servicePrincipal *ADServicePrincipalInfo) ServicePrincipalPasswordCredentials() []map[string]interface{} {
-// 	if servicePrincipal.GetPasswordCredentials() == nil {
-// 		return nil
-// 	}
-
-// 	passwordCredentials := []map[string]interface{}{}
-// 	for _, p := range servicePrincipal.GetPasswordCredentials() {
-// 		passwordCredentialData := map[string]interface{}{}
-// 		if p.GetDisplayName() != nil {
-// 			passwordCredentialData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetHint() != nil {
-// 			passwordCredentialData["hint"] = *p.GetHint()
-// 		}
-// 		if p.GetSecretText() != nil {
-// 			passwordCredentialData["secretText"] = *p.GetSecretText()
-// 		}
-// 		if p.GetKeyId() != nil {
-// 			passwordCredentialData["keyId"] = *p.GetKeyId()
-// 		}
-// 		if p.GetEndDateTime() != nil {
-// 			passwordCredentialData["endDateTime"] = *p.GetEndDateTime()
-// 		}
-// 		if p.GetStartDateTime() != nil {
-// 			passwordCredentialData["startDateTime"] = *p.GetStartDateTime()
-// 		}
-// 		if p.GetCustomKeyIdentifier() != nil {
-// 			passwordCredentialData["customKeyIdentifier"] = p.GetCustomKeyIdentifier()
-// 		}
-// 		passwordCredentials = append(passwordCredentials, passwordCredentialData)
-// 	}
-// 	return passwordCredentials
-// }
-
-// func (signIn *ADSignInReportInfo) SignInAppliedConditionalAccessPolicies() []map[string]interface{} {
-// 	if signIn.GetAppliedConditionalAccessPolicies() == nil {
-// 		return nil
-// 	}
-
-// 	policies := []map[string]interface{}{}
-// 	for _, p := range signIn.GetAppliedConditionalAccessPolicies() {
-// 		policyData := map[string]interface{}{
-// 			"enforcedGrantControls":   p.GetEnforcedGrantControls(),
-// 			"enforcedSessionControls": p.GetEnforcedSessionControls(),
-// 		}
-// 		if p.GetDisplayName() != nil {
-// 			policyData["displayName"] = *p.GetDisplayName()
-// 		}
-// 		if p.GetId() != nil {
-// 			policyData["id"] = *p.GetId()
-// 		}
-// 		if p.GetResult() != nil {
-// 			policyData["result"] = p.GetResult()
-// 		}
-// 		policies = append(policies, policyData)
-// 	}
-
-// 	return policies
-// }
-
-// func (signIn *ADSignInReportInfo) SignInDeviceDetail() map[string]interface{} {
-// 	if signIn.GetDeviceDetail() == nil {
-// 		return nil
-// 	}
-
-// 	deviceDetailInfo := map[string]interface{}{}
-// 	if signIn.GetDeviceDetail().GetBrowser() != nil {
-// 		deviceDetailInfo["browser"] = *signIn.GetDeviceDetail().GetBrowser()
-// 	}
-// 	if signIn.GetDeviceDetail().GetDeviceId() != nil {
-// 		deviceDetailInfo["deviceId"] = *signIn.GetDeviceDetail().GetDeviceId()
-// 	}
-// 	if signIn.GetDeviceDetail().GetDisplayName() != nil {
-// 		deviceDetailInfo["displayName"] = *signIn.GetDeviceDetail().GetDisplayName()
-// 	}
-// 	if signIn.GetDeviceDetail().GetIsCompliant() != nil {
-// 		deviceDetailInfo["isCompliant"] = *signIn.GetDeviceDetail().GetIsCompliant()
-// 	}
-// 	if signIn.GetDeviceDetail().GetIsManaged() != nil {
-// 		deviceDetailInfo["isManaged"] = *signIn.GetDeviceDetail().GetIsManaged()
-// 	}
-// 	if signIn.GetDeviceDetail().GetOperatingSystem() != nil {
-// 		deviceDetailInfo["operatingSystem"] = *signIn.GetDeviceDetail().GetOperatingSystem()
-// 	}
-// 	if signIn.GetDeviceDetail().GetTrustType() != nil {
-// 		deviceDetailInfo["trustType"] = *signIn.GetDeviceDetail().GetTrustType()
-// 	}
-// 	return deviceDetailInfo
-// }
-
-// func (signIn *ADSignInReportInfo) SignInStatus() map[string]interface{} {
-// 	if signIn.GetStatus() == nil {
-// 		return nil
-// 	}
-
-// 	statusInfo := map[string]interface{}{}
-// 	if signIn.GetStatus().GetErrorCode() != nil {
-// 		statusInfo["errorCode"] = *signIn.GetStatus().GetErrorCode()
-// 	}
-// 	if signIn.GetStatus().GetFailureReason() != nil {
-// 		statusInfo["failureReason"] = *signIn.GetStatus().GetFailureReason()
-// 	}
-// 	if signIn.GetStatus().GetAdditionalDetails() != nil {
-// 		statusInfo["additionalDetails"] = *signIn.GetStatus().GetAdditionalDetails()
-// 	}
-// 	return statusInfo
-// }
-
-// func (signIn *ADSignInReportInfo) SignInLocation() map[string]interface{} {
-// 	if signIn.GetLocation() == nil {
-// 		return nil
-// 	}
-
-// 	locationInfo := map[string]interface{}{}
-// 	if signIn.GetLocation().GetCity() != nil {
-// 		locationInfo["city"] = *signIn.GetLocation().GetCity()
-// 	}
-// 	if signIn.GetLocation().GetCountryOrRegion() != nil {
-// 		locationInfo["countryOrRegion"] = *signIn.GetLocation().GetCountryOrRegion()
-// 	}
-// 	if signIn.GetLocation().GetState() != nil {
-// 		locationInfo["state"] = *signIn.GetLocation().GetState()
-// 	}
-// 	if signIn.GetLocation().GetGeoCoordinates() != nil {
-// 		coordinateInfo := map[string]interface{}{}
-// 		if signIn.GetLocation().GetGeoCoordinates().GetAltitude() != nil {
-// 			coordinateInfo["altitude"] = *signIn.GetLocation().GetGeoCoordinates().GetAltitude()
-// 		}
-// 		if signIn.GetLocation().GetGeoCoordinates().GetLatitude() != nil {
-// 			coordinateInfo["latitude"] = *signIn.GetLocation().GetGeoCoordinates().GetLatitude()
-// 		}
-// 		if signIn.GetLocation().GetGeoCoordinates().GetLongitude() != nil {
-// 			coordinateInfo["longitude"] = *signIn.GetLocation().GetGeoCoordinates().GetLongitude()
-// 		}
-// 		locationInfo["geoCoordinates"] = coordinateInfo
-// 	}
-// 	return locationInfo
-// }
-
-// func (user *ADUserInfo) UserMemberOf() []map[string]interface{} {
-// 	if user.GetMemberOf() == nil {
-// 		return nil
-// 	}
-
-// 	members := []map[string]interface{}{}
-// 	for _, i := range user.GetMemberOf() {
-// 		member := map[string]interface{}{
-// 			"@odata.type": i.GetType(),
-// 			"id":          i.GetId(),
-// 		}
-// 		members = append(members, member)
-// 	}
-// 	return members
-// }
-
-// func (user *ADUserInfo) UserPasswordProfile() map[string]interface{} {
-// 	if user.GetPasswordProfile() == nil {
-// 		return nil
-// 	}
-
-// 	passwordProfileData := map[string]interface{}{}
-// 	if user.GetPasswordProfile().GetForceChangePasswordNextSignIn() != nil {
-// 		passwordProfileData["forceChangePasswordNextSignIn"] = *user.GetPasswordProfile().GetForceChangePasswordNextSignIn()
-// 	}
-// 	if user.GetPasswordProfile().GetForceChangePasswordNextSignInWithMfa() != nil {
-// 		passwordProfileData["forceChangePasswordNextSignInWithMfa"] = *user.GetPasswordProfile().GetForceChangePasswordNextSignInWithMfa()
-// 	}
-// 	if user.GetPasswordProfile().GetPassword() != nil {
-// 		passwordProfileData["password"] = *user.GetPasswordProfile().GetPassword()
-// 	}
-
-// 	return passwordProfileData
-// }
+func (message *Office365MailMessageInfo) MessageAttachments() []map[string]interface{} {
+	if message.GetAttachments() == nil {
+		return nil
+	}
+
+	data := []map[string]interface{}{}
+	for _, i := range message.GetAttachments() {
+		attachmentInfo := map[string]interface{}{
+			"lastModifiedDateTime": i.GetLastModifiedDateTime(),
+		}
+		if i.GetName() != nil {
+			attachmentInfo["name"] = *i.GetName()
+		}
+		if i.GetContentType() != nil {
+			attachmentInfo["contentType"] = *i.GetContentType()
+		}
+		if i.GetIsInline() != nil {
+			attachmentInfo["isInline"] = *i.GetIsInline()
+		}
+		if i.GetSize() != nil {
+			attachmentInfo["size"] = *i.GetSize()
+		}
+		data = append(data, attachmentInfo)
+	}
+	return data
+}
+
+func (message *Office365MailMessageInfo) MessageBccRecipients() []map[string]interface{} {
+	if message.GetBccRecipients() == nil {
+		return nil
+	}
+
+	bccRecipients := []map[string]interface{}{}
+	for _, i := range message.GetBccRecipients() {
+		recipientInfo := map[string]interface{}{}
+		if i.GetEmailAddress() != nil {
+			addressInfo := map[string]interface{}{}
+			if i.GetEmailAddress().GetAddress() != nil {
+				addressInfo["address"] = i.GetEmailAddress().GetAddress()
+			}
+			if i.GetEmailAddress().GetName() != nil {
+				addressInfo["name"] = i.GetEmailAddress().GetName()
+			}
+			recipientInfo["emailAddress"] = addressInfo
+		}
+		bccRecipients = append(bccRecipients, recipientInfo)
+	}
+	return bccRecipients
+}
+
+func (message *Office365MailMessageInfo) MessageBody() map[string]interface{} {
+	if message.GetBody() == nil {
+		return nil
+	}
+
+	bodyInfo := map[string]interface{}{}
+	if message.GetBody().GetContent() != nil {
+		bodyInfo["content"] = *message.GetBody().GetContent()
+	}
+	if message.GetBody().GetContentType() != nil {
+		bodyInfo["contentType"] = message.GetBody().GetContentType().String()
+	}
+	return bodyInfo
+}
+
+func (message *Office365MailMessageInfo) MessageCcRecipients() []map[string]interface{} {
+	if message.GetCcRecipients() == nil {
+		return nil
+	}
+
+	ccRecipients := []map[string]interface{}{}
+	for _, i := range message.GetCcRecipients() {
+		recipientInfo := map[string]interface{}{}
+		if i.GetEmailAddress() != nil {
+			addressInfo := map[string]interface{}{}
+			if i.GetEmailAddress().GetAddress() != nil {
+				addressInfo["address"] = i.GetEmailAddress().GetAddress()
+			}
+			if i.GetEmailAddress().GetName() != nil {
+				addressInfo["name"] = i.GetEmailAddress().GetName()
+			}
+			recipientInfo["emailAddress"] = addressInfo
+		}
+		ccRecipients = append(ccRecipients, recipientInfo)
+	}
+	return ccRecipients
+}
+
+func (message *Office365MailMessageInfo) MessageFrom() map[string]interface{} {
+	if message.GetFrom() == nil {
+		return nil
+	}
+	fromInfo := map[string]interface{}{}
+	if message.GetFrom().GetEmailAddress() != nil {
+		addressInfo := map[string]interface{}{}
+		if message.GetFrom().GetEmailAddress().GetAddress() != nil {
+			addressInfo["address"] = message.GetFrom().GetEmailAddress().GetAddress()
+		}
+		if message.GetFrom().GetEmailAddress().GetName() != nil {
+			addressInfo["name"] = message.GetFrom().GetEmailAddress().GetName()
+		}
+		fromInfo["emailAddress"] = addressInfo
+	}
+	return fromInfo
+}
+
+func (message *Office365MailMessageInfo) MessageImportance() interface{} {
+	if message.GetImportance() == nil {
+		return nil
+	}
+	return message.GetImportance().String()
+}
+
+func (message *Office365MailMessageInfo) MessageInferenceClassification() interface{} {
+	if message.GetInferenceClassification() == nil {
+		return nil
+	}
+	return message.GetInferenceClassification().String()
+}
+
+func (message *Office365MailMessageInfo) MessageReplyTo() []map[string]interface{} {
+	if message.GetReplyTo() == nil {
+		return nil
+	}
+
+	data := []map[string]interface{}{}
+	for _, i := range message.GetReplyTo() {
+		replyToInfo := map[string]interface{}{}
+		if i.GetEmailAddress() != nil {
+			addressInfo := map[string]interface{}{}
+			if i.GetEmailAddress().GetAddress() != nil {
+				addressInfo["address"] = i.GetEmailAddress().GetAddress()
+			}
+			if i.GetEmailAddress().GetName() != nil {
+				addressInfo["name"] = i.GetEmailAddress().GetName()
+			}
+			replyToInfo["emailAddress"] = addressInfo
+		}
+		data = append(data, replyToInfo)
+	}
+	return data
+}
+
+func (message *Office365MailMessageInfo) MessageSender() map[string]interface{} {
+	if message.GetSender() == nil {
+		return nil
+	}
+	senderInfo := map[string]interface{}{}
+	if message.GetSender().GetEmailAddress() != nil {
+		addressInfo := map[string]interface{}{}
+		if message.GetSender().GetEmailAddress().GetAddress() != nil {
+			addressInfo["address"] = message.GetSender().GetEmailAddress().GetAddress()
+		}
+		if message.GetSender().GetEmailAddress().GetName() != nil {
+			addressInfo["name"] = message.GetSender().GetEmailAddress().GetName()
+		}
+		senderInfo["emailAddress"] = addressInfo
+	}
+	return senderInfo
+}
+
+func (message *Office365MailMessageInfo) MessageToRecipients() []map[string]interface{} {
+	if message.GetToRecipients() == nil {
+		return nil
+	}
+
+	recipients := []map[string]interface{}{}
+	for _, i := range message.GetToRecipients() {
+		recipientInfo := map[string]interface{}{}
+		if i.GetEmailAddress() != nil {
+			addressInfo := map[string]interface{}{}
+			if i.GetEmailAddress().GetAddress() != nil {
+				addressInfo["address"] = i.GetEmailAddress().GetAddress()
+			}
+			if i.GetEmailAddress().GetName() != nil {
+				addressInfo["name"] = i.GetEmailAddress().GetName()
+			}
+			recipientInfo["emailAddress"] = addressInfo
+		}
+		recipients = append(recipients, recipientInfo)
+	}
+	return recipients
+}
+
+func (team *Office365TeamInfo) TeamMembers() interface{} {
+	if team.GetSpecialization() == nil {
+		return nil
+	}
+	return team.GetSpecialization().String()
+}
+
+func (team *Office365TeamInfo) TeamSpecialization() interface{} {
+	if team.GetSpecialization() == nil {
+		return nil
+	}
+	return team.GetSpecialization().String()
+}
+
+func (team *Office365TeamInfo) TeamSummary() map[string]interface{} {
+	if team.GetSummary() == nil {
+		return nil
+	}
+
+	summary := map[string]interface{}{}
+	if team.GetSummary().GetGuestsCount() != nil {
+		summary["guests_count"] = *team.GetSummary().GetGuestsCount()
+	}
+	if team.GetSummary().GetMembersCount() != nil {
+		summary["members_count"] = *team.GetSummary().GetMembersCount()
+	}
+	if team.GetSummary().GetOwnersCount() != nil {
+		summary["owners_count"] = *team.GetSummary().GetOwnersCount()
+	}
+
+	return summary
+}
+
+func (team *Office365TeamInfo) TeamTemplate() map[string]interface{} {
+	if team.GetTemplate() == nil {
+		return nil
+	}
+
+	template := map[string]interface{}{}
+	if team.GetTemplate().GetId() != nil {
+		template["id"] = *team.GetTemplate().GetId()
+	}
+	if team.GetSummary().GetMembersCount() != nil {
+		template["type"] = *team.GetTemplate().GetType()
+	}
+
+	return template
+}
+
+func (team *Office365TeamInfo) TeamVisibility() interface{} {
+	if team.GetVisibility() == nil {
+		return nil
+	}
+	return team.GetVisibility().String()
+}

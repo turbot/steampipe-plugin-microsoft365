@@ -19,7 +19,11 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			Schema:      ConfigSchema,
 		},
 		TableMap: map[string]*plugin.Table{
-			"office365_calendar_my_events": tableOffice365CalendarMyEvents(),
+			"office365_calendar_event": tableOffice365CalendarEvent(),
+			"office365_drive":          tableOffice365Drive(),
+			"office365_drive_file":    tableOffice365DriveFiles(),
+			"office365_mail_message":   tableOffice365MailMessage(),
+			"office365_team":           tableOffice365CTeam(),
 		},
 	}
 

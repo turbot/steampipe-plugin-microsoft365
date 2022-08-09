@@ -15,16 +15,21 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365CalendarMyEvents() *plugin.Table {
+func tableOffice365CalendarEvent() *plugin.Table {
 	return &plugin.Table{
-		Name:        "office365_calendar_my_events",
+		Name:        "office365_calendar_event",
 		Description: "",
 		List: &plugin.ListConfig{
-			Hydrate: listOffice365CalendarMyEvents,
+			Hydrate:    listOffice365CalendarEvents,
+			KeyColumns: plugin.SingleColumn("user_identifier"),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound", "UnsupportedQueryOption"}),
+			},
 		},
 
 		Columns: []*plugin.Column{
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
+			{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
 			{Name: "subject", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetSubject")},
 			{Name: "online_meeting_url", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetOnlineMeetingUrl")},
 			{Name: "is_all_day", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsAllDay")},
@@ -78,14 +83,15 @@ func tableOffice365CalendarMyEvents() *plugin.Table {
 
 //// LIST FUNCTION
 
-func listOffice365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %v", err)
 	}
 
-	result, err := client.Me().Events().Get()
+	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+	result, err := client.UsersById(userIdentifier).Events().Get()
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

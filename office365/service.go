@@ -188,10 +188,18 @@ func GetGraphClient(ctx context.Context, d *plugin.QueryData) (*msgraphsdkgo.Gra
 				},
 			},
 		)
+		if err != nil {
+			logger.Error("GetGraphClient", "client_certificate_credential_error", err)
+			return nil, nil, err
+		}
 	} else if enableMsi { // Managed identity authentication
 		cred, err = azidentity.NewManagedIdentityCredential(
 			&azidentity.ManagedIdentityCredentialOptions{},
 		)
+		if err != nil {
+			logger.Error("GetGraphClient", "managed_identity_credential_error", err)
+			return nil, nil, err
+		}
 	}
 
 	auth, err := a.NewAzureIdentityAuthenticationProvider(cred)
