@@ -16,7 +16,7 @@ select
 from
   office365_mail_message
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
 order by created_date_time
 limit 10;
 ```
@@ -31,7 +31,7 @@ select
 from
   office365_mail_message
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and not is_read
 order by created_date_time;
 ```
@@ -46,7 +46,7 @@ select
 from
   office365_mail_message
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and filter = 'importance eq ''high'''
 order by created_date_time;
 ```
@@ -61,7 +61,7 @@ select
 from
   office365_mail_message
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and filter = '(from/emailAddress/address) eq ''subhajit@turbot.com'''
 order by created_date_time;
 ```
@@ -76,7 +76,7 @@ select
 from
   office365_mail_message
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and is_draft
 order by created_date_time;
 ```

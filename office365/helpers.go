@@ -6,6 +6,10 @@ type Office365CalendarEventInfo struct {
 	models.Eventable
 }
 
+type Office365ContactInfo struct {
+	models.Contactable
+}
+
 type Office365DriveInfo struct {
 	models.Driveable
 }
@@ -27,6 +31,101 @@ type Office365TeamInfo struct {
 type Office365TeamChannelInfo struct {
 	models.Channelable
 	TeamID string
+}
+
+func (contact *Office365ContactInfo) ContactBusinessAddress() map[string]interface{} {
+	if contact.GetBusinessAddress() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if contact.GetBusinessAddress().GetCity() != nil {
+		data["city"] = *contact.GetBusinessAddress().GetCity()
+	}
+	if contact.GetBusinessAddress().GetCountryOrRegion() != nil {
+		data["countryOrRegion"] = *contact.GetBusinessAddress().GetCountryOrRegion()
+	}
+	if contact.GetBusinessAddress().GetPostalCode() != nil {
+		data["postalCode"] = *contact.GetBusinessAddress().GetPostalCode()
+	}
+	if contact.GetBusinessAddress().GetState() != nil {
+		data["state"] = *contact.GetBusinessAddress().GetState()
+	}
+	if contact.GetBusinessAddress().GetStreet() != nil {
+		data["street"] = *contact.GetBusinessAddress().GetStreet()
+	}
+
+	return data
+}
+
+func (contact *Office365ContactInfo) ContactHomeAddress() map[string]interface{} {
+	if contact.GetHomeAddress() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if contact.GetHomeAddress().GetCity() != nil {
+		data["city"] = *contact.GetHomeAddress().GetCity()
+	}
+	if contact.GetHomeAddress().GetCountryOrRegion() != nil {
+		data["countryOrRegion"] = *contact.GetHomeAddress().GetCountryOrRegion()
+	}
+	if contact.GetHomeAddress().GetPostalCode() != nil {
+		data["postalCode"] = *contact.GetHomeAddress().GetPostalCode()
+	}
+	if contact.GetHomeAddress().GetState() != nil {
+		data["state"] = *contact.GetHomeAddress().GetState()
+	}
+	if contact.GetHomeAddress().GetStreet() != nil {
+		data["street"] = *contact.GetHomeAddress().GetStreet()
+	}
+
+	return data
+}
+
+func (contact *Office365ContactInfo) ContactOtherAddress() map[string]interface{} {
+	if contact.GetOtherAddress() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if contact.GetOtherAddress().GetCity() != nil {
+		data["city"] = *contact.GetOtherAddress().GetCity()
+	}
+	if contact.GetOtherAddress().GetCountryOrRegion() != nil {
+		data["countryOrRegion"] = *contact.GetOtherAddress().GetCountryOrRegion()
+	}
+	if contact.GetOtherAddress().GetPostalCode() != nil {
+		data["postalCode"] = *contact.GetOtherAddress().GetPostalCode()
+	}
+	if contact.GetOtherAddress().GetState() != nil {
+		data["state"] = *contact.GetOtherAddress().GetState()
+	}
+	if contact.GetOtherAddress().GetStreet() != nil {
+		data["street"] = *contact.GetOtherAddress().GetStreet()
+	}
+
+	return data
+}
+
+func (contact *Office365ContactInfo) ContactEmailAddresses() []map[string]interface{} {
+	if contact.GetEmailAddresses() == nil {
+		return nil
+	}
+
+	contacts := []map[string]interface{}{}
+	for _, c := range contact.GetEmailAddresses() {
+		data := map[string]interface{}{}
+		if c.GetAddress() != nil {
+			data["address"] = *c.GetAddress()
+		}
+		if c.GetName() != nil {
+			data["name"] = *c.GetName()
+		}
+		contacts = append(contacts, data)
+	}
+
+	return contacts
 }
 
 func (driveItem *Office365DriveItemInfo) DriveItemCreatedBy() map[string]interface{} {
@@ -823,4 +922,3 @@ func (team *Office365TeamChannelInfo) TeamChannelMembershipType() interface{} {
 	}
 	return team.GetMembershipType().String()
 }
-

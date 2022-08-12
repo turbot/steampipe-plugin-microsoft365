@@ -17,7 +17,7 @@ select
 from
   office365_calendar_event
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
 order by start_time
 limit 10;
 ```
@@ -33,7 +33,7 @@ select
 from
   office365_calendar_event
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and start_time >= current_date
   and end_time <= (current_date + interval '4 days')
 order by start_time;
@@ -50,7 +50,7 @@ select
 from
   office365_calendar_event
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and start_time >= date_trunc('month', current_date)
   and end_time <= date_trunc('month', current_date) + interval '1 month'
 order by start_time;
@@ -67,7 +67,7 @@ select
 from
   office365_calendar_event
 where
-  user_identifier = 'steampipe@turbotoffice.onmicrosoft.com'
+  user_identifier = 'test@org.onmicrosoft.com'
   and start_time >= date_trunc('week', current_date)
   and end_time < (date_trunc('week', current_date) + interval '7 days')
 order by start_time;
