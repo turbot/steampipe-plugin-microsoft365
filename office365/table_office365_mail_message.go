@@ -18,7 +18,7 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365MailMessage() *plugin.Table {
+func tableOffice365MailMessage(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_mail_message",
 		Description: "",

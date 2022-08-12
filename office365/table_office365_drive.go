@@ -15,7 +15,7 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365Drive() *plugin.Table {
+func tableOffice365Drive(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_drive",
 		Description: "",

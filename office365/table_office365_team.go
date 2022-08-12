@@ -8,6 +8,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
+	"github.com/microsoftgraph/msgraph-sdk-go/groups/item/members"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
@@ -15,7 +16,7 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365CTeam() *plugin.Table {
+func tableOffice365CTeam(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_team",
 		Description: "",
@@ -43,7 +44,7 @@ func tableOffice365CTeam() *plugin.Table {
 			{Name: "specialization", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamSpecialization")},
 
 			// JSON fields
-			// {Name: "members", Type: proto.ColumnType_JSON, Description: "", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
+			{Name: "members", Type: proto.ColumnType_JSON, Description: "", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
 			{Name: "summary", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamSummary")},
 			{Name: "template", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamTemplate")},
 
@@ -105,43 +106,44 @@ func listOffice365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, fmt.Errorf("error creating client: %v", err)
 	}
 
-	var members []map[string]interface{}
-	result, err := client.UsersById(data.UserIdentifier).JoinedTeamsById(*teamID).Members().Get()
+	headers := map[string]string{
+		"ConsistencyLevel": "eventual",
+	}
+
+	includeCount := true
+	requestParameters := &members.MembersRequestBuilderGetQueryParameters{
+		Count: &includeCount,
+	}
+
+	config := &members.MembersRequestBuilderGetRequestConfiguration{
+		Headers:         headers,
+		QueryParameters: requestParameters,
+	}
+
+	memberIds := []*string{}
+	members, err := client.GroupsById(*teamID).Members().GetWithRequestConfigurationAndResponseHandler(config, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
+		plugin.Logger(ctx).Error("listOffice365TeamMembers", "get_team_members_error", errObj)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateConversationMemberCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator(members, adapter, models.CreateDirectoryObjectCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		plugin.Logger(ctx).Error("office365_teams.listOffice365TeamMembers", "create_iterator_instance_error", err)
+		plugin.Logger(ctx).Error("listOffice365TeamMembers", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
-		member := pageItem.(models.ConversationMemberable)
+		member := pageItem.(models.DirectoryObjectable)
+		memberIds = append(memberIds, member.GetId())
 
-		data := map[string]interface{}{
-			"roles": member.GetRoles(),
-		}
-		if member.GetDisplayName() != nil {
-			data["displayName"] = *member.GetDisplayName()
-		}
-		if member.GetId() != nil {
-			data["id"] = *member.GetId()
-		}
-		if member.GetVisibleHistoryStartDateTime() != nil {
-			data["visibleHistoryStartDateTime"] = *member.GetVisibleHistoryStartDateTime()
-		}
-		members = append(members, data)
-
-		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return true
 	})
 	if err != nil {
-		plugin.Logger(ctx).Error("office365_teams.listOffice365TeamMembers", "paging_error", err)
+		plugin.Logger(ctx).Error("listOffice365TeamMembers", "paging_error", err)
 		return nil, err
 	}
 
-	return members, nil
+	return memberIds, nil
 }

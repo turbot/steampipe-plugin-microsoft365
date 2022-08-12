@@ -15,14 +15,14 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365DriveFiles() *plugin.Table {
+func tableOffice365DriveFile(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_drive_file",
 		Description: "",
 		List: &plugin.ListConfig{
-			Hydrate: listOffice365DriveFiles,
-			// ParentHydrate: listOffice365Drives,
-			KeyColumns: plugin.SingleColumn("user_identifier"),
+			Hydrate:       listOffice365DriveFiles,
+			ParentHydrate: listOffice365Drives,
+			KeyColumns:    plugin.SingleColumn("user_identifier"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -57,15 +57,14 @@ func tableOffice365DriveFiles() *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
-	// driveData := h.Item.(*Office365DriveInfo)
+	driveData := h.Item.(*Office365DriveInfo)
 
-	// var driveID string
-	// if driveData != nil {
-	// 	driveID = *driveData.GetId()
-	// }
+	var driveID string
+	if driveData != nil {
+		driveID = *driveData.GetId()
+	}
 
 	logger := plugin.Logger(ctx)
-	driveID := "b!9Gsmy9eA9UueQZNqu5gVXeJOR1WJQBhNnG6bef2-YkjFaNz_gf8ERI4H7WKA3uv4"
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
@@ -89,7 +88,7 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		item := pageItem.(models.DriveItemable)
 
-		d.StreamListItem(ctx, &Office365DriveItemInfo{item, driveID})
+		d.StreamLeafListItem(ctx, &Office365DriveItemInfo{item, driveID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

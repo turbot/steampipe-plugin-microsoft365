@@ -9,7 +9,7 @@ require (
 	github.com/microsoft/kiota-authentication-azure-go v0.3.1
 	github.com/microsoftgraph/msgraph-sdk-go v0.30.0
 	github.com/microsoftgraph/msgraph-sdk-go-core v0.26.2
-	github.com/turbot/steampipe-plugin-sdk/v4 v4.0.1-rc.0
+	github.com/turbot/steampipe-plugin-sdk/v4 v4.0.1
 )
 
 require (

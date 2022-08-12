@@ -24,6 +24,11 @@ type Office365TeamInfo struct {
 	UserIdentifier string
 }
 
+type Office365TeamChannelInfo struct {
+	models.Channelable
+	TeamID string
+}
+
 func (driveItem *Office365DriveItemInfo) DriveItemCreatedBy() map[string]interface{} {
 	if driveItem.GetCreatedBy() == nil {
 		return nil
@@ -811,3 +816,11 @@ func (team *Office365TeamInfo) TeamVisibility() interface{} {
 	}
 	return team.GetVisibility().String()
 }
+
+func (team *Office365TeamChannelInfo) TeamChannelMembershipType() interface{} {
+	if team.GetMembershipType() == nil {
+		return nil
+	}
+	return team.GetMembershipType().String()
+}
+

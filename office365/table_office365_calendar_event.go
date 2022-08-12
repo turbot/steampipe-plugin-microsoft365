@@ -16,7 +16,7 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365CalendarEvent() *plugin.Table {
+func tableOffice365CalendarEvent(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_calendar_event",
 		Description: "",
