@@ -14,9 +14,36 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
+func teamColumns() []*plugin.Column {
+	return []*plugin.Column{
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
+		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "description", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDescription")},
+		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetInternalId")},
+		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsArchived")},
+
+		// Other fields
+		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
+		{Name: "classification", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetClassification")},
+		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebUrl")},
+		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamVisibility")},
+		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamSpecialization")},
+
+		// JSON fields
+		{Name: "members", Type: proto.ColumnType_JSON, Description: "", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
+		{Name: "summary", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamSummary")},
+		{Name: "template", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamTemplate")},
+
+		// Standard columns
+		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Transform: transform.FromMethod("GetTenantId")},
+	}
+}
+
 //// TABLE DEFINITION
 
-func tableOffice365CTeam(_ context.Context) *plugin.Table {
+func tableOffice365Team(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_team",
 		Description: "",
@@ -27,31 +54,7 @@ func tableOffice365CTeam(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
-
-		Columns: []*plugin.Column{
-			{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
-			{Name: "display_name", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDisplayName")},
-			{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
-			{Name: "description", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDescription")},
-			{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetInternalId")},
-			{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsArchived")},
-
-			// Other fields
-			{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
-			{Name: "classification", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetClassification")},
-			{Name: "web_url", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebUrl")},
-			{Name: "visibility", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamVisibility")},
-			{Name: "specialization", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamSpecialization")},
-
-			// JSON fields
-			{Name: "members", Type: proto.ColumnType_JSON, Description: "", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
-			{Name: "summary", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamSummary")},
-			{Name: "template", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamTemplate")},
-
-			// Standard columns
-			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
-			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Transform: transform.FromMethod("GetTenantId")},
-		},
+		Columns: teamColumns(),
 	}
 }
 

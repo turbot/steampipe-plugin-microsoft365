@@ -13,6 +13,22 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
+func driveColumns() []*plugin.Column {
+	return []*plugin.Column{
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the drive.", Transform: transform.FromMethod("GetId")},
+		{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the item.", Transform: transform.FromMethod("GetName")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "drive_type", Type: proto.ColumnType_STRING, Description: "Describes the type of drive represented by this resource. OneDrive personal drives will return personal. OneDrive for Business will return business. SharePoint document libraries will return documentLibrary.", Transform: transform.FromMethod("GetDriveType")},
+		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "URL that displays the resource in the browser.", Transform: transform.FromMethod("GetWebUrl")},
+		{Name: "description", Type: proto.ColumnType_STRING, Description: "Provide a user-visible description of the drive.", Transform: transform.FromMethod("GetDescription")},
+		{Name: "etag", Type: proto.ColumnType_STRING, Description: "Specifies the eTag.", Transform: transform.FromMethod("GetETag")},
+
+		// Standard columns
+		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
+		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+	}
+}
+
 //// TABLE DEFINITION
 
 func tableOffice365Drive(_ context.Context) *plugin.Table {
@@ -26,20 +42,7 @@ func tableOffice365Drive(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
-
-		Columns: []*plugin.Column{
-			{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
-			{Name: "name", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetName")},
-			{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
-			{Name: "drive_type", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDriveType")},
-			{Name: "web_url", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebUrl")},
-			{Name: "description", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDescription")},
-			{Name: "etag", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetETag")},
-
-			// Standard columns
-			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		},
+		Columns: driveColumns(),
 	}
 }
 

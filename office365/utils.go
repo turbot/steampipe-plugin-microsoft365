@@ -35,3 +35,14 @@ func getTenant(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 
 	return tenantID, nil
 }
+
+func getUserFromConfig(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) string {
+	var userIdentifier string
+
+	office365Config := GetConfig(d.Connection)
+	if office365Config.UserIdentifier != nil {
+		userIdentifier = *office365Config.UserIdentifier
+	}
+
+	return userIdentifier
+}

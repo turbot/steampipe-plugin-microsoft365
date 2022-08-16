@@ -16,6 +16,51 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
+func mailMessageColumns() []*plugin.Column {
+	return []*plugin.Column{
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the message.", Transform: transform.FromMethod("GetId")},
+		{Name: "subject", Type: proto.ColumnType_STRING, Description: "The subject of the message.", Transform: transform.FromMethod("GetSubject")},
+		{Name: "body_preview", Type: proto.ColumnType_STRING, Description: "The first 255 characters of the message body in text format.", Transform: transform.FromMethod("GetBodyPreview")},
+		{Name: "is_read", Type: proto.ColumnType_BOOL, Description: "Indicates whether the message has been read.", Transform: transform.FromMethod("GetIsRead")},
+		{Name: "has_attachments", Type: proto.ColumnType_BOOL, Description: "Indicates whether the message has attachments.", Transform: transform.FromMethod("GetHasAttachments")},
+		{Name: "is_draft", Type: proto.ColumnType_BOOL, Description: "Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet.", Transform: transform.FromMethod("GetIsDraft")},
+		{Name: "received_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the message was received.", Transform: transform.FromMethod("GetReceivedDateTime")},
+		{Name: "sent_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the message was sent.", Transform: transform.FromMethod("GetSentDateTime")},
+
+		// Other columns
+		{Name: "importance", Type: proto.ColumnType_STRING, Description: "The importance of the message. The possible values are: low, normal, and high.", Transform: transform.FromMethod("MessageImportance")},
+		{Name: "inference_classification", Type: proto.ColumnType_STRING, Description: "The classification of the message for the user, based on inferred relevance or importance, or on an explicit override. The possible values are: focused or other.", Transform: transform.FromMethod("MessageInferenceClassification")},
+		{Name: "change_key", Type: proto.ColumnType_STRING, Description: "The version of the message.", Transform: transform.FromMethod("GetChangeKey")},
+		{Name: "conversation_id", Type: proto.ColumnType_STRING, Description: "The ID of the conversation the email belongs to.", Transform: transform.FromMethod("GetConversationId")},
+		{Name: "internet_message_id", Type: proto.ColumnType_STRING, Description: "The message ID in the format specified by RFC2822.", Transform: transform.FromMethod("GetInternetMessageId")},
+		{Name: "is_read_receipt_requested", Type: proto.ColumnType_BOOL, Description: "Indicates whether a read receipt is requested for the message.", Transform: transform.FromMethod("GetIsReadReceiptRequested")},
+		{Name: "is_delivery_receipt_requested", Type: proto.ColumnType_BOOL, Description: "Indicates whether a read receipt is requested for the message.", Transform: transform.FromMethod("GetIsDeliveryReceiptRequested")},
+		{Name: "parent_folder_id", Type: proto.ColumnType_STRING, Description: "The unique identifier for the message's parent mailFolder.", Transform: transform.FromMethod("GetParentFolderId")},
+
+		// Other fields
+		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
+		{Name: "last_modified_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetLastModifiedDateTime")},
+		{Name: "web_link", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebLink")},
+
+		// JSON fields
+		{Name: "sender", Type: proto.ColumnType_JSON, Description: "The date and time the message was created.", Transform: transform.FromMethod("MessageSender")},
+		{Name: "from", Type: proto.ColumnType_JSON, Description: "The owner of the mailbox from which the message is sent.", Transform: transform.FromMethod("MessageFrom")},
+		{Name: "body", Type: proto.ColumnType_JSON, Description: "The body of the message. It can be in HTML or text format.", Transform: transform.FromMethod("MessageBody")},
+		{Name: "categories", Type: proto.ColumnType_JSON, Description: "The categories associated with the message.", Transform: transform.FromMethod("GetCategories")},
+		{Name: "reply_to", Type: proto.ColumnType_JSON, Description: "The email addresses to use when replying.", Transform: transform.FromMethod("MessageReplyTo")},
+		{Name: "to_recipients", Type: proto.ColumnType_JSON, Description: "The To: recipients for the message.", Transform: transform.FromMethod("MessageToRecipients")},
+		{Name: "attachments", Type: proto.ColumnType_JSON, Description: "The attachments of the message.", Transform: transform.FromMethod("MessageAttachments")},
+		{Name: "bcc_recipients", Type: proto.ColumnType_JSON, Description: "The Bcc: recipients for the message.", Transform: transform.FromMethod("MessageBccRecipients")},
+		{Name: "cc_recipients", Type: proto.ColumnType_JSON, Description: "The Cc: recipients for the message.", Transform: transform.FromMethod("MessageCcRecipients")},
+
+		// Standard columns
+		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
+		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+	}
+}
+
 //// TABLE DEFINITION
 
 func tableOffice365MailMessage(_ context.Context) *plugin.Table {
@@ -39,49 +84,7 @@ func tableOffice365MailMessage(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
-
-		Columns: []*plugin.Column{
-			{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
-			{Name: "subject", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetSubject")},
-			{Name: "body_preview", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetBodyPreview")},
-			{Name: "is_read", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsRead")},
-			{Name: "has_attachments", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetHasAttachments")},
-			{Name: "is_draft", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsDraft")},
-			{Name: "received_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetReceivedDateTime")},
-			{Name: "sent_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetSentDateTime")},
-
-			// Other columns
-			{Name: "importance", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("MessageImportance")},
-			{Name: "inference_classification", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("MessageInferenceClassification")},
-			{Name: "change_key", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetChangeKey")},
-			{Name: "conversation_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetConversationId")},
-			{Name: "internet_message_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetInternetMessageId")},
-			{Name: "is_read_receipt_requested", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsReadReceiptRequested")},
-			{Name: "is_delivery_receipt_requested", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsDeliveryReceiptRequested")},
-			{Name: "parent_folder_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetParentFolderId")},
-
-			// Other fields
-			{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
-			{Name: "last_modified_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetLastModifiedDateTime")},
-			{Name: "web_link", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebLink")},
-
-			// JSON fields
-			{Name: "sender", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageSender")},
-			{Name: "from", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageFrom")},
-			{Name: "body", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageBody")},
-			{Name: "categories", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("GetCategories")},
-			{Name: "reply_to", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageReplyTo")},
-			{Name: "to_recipients", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageToRecipients")},
-			{Name: "attachments", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageAttachments")},
-			{Name: "bcc_recipients", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageBccRecipients")},
-			{Name: "cc_recipients", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("MessageCcRecipients")},
-
-			// Standard columns
-			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
-			{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
-			{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
-			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		},
+		Columns: mailMessageColumns(),
 	}
 }
 

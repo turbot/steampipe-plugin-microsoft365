@@ -14,6 +14,7 @@ type office365Config struct {
 	EnableMsi           *bool   `cty:"enable_msi"`
 	MsiEndpoint         *string `cty:"msi_endpoint"`
 	Environment         *string `cty:"environment"`
+	UserIdentifier      *string `cty:"user_identifier"`
 }
 
 var ConfigSchema = map[string]*schema.Attribute{
@@ -39,6 +40,9 @@ var ConfigSchema = map[string]*schema.Attribute{
 		Type: schema.TypeBool,
 	},
 	"msi_endpoint": {
+		Type: schema.TypeString,
+	},
+	"user_identifier": {
 		Type: schema.TypeString,
 	},
 }
