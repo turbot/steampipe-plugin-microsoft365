@@ -17,7 +17,7 @@ import (
 func tableOffice365MailMyMessage(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_mail_my_message",
-		Description: "",
+		Description: "Retrieves messages in the specified user's mailbox.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365MailMyMessages,
 			KeyColumns: plugin.KeyColumnSlice{

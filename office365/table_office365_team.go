@@ -16,24 +16,24 @@ import (
 
 func teamColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetId")},
-		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromMethod("GetId")},
+		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
-		{Name: "description", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetDescription")},
-		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetInternalId")},
-		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "", Transform: transform.FromMethod("GetIsArchived")},
+		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Transform: transform.FromMethod("GetDescription")},
+		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "A unique ID for the team that has been used in a few places such as the audit log/Office 365 Management Activity API.", Transform: transform.FromMethod("GetInternalId")},
+		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "True if this team is in read-only mode.", Transform: transform.FromMethod("GetIsArchived")},
 
 		// Other fields
-		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "", Transform: transform.FromMethod("GetCreatedDateTime")},
-		{Name: "classification", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetClassification")},
-		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("GetWebUrl")},
-		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamVisibility")},
-		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromMethod("TeamSpecialization")},
+		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "Date and time when the team was created.", Transform: transform.FromMethod("GetCreatedDateTime")},
+		{Name: "classification", Type: proto.ColumnType_STRING, Description: "An optional label. Typically describes the data or business sensitivity of the team. Must match one of a pre-configured set in the tenant's directory.", Transform: transform.FromMethod("GetClassification")},
+		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "A hyperlink that will go to the team in the Microsoft Teams client.", Transform: transform.FromMethod("GetWebUrl")},
+		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The visibility of the group and team. Defaults to Public.", Transform: transform.FromMethod("TeamVisibility")},
+		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "Indicates whether the team is intended for a particular use case. Each team specialization has access to unique behaviors and experiences targeted to its use case.", Transform: transform.FromMethod("TeamSpecialization")},
 
 		// JSON fields
-		{Name: "members", Type: proto.ColumnType_JSON, Description: "", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
-		{Name: "summary", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamSummary")},
-		{Name: "template", Type: proto.ColumnType_JSON, Description: "", Transform: transform.FromMethod("TeamTemplate")},
+		{Name: "members", Type: proto.ColumnType_JSON, Description: "Members and owners of the team.", Hydrate: listOffice365TeamMembers, Transform: transform.FromValue()},
+		{Name: "summary", Type: proto.ColumnType_JSON, Description: "Specifies the team's summary.", Transform: transform.FromMethod("TeamSummary")},
+		{Name: "template", Type: proto.ColumnType_JSON, Description: "The template this team was created from.", Transform: transform.FromMethod("TeamTemplate")},
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
@@ -46,7 +46,7 @@ func teamColumns() []*plugin.Column {
 func tableOffice365Team(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_team",
-		Description: "",
+		Description: "Retrieves the teams that the specified user is a direct member of.",
 		List: &plugin.ListConfig{
 			Hydrate:    listOffice365Teams,
 			KeyColumns: plugin.SingleColumn("user_identifier"),

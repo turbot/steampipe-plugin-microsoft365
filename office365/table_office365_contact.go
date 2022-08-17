@@ -66,7 +66,7 @@ func contactColumns() []*plugin.Column {
 func tableOffice365Contact(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_contact",
-		Description: "",
+		Description: "Contacts owned by the specified user.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365Contacts,
 			KeyColumns: plugin.KeyColumnSlice{

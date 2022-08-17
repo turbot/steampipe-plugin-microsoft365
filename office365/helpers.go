@@ -200,6 +200,13 @@ func (driveItem *Office365DriveItemInfo) DriveItemFile() map[string]interface{} 
 	return data
 }
 
+func (driveItem *Office365DriveItemInfo) DriveItemFilePath() string {
+	if driveItem.GetParentReference() != nil && driveItem.GetParentReference().GetPath() != nil {
+		return *driveItem.GetParentReference().GetPath()
+	}
+	return ""
+}
+
 func (driveItem *Office365DriveItemInfo) DriveItemLastModifiedBy() map[string]interface{} {
 	if driveItem.GetLastModifiedBy() == nil {
 		return nil
@@ -395,8 +402,8 @@ func (event *Office365CalendarEventInfo) EventLocation() map[string]interface{} 
 	if event.GetLocation().GetLocationUri() != nil {
 		locationInfo["locationUri"] = *event.GetLocation().GetLocationUri()
 	}
-	if event.GetLocation().GetType() != nil {
-		locationInfo["type"] = *event.GetLocation().GetType()
+	if event.GetLocation().GetOdataType() != nil {
+		locationInfo["@odata_type"] = *event.GetLocation().GetOdataType()
 	}
 	if event.GetLocation().GetUniqueId() != nil {
 		locationInfo["uniqueId"] = *event.GetLocation().GetUniqueId()
@@ -471,8 +478,8 @@ func (event *Office365CalendarEventInfo) EventLocations() []map[string]interface
 		if l.GetLocationUri() != nil {
 			locationInfo["locationUri"] = *l.GetLocationUri()
 		}
-		if l.GetType() != nil {
-			locationInfo["type"] = *l.GetType()
+		if l.GetOdataType() != nil {
+			locationInfo["@odata_type"] = *l.GetOdataType()
 		}
 		if l.GetUniqueId() != nil {
 			locationInfo["uniqueId"] = *l.GetUniqueId()
@@ -575,8 +582,8 @@ func (event *Office365CalendarEventInfo) EventOrganizer() map[string]interface{}
 	}
 
 	organizerInfo := map[string]interface{}{}
-	if event.GetOrganizer().GetType() != nil {
-		organizerInfo["type"] = *event.GetOrganizer().GetType()
+	if event.GetOrganizer().GetOdataType() != nil {
+		organizerInfo["@odata_type"] = *event.GetOrganizer().GetOdataType()
 	}
 
 	if event.GetOrganizer().GetEmailAddress() != nil {
@@ -902,8 +909,8 @@ func (team *Office365TeamInfo) TeamTemplate() map[string]interface{} {
 	if team.GetTemplate().GetId() != nil {
 		template["id"] = *team.GetTemplate().GetId()
 	}
-	if team.GetSummary().GetMembersCount() != nil {
-		template["type"] = *team.GetTemplate().GetType()
+	if team.GetTemplate().GetOdataType() != nil {
+		template["@odata_type"] = *team.GetTemplate().GetOdataType()
 	}
 
 	return template

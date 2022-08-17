@@ -74,7 +74,7 @@ func calendarEventColumns() []*plugin.Column {
 func tableOffice365CalendarEvent(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_calendar_event",
-		Description: "",
+		Description: "Events scheduled on the specified calendar.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365CalendarEvents,
 			KeyColumns: []*plugin.KeyColumn{

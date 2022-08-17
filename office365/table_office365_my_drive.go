@@ -15,7 +15,7 @@ import (
 func tableOffice365MyDrive(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_my_drive",
-		Description: "",
+		Description: "Drives defined user's shared drives in the Google Drive.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365MyDrives,
 			IgnoreConfig: &plugin.IgnoreConfig{

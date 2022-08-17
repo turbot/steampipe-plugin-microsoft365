@@ -15,7 +15,7 @@ import (
 func tableOffice365MyDriveFile(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_my_drive_file",
-		Description: "",
+		Description: "Retrieves file's metadata or content owned by an user.",
 		List: &plugin.ListConfig{
 			Hydrate:       listOffice365MyDriveFiles,
 			ParentHydrate: listOffice365MyDrives,
@@ -63,12 +63,30 @@ func listOffice365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *plug
 	}
 
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+		var resultFiles []Office365DriveItemInfo
+
 		item := pageItem.(models.DriveItemable)
 
-		d.StreamLeafListItem(ctx, &Office365DriveItemInfo{item, driveID})
+		resultFiles = append(resultFiles, Office365DriveItemInfo{item, driveID})
+		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
+			childData, err := expandDriveFolders(ctx, client, adapter, item, userIdentifier, driveID)
+			if err != nil {
+				return false
+			}
+			resultFiles = append(resultFiles, childData...)
+		}
+
+		for _, i := range resultFiles {
+			d.StreamListItem(ctx, i)
+
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+				break
+			}
+		}
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return true
 	})
 	if err != nil {
 		logger.Error("listOffice365MyDriveFiles", "paging_error", err)

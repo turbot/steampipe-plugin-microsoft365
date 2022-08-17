@@ -16,7 +16,7 @@ import (
 func tableOffice365MyContact(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_my_contact",
-		Description: "",
+		Description: "Contacts owned by the specified user.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365MyContacts,
 			IgnoreConfig: &plugin.IgnoreConfig{

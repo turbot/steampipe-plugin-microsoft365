@@ -34,7 +34,7 @@ func driveColumns() []*plugin.Column {
 func tableOffice365Drive(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_drive",
-		Description: "",
+		Description: "Drives defined user's shared drives in the Google Drive.",
 		List: &plugin.ListConfig{
 			Hydrate:    listOffice365Drives,
 			KeyColumns: plugin.SingleColumn("user_identifier"),

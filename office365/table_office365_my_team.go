@@ -15,7 +15,7 @@ import (
 func tableOffice365MyTeam(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_my_team",
-		Description: "",
+		Description: "Retrieves the teams that the specified user is a direct member of.",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365MyTeams,
 			IgnoreConfig: &plugin.IgnoreConfig{
