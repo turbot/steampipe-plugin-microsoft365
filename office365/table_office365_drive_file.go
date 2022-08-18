@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphsdkgo "github.com/microsoftgraph/msgraph-sdk-go"
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
 func driveFileColumns() []*plugin.Column {
@@ -32,6 +31,7 @@ func driveFileColumns() []*plugin.Column {
 		{Name: "last_modified_by", Type: proto.ColumnType_JSON, Description: "Identity of the user, device, and application which last modified the item.", Transform: transform.FromMethod("DriveItemLastModifiedBy")},
 		{Name: "parent_Reference", Type: proto.ColumnType_JSON, Description: "Parent information, if the item has a parent.", Transform: transform.FromMethod("DriveItemParentReference")},
 		{Name: "file", Type: proto.ColumnType_JSON, Description: "File metadata, if the item is a file.", Transform: transform.FromMethod("DriveItemFile")},
+		{Name: "folder", Type: proto.ColumnType_JSON, Description: "Folder metadata, if the item is a folder.", Transform: transform.FromMethod("DriveItemFolder")},
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},

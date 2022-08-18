@@ -74,7 +74,7 @@ func listOffice365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *pl
 	equalQuals := d.KeyColumnQuals
 	quals := d.Quals
 
-	var queryFilter, combinedFilter string
+	var queryFilter string
 	filter := buildQueryFilter(equalQuals)
 	filter = append(filter, buildBoolNEFilter(quals)...)
 
@@ -83,14 +83,13 @@ func listOffice365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *pl
 	}
 
 	if queryFilter != "" {
-		combinedFilter = queryFilter
+		filter = append(filter, queryFilter)
 	}
 
 	if len(filter) > 0 {
 		joinStr := strings.Join(filter, " and ")
-		combinedFilter += fmt.Sprintf(" and %s", joinStr)
+		input.Filter = &joinStr
 	}
-	input.Filter = &combinedFilter
 
 	options := &messages.MessagesRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,

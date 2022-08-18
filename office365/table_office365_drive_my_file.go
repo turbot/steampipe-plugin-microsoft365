@@ -12,12 +12,12 @@ import (
 
 //// TABLE DEFINITION
 
-func tableOffice365MyDriveFile(_ context.Context) *plugin.Table {
+func tableOffice365DriveMyFile(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "office365_my_drive_file",
+		Name:        "office365_drive_my_file",
 		Description: "Retrieves file's metadata or content owned by an user.",
 		List: &plugin.ListConfig{
-			Hydrate:       listOffice365MyDriveFiles,
+			Hydrate:       listOffice365DriveMyFiles,
 			ParentHydrate: listOffice365MyDrives,
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
@@ -29,7 +29,7 @@ func tableOffice365MyDriveFile(_ context.Context) *plugin.Table {
 
 //// LIST FUNCTION
 
-func listOffice365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	driveData := h.Item.(*Office365DriveInfo)
 
 	var driveID string
@@ -58,7 +58,7 @@ func listOffice365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *plug
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		logger.Error("listOffice365MyDriveFiles", "create_iterator_instance_error", err)
+		logger.Error("listOffice365DriveMyFiles", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
@@ -89,7 +89,7 @@ func listOffice365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *plug
 		return true
 	})
 	if err != nil {
-		logger.Error("listOffice365MyDriveFiles", "paging_error", err)
+		logger.Error("listOffice365DriveMyFiles", "paging_error", err)
 		return nil, err
 	}
 

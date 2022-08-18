@@ -3,9 +3,11 @@ package office365
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/drives"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
@@ -42,7 +44,30 @@ func listOffice365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugin.H
 		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
 	}
 
-	result, err := client.UsersById(userIdentifier).Drives().Get()
+	input := &drives.DrivesRequestBuilderGetQueryParameters{}
+
+	var queryFilter string
+	equalQuals := d.KeyColumnQuals
+	filter := buildDriveQueryFilter(equalQuals)
+
+	if equalQuals["filter"] != nil {
+		queryFilter = equalQuals["filter"].GetStringValue()
+	}
+
+	if queryFilter != "" {
+		filter = append(filter, queryFilter)
+	}
+
+	if len(filter) > 0 {
+		joinStr := strings.Join(filter, " and ")
+		input.Filter = &joinStr
+	}
+
+	options := &drives.DrivesRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.UsersById(userIdentifier).Drives().GetWithRequestConfigurationAndResponseHandler(options, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

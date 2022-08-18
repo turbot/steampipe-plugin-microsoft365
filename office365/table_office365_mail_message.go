@@ -6,14 +6,14 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
+
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages"
-
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
 func mailMessageColumns() []*plugin.Column {
@@ -119,7 +119,7 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 	equalQuals := d.KeyColumnQuals
 	quals := d.Quals
 
-	var queryFilter, combinedFilter string
+	var queryFilter string
 	filter := buildQueryFilter(equalQuals)
 	filter = append(filter, buildBoolNEFilter(quals)...)
 
@@ -128,14 +128,13 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 	}
 
 	if queryFilter != "" {
-		combinedFilter = queryFilter
+		filter = append(filter, queryFilter)
 	}
 
 	if len(filter) > 0 {
 		joinStr := strings.Join(filter, " and ")
-		combinedFilter += fmt.Sprintf(" and %s", joinStr)
+		input.Filter = &joinStr
 	}
-	input.Filter = &combinedFilter
 
 	options := &messages.MessagesRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
@@ -205,7 +204,6 @@ func buildQueryFilter(equalQuals plugin.KeyColumnEqualsQualMap) []string {
 			}
 		}
 	}
-
 	return filters
 }
 
@@ -229,6 +227,5 @@ func buildBoolNEFilter(quals plugin.KeyColumnQualMap) []string {
 			}
 		}
 	}
-
 	return filters
 }

@@ -2,6 +2,10 @@ package office365
 
 import "github.com/microsoftgraph/msgraph-sdk-go/models"
 
+type Office365CalendarInfo struct {
+	models.Calendarable
+}
+
 type Office365CalendarEventInfo struct {
 	models.Eventable
 }
@@ -31,6 +35,52 @@ type Office365TeamInfo struct {
 type Office365TeamChannelInfo struct {
 	models.Channelable
 	TeamID string
+}
+
+func (calendar *Office365CalendarInfo) CalendarColor() string {
+	if calendar.GetColor() == nil {
+		return ""
+	}
+	return calendar.GetColor().String()
+}
+
+func (calendar *Office365CalendarInfo) CalendarDefaultOnlineMeetingProvider() string {
+	if calendar.GetDefaultOnlineMeetingProvider() == nil {
+		return ""
+	}
+	return calendar.GetDefaultOnlineMeetingProvider().String()
+}
+
+func (calendar *Office365CalendarInfo) CalendarMultiValueExtendedProperties() []map[string]interface{} {
+	if calendar.GetMultiValueExtendedProperties() == nil {
+		return nil
+	}
+
+	var multiValueExtendedProperties []map[string]interface{}
+	for _, i := range calendar.GetMultiValueExtendedProperties() {
+		multiValueExtendedProperties = append(multiValueExtendedProperties, map[string]interface{}{
+			"value": i.GetValue(),
+		})
+	}
+	return multiValueExtendedProperties
+}
+
+func (calendar *Office365CalendarInfo) CalendarOwner() map[string]interface{} {
+	if calendar.GetOwner() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if calendar.GetOwner().GetAddress() != nil {
+		data["address"] = *calendar.GetOwner().GetAddress()
+	}
+	if calendar.GetOwner().GetName() != nil {
+		data["name"] = *calendar.GetOwner().GetName()
+	}
+	if calendar.GetOwner().GetOdataType() != nil {
+		data["@odata_type"] = *calendar.GetOwner().GetOdataType()
+	}
+	return data
 }
 
 func (contact *Office365ContactInfo) ContactBusinessAddress() map[string]interface{} {
@@ -128,6 +178,142 @@ func (contact *Office365ContactInfo) ContactEmailAddresses() []map[string]interf
 	return contacts
 }
 
+func (drive *Office365DriveInfo) DriveCreatedBy() map[string]interface{} {
+	if drive.GetCreatedBy() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if drive.GetCreatedBy().GetApplication() != nil {
+		applicationData := map[string]interface{}{}
+		if drive.GetCreatedBy().GetApplication().GetDisplayName() != nil {
+			applicationData["displayName"] = *drive.GetCreatedBy().GetApplication().GetDisplayName()
+		}
+		if drive.GetCreatedBy().GetApplication().GetId() != nil {
+			applicationData["id"] = *drive.GetCreatedBy().GetApplication().GetId()
+		}
+		data["application"] = applicationData
+	}
+	if drive.GetCreatedBy().GetUser() != nil {
+		userData := map[string]interface{}{}
+		if drive.GetCreatedBy().GetUser().GetDisplayName() != nil {
+			userData["displayName"] = *drive.GetCreatedBy().GetUser().GetDisplayName()
+		}
+		if drive.GetCreatedBy().GetUser().GetId() != nil {
+			userData["id"] = *drive.GetCreatedBy().GetUser().GetId()
+		}
+		data["user"] = userData
+	}
+	if drive.GetCreatedBy().GetDevice() != nil {
+		deviceData := map[string]interface{}{}
+		if drive.GetCreatedBy().GetDevice().GetDisplayName() != nil {
+			deviceData["displayName"] = *drive.GetCreatedBy().GetDevice().GetDisplayName()
+		}
+		if drive.GetCreatedBy().GetDevice().GetId() != nil {
+			deviceData["id"] = *drive.GetCreatedBy().GetDevice().GetId()
+		}
+		data["device"] = deviceData
+	}
+
+	return data
+}
+
+func (drive *Office365DriveInfo) DriveLastModifiedBy() map[string]interface{} {
+	if drive.GetLastModifiedBy() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if drive.GetLastModifiedBy().GetApplication() != nil {
+		applicationData := map[string]interface{}{}
+		if drive.GetLastModifiedBy().GetApplication().GetDisplayName() != nil {
+			applicationData["displayName"] = *drive.GetLastModifiedBy().GetApplication().GetDisplayName()
+		}
+		if drive.GetLastModifiedBy().GetApplication().GetId() != nil {
+			applicationData["id"] = *drive.GetLastModifiedBy().GetApplication().GetId()
+		}
+		data["application"] = applicationData
+	}
+	if drive.GetLastModifiedBy().GetUser() != nil {
+		userData := map[string]interface{}{}
+		if drive.GetLastModifiedBy().GetUser().GetDisplayName() != nil {
+			userData["displayName"] = *drive.GetLastModifiedBy().GetUser().GetDisplayName()
+		}
+		if drive.GetLastModifiedBy().GetUser().GetId() != nil {
+			userData["id"] = *drive.GetLastModifiedBy().GetUser().GetId()
+		}
+		data["user"] = userData
+	}
+	if drive.GetLastModifiedBy().GetDevice() != nil {
+		deviceData := map[string]interface{}{}
+		if drive.GetLastModifiedBy().GetDevice().GetDisplayName() != nil {
+			deviceData["displayName"] = *drive.GetLastModifiedBy().GetDevice().GetDisplayName()
+		}
+		if drive.GetLastModifiedBy().GetDevice().GetId() != nil {
+			deviceData["id"] = *drive.GetLastModifiedBy().GetDevice().GetId()
+		}
+		data["device"] = deviceData
+	}
+
+	return data
+}
+
+func (drive *Office365DriveInfo) DriveParentReference() map[string]interface{} {
+	if drive.GetParentReference() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if drive.GetParentReference().GetDriveId() != nil {
+		data["driveId"] = *drive.GetParentReference().GetDriveId()
+	}
+	if drive.GetParentReference().GetDriveType() != nil {
+		data["driveType"] = *drive.GetParentReference().GetDriveType()
+	}
+	if drive.GetParentReference().GetId() != nil {
+		data["id"] = *drive.GetParentReference().GetId()
+	}
+	if drive.GetParentReference().GetName() != nil {
+		data["name"] = *drive.GetParentReference().GetName()
+	}
+	if drive.GetParentReference().GetPath() != nil {
+		data["path"] = *drive.GetParentReference().GetPath()
+	}
+	if drive.GetParentReference().GetShareId() != nil {
+		data["shareId"] = *drive.GetParentReference().GetShareId()
+	}
+	if drive.GetParentReference().GetSiteId() != nil {
+		data["siteId"] = *drive.GetParentReference().GetSiteId()
+	}
+	if drive.GetParentReference().GetSharepointIds() != nil {
+		sharePointData := map[string]interface{}{}
+		if drive.GetParentReference().GetSharepointIds().GetListId() != nil {
+			sharePointData["listId"] = *drive.GetParentReference().GetSharepointIds().GetListId()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetListItemId() != nil {
+			sharePointData["listItemId"] = *drive.GetParentReference().GetSharepointIds().GetListItemId()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetListItemUniqueId() != nil {
+			sharePointData["listItemUniqueId"] = *drive.GetParentReference().GetSharepointIds().GetListItemUniqueId()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetSiteId() != nil {
+			sharePointData["siteId"] = *drive.GetParentReference().GetSharepointIds().GetSiteId()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetSiteUrl() != nil {
+			sharePointData["siteUrl"] = *drive.GetParentReference().GetSharepointIds().GetSiteUrl()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetTenantId() != nil {
+			sharePointData["tenantId"] = *drive.GetParentReference().GetSharepointIds().GetTenantId()
+		}
+		if drive.GetParentReference().GetSharepointIds().GetWebId() != nil {
+			sharePointData["webId"] = *drive.GetParentReference().GetSharepointIds().GetWebId()
+		}
+		data["sharePointIds"] = sharePointData
+	}
+
+	return data
+}
+
 func (driveItem *Office365DriveItemInfo) DriveItemCreatedBy() map[string]interface{} {
 	if driveItem.GetCreatedBy() == nil {
 		return nil
@@ -205,6 +391,18 @@ func (driveItem *Office365DriveItemInfo) DriveItemFilePath() string {
 		return *driveItem.GetParentReference().GetPath()
 	}
 	return ""
+}
+
+func (driveItem *Office365DriveItemInfo) DriveItemFolder() map[string]interface{} {
+	if driveItem.GetFolder() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if driveItem.GetFolder().GetChildCount() != nil {
+		data["childCount"] = *driveItem.GetFolder().GetChildCount()
+	}
+	return data
 }
 
 func (driveItem *Office365DriveItemInfo) DriveItemLastModifiedBy() map[string]interface{} {

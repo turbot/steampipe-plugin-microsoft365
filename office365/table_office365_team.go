@@ -5,20 +5,18 @@ import (
 	"fmt"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/groups/item/members"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
 func teamColumns() []*plugin.Column {
 	return []*plugin.Column{
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromMethod("GetId")},
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
 		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Transform: transform.FromMethod("GetDescription")},
 		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "A unique ID for the team that has been used in a few places such as the audit log/Office 365 Management Activity API.", Transform: transform.FromMethod("GetInternalId")},
 		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "True if this team is in read-only mode.", Transform: transform.FromMethod("GetIsArchived")},
@@ -27,7 +25,7 @@ func teamColumns() []*plugin.Column {
 		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "Date and time when the team was created.", Transform: transform.FromMethod("GetCreatedDateTime")},
 		{Name: "classification", Type: proto.ColumnType_STRING, Description: "An optional label. Typically describes the data or business sensitivity of the team. Must match one of a pre-configured set in the tenant's directory.", Transform: transform.FromMethod("GetClassification")},
 		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "A hyperlink that will go to the team in the Microsoft Teams client.", Transform: transform.FromMethod("GetWebUrl")},
-		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The visibility of the group and team. Defaults to Public.", Transform: transform.FromMethod("TeamVisibility")},
+		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The visibility of the group and team. Defaults to Public.", Transform: transform.FromMethod("TeamVisibility"), Default: "Public"},
 		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "Indicates whether the team is intended for a particular use case. Each team specialization has access to unique behaviors and experiences targeted to its use case.", Transform: transform.FromMethod("TeamSpecialization")},
 
 		// JSON fields
@@ -38,6 +36,7 @@ func teamColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Transform: transform.FromMethod("GetTenantId")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
 	}
 }
 
@@ -51,7 +50,7 @@ func tableOffice365Team(_ context.Context) *plugin.Table {
 			Hydrate:    listOffice365Teams,
 			KeyColumns: plugin.SingleColumn("user_identifier"),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"NotFound"}),
 			},
 		},
 		Columns: teamColumns(),

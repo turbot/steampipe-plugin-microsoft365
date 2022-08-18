@@ -62,7 +62,7 @@ from
   office365_mail_message
 where
   user_identifier = 'test@org.onmicrosoft.com'
-  and filter = '(from/emailAddress/address) eq ''subhajit@turbot.com'''
+  and filter = '(from/emailAddress/address) eq ''test@domain.com'''
 order by created_date_time;
 ```
 

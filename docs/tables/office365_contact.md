@@ -1,6 +1,8 @@
-# Table: googleworkspace_people_contact
+# Table: office365_contact
 
-List contacts for the authenticated user.
+List contacts of the specified user.
+
+The `office365_contact` table can be used to query user's contacts, if you have access; and **you must specify user's id or email** in the where or join clause (`where user_identifier=`, `join office365_contact on user_identifier=`).
 
 ## Examples
 
