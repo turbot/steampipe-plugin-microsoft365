@@ -87,8 +87,8 @@ github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
-github.com/cjlapao/common-go v0.0.20 h1:AIZBtuxwJPXFqyxFOlvVDWZgbsuTSquZEUw4KMx8pNg=
-github.com/cjlapao/common-go v0.0.20/go.mod h1:EVLEXIxsBHblPMrhJYOvL4yBCcBj7IYDdW88VlfxpPM=
+github.com/cjlapao/common-go v0.0.25 h1:/a5SdWGtOFzXceM1RnB3v4hgUK8woMo9Ma/XRgCQ87g=
+github.com/cjlapao/common-go v0.0.25/go.mod h1:OyTAY388jfEj8uaRzx0uYneFghKDLL5KP+ewSydlQ5g=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
@@ -316,8 +316,8 @@ github.com/mattn/go-runewidth v0.0.13/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 h1:I0XW9+e1XWDxdcEniV4rQAIOPUGDq67JSCiRCgGCZLI=
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
-github.com/microsoft/kiota-abstractions-go v0.8.1 h1:ACCwRwddJYOx+SRqfgcR8Wo8PZTd4g+JMa8lY8ABy+4=
-github.com/microsoft/kiota-abstractions-go v0.8.1/go.mod h1:05aCidCKhzer+yfhGeePaMUY3MH+wrAkQztBVEreTtc=
+github.com/microsoft/kiota-abstractions-go v0.8.2 h1:KxHr72YwlntvVgF0C+8CtNmNQajtIq7fedq2N0+74Uk=
+github.com/microsoft/kiota-abstractions-go v0.8.2/go.mod h1:i1wK2rdsLGSjgpnpLHjC60nEa/UdCVS6ulCh1Q+1COw=
 github.com/microsoft/kiota-authentication-azure-go v0.3.1 h1:jKZcFPCaNk4WSqS39mmnPvpXlBxc4DhX0zIQVYu2b4U=
 github.com/microsoft/kiota-authentication-azure-go v0.3.1/go.mod h1:gUNv91OtbPfD0R7K7R4IjVo6yPXbcWltnCKvwCiAN7Y=
 github.com/microsoft/kiota-http-go v0.5.2 h1:BS/bK2xHLT8TT+p0uZKxwu+lkXDAPByugYP2n1nV0Uo=
@@ -326,8 +326,8 @@ github.com/microsoft/kiota-serialization-json-go v0.5.5 h1:B0iKBKOdi+9NKFlormLRq
 github.com/microsoft/kiota-serialization-json-go v0.5.5/go.mod h1:GI9vrssO1EvqzDtvMKuhjALn40phZOWkeeaMgtCk6xE=
 github.com/microsoft/kiota-serialization-text-go v0.4.1 h1:6QPH7+geUPCpaSZkKCQw0Scngx2IF0vKodrvvWWiu2A=
 github.com/microsoft/kiota-serialization-text-go v0.4.1/go.mod h1:DsriFnVBDCc4D84qxG3j8q/1Sxu16JILfhxMZm3kdfw=
-github.com/microsoftgraph/msgraph-sdk-go v0.33.0 h1:DnWs8SwvCxLjiz0b4ADL0+wsEB5nGMFAp/zmQluh2Bk=
-github.com/microsoftgraph/msgraph-sdk-go v0.33.0/go.mod h1:1BTR3dPPxzKr/dgwHYUKPU/vvXxv5vkdSVn91qxnxS4=
+github.com/microsoftgraph/msgraph-sdk-go v0.34.0 h1:AXPTyCUKaxy4i0qSLBuUbaZTw4thoZTMS2i8KWCItlo=
+github.com/microsoftgraph/msgraph-sdk-go v0.34.0/go.mod h1:5KCKGk0dKyEK17M40vCHTnyaayUe/SqIOh9aww0ECpU=
 github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0 h1:FqKddh8nTTbNyUtRCCmPKtgxSNGz944Kw8Q+WU/H+lo=
 github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0/go.mod h1:kcTY0sEZ/LOJiSj/1OMxcs0T51uodJ/bOeVfWo4lo/s=
 github.com/mitchellh/go-testing-interface v1.0.0 h1:fzU/JVNcaqHQEcVFAKeR41fkiLdIPrefOvVG1VZ96U0=
