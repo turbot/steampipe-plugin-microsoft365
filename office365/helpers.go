@@ -4,6 +4,7 @@ import "github.com/microsoftgraph/msgraph-sdk-go/models"
 
 type Office365CalendarInfo struct {
 	models.Calendarable
+	UserIdentifier string
 }
 
 type Office365CalendarEventInfo struct {
@@ -517,7 +518,7 @@ func (event *Office365CalendarEventInfo) EventAttendees() []map[string]interface
 			if a.GetStatus().GetTime() != nil {
 				responseStatusInfo["time"] = *a.GetStatus().GetTime()
 			}
-			attendeeInfo["status"] = attendeeInfo
+			attendeeInfo["status"] = responseStatusInfo
 		}
 		if a.GetProposedNewTime() != nil {
 			data := map[string]interface{}{}
@@ -526,7 +527,7 @@ func (event *Office365CalendarEventInfo) EventAttendees() []map[string]interface
 				if event.GetEnd().GetDateTime() != nil {
 					endTimeInfo["dateTime"] = *event.GetEnd().GetDateTime()
 				}
-				if event.GetEnd().GetDateTime() != nil {
+				if event.GetEnd().GetTimeZone() != nil {
 					endTimeInfo["timeZone"] = *event.GetEnd().GetTimeZone()
 				}
 				data["end"] = endTimeInfo
@@ -536,7 +537,7 @@ func (event *Office365CalendarEventInfo) EventAttendees() []map[string]interface
 				if event.GetStart().GetDateTime() != nil {
 					startTimeInfo["dateTime"] = *event.GetStart().GetDateTime()
 				}
-				if event.GetStart().GetDateTime() != nil {
+				if event.GetStart().GetTimeZone() != nil {
 					startTimeInfo["timeZone"] = *event.GetStart().GetTimeZone()
 				}
 				data["start"] = startTimeInfo

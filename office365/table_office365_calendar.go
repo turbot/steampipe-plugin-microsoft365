@@ -7,6 +7,9 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+
+	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
+	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
 //// TABLE DEFINITION
@@ -47,6 +50,7 @@ func tableOffice365Calendar(_ context.Context) *plugin.Table {
 			{Name: "allowed_online_meeting_providers", Type: proto.ColumnType_JSON, Description: "Represent the online meeting service providers that can be used to create online meetings in this calendar. Possible values are: unknown, skypeForBusiness, skypeForConsumer, teamsForBusiness.", Transform: transform.FromMethod("GetAllowedOnlineMeetingProviders")},
 			{Name: "multi_value_extended_properties", Type: proto.ColumnType_JSON, Description: "The collection of multi-value extended properties defined for the calendar.", Transform: transform.FromMethod("CalendarMultiValueExtendedProperties")},
 			{Name: "owner", Type: proto.ColumnType_JSON, Description: "Represents the user who created or added the calendar.", Transform: transform.FromMethod("CalendarOwner")},
+			{Name: "permissions", Type: proto.ColumnType_JSON, Description: "Represents the user who created or added the calendar.", Hydrate: listOffice365CalendarPermissions, Transform: transform.FromValue()},
 
 			// Standard columns
 			{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
@@ -73,7 +77,72 @@ func listOffice365Calendars(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
-	d.StreamListItem(ctx, &Office365CalendarInfo{result})
+	d.StreamListItem(ctx, &Office365CalendarInfo{result, userIdentifier})
 
 	return nil, nil
+}
+
+func listOffice365CalendarPermissions(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	calendarData := h.Item.(*Office365CalendarInfo)
+
+	// Create client
+	client, adapter, err := GetGraphClient(ctx, d)
+	if err != nil {
+		return nil, fmt.Errorf("error creating client: %v", err)
+	}
+
+	var permissions []map[string]interface{}
+	result, err := client.UsersById(calendarData.UserIdentifier).Calendar().CalendarPermissions().Get()
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateCalendarPermissionCollectionResponseFromDiscriminatorValue)
+	if err != nil {
+		logger.Error("listOffice365CalendarPermissions", "create_iterator_instance_error", err)
+		return nil, err
+	}
+
+	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+		perms := pageItem.(models.CalendarPermissionable)
+
+		data := map[string]interface{}{
+			"allowedRoles": perms.GetAllowedRoles(),
+		}
+		if perms.GetId() != nil {
+			data["id"] = *perms.GetId()
+		}
+		if perms.GetIsInsideOrganization() != nil {
+			data["isInsideOrganization"] = *perms.GetIsInsideOrganization()
+		}
+		if perms.GetIsRemovable() != nil {
+			data["isRemovable"] = *perms.GetIsRemovable()
+		}
+		if perms.GetRole() != nil {
+			data["role"] = perms.GetRole().String()
+		}
+		if perms.GetEmailAddress() != nil {
+			emailData := map[string]interface{}{}
+			if perms.GetEmailAddress().GetName() != nil {
+				emailData["name"] = *perms.GetEmailAddress().GetName()
+			}
+			if perms.GetEmailAddress().GetAddress() != nil {
+				emailData["address"] = *perms.GetEmailAddress().GetAddress()
+			}
+			data["emailAddress"] = emailData
+		}
+		permissions = append(permissions, data)
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		return d.QueryStatus.RowsRemaining(ctx) != 0
+	})
+	if err != nil {
+		logger.Error("listOffice365CalendarPermissions", "paging_error", err)
+		return nil, err
+	}
+
+	return permissions, nil
 }
