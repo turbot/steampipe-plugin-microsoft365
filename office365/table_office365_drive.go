@@ -72,7 +72,8 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_drive.listOffice365Drives", "connection_error", err)
+		return nil, err
 	}
 
 	input := &drives.DrivesRequestBuilderGetQueryParameters{}

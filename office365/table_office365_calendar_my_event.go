@@ -48,7 +48,8 @@ func listOffice365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, h *
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_calendar_my_event.listOffice365CalendarMyEvents", "connection_error", err)
+		return nil, err
 	}
 	userIdentifier := getUserFromConfig(ctx, d, h)
 	if userIdentifier == "" {

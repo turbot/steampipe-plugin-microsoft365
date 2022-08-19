@@ -29,10 +29,13 @@ func tableOffice365MyTeam(_ context.Context) *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365MyTeams(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+	
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_my_team.listOffice365MyTeams", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := getUserFromConfig(ctx, d, h)

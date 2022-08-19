@@ -2,7 +2,6 @@ package office365
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
@@ -63,12 +62,13 @@ func tableOffice365Calendar(_ context.Context) *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365Calendars(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	//logger := plugin.Logger(ctx)
+	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_calendar.listOffice365Calendars", "connection_error", err)
+		return nil, err
 	}
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
 
@@ -90,7 +90,8 @@ func listOffice365CalendarPermissions(ctx context.Context, d *plugin.QueryData, 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_calendar.listOffice365CalendarPermissions", "connection_error", err)
+		return nil, err
 	}
 
 	var permissions []map[string]interface{}

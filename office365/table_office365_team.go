@@ -2,7 +2,6 @@ package office365
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
@@ -60,10 +59,13 @@ func tableOffice365Team(_ context.Context) *plugin.Table {
 //// LIST FUNCTION
 
 func listOffice365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_team.listOffice365Teams", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
@@ -96,6 +98,8 @@ func listOffice365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydr
 }
 
 func listOffice365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	data := h.Item.(*Office365TeamInfo)
 	teamID := data.GetId()
 	if teamID == nil || data.UserIdentifier == "" {
@@ -105,7 +109,8 @@ func listOffice365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugi
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_team.listOffice365TeamMembers", "connection_error", err)
+		return nil, err
 	}
 
 	headers := map[string]string{

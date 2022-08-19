@@ -36,13 +36,13 @@ func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plug
 	if driveData != nil {
 		driveID = *driveData.GetId()
 	}
-
 	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_drive_my_file.listOffice365DriveMyFiles", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := getUserFromConfig(ctx, d, h)
@@ -85,7 +85,6 @@ func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plug
 			}
 		}
 
-		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return true
 	})
 	if err != nil {

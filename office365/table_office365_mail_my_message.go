@@ -46,7 +46,8 @@ func listOffice365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *pl
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_mail_my_message.listOffice365MailMyMessages", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := getUserFromConfig(ctx, d, h)

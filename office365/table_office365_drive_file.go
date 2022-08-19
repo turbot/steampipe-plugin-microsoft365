@@ -2,7 +2,6 @@ package office365
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
@@ -67,13 +66,13 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 	if driveData != nil {
 		driveID = *driveData.GetId()
 	}
-
 	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_drive_file.listOffice365DriveFiles", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
@@ -112,7 +111,6 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 			}
 		}
 
-		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return true
 	})
 	if err != nil {

@@ -35,7 +35,8 @@ func listOffice365MyContacts(ctx context.Context, d *plugin.QueryData, h *plugin
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_my_contact.listOffice365MyContacts", "connection_error", err)
+		return nil, err
 	}
 
 	userIdentifier := getUserFromConfig(ctx, d, h)

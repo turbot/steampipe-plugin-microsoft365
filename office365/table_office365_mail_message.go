@@ -96,7 +96,8 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client: %v", err)
+		logger.Error("office365_mail_message.listOffice365MailMessages", "connection_error", err)
+		return nil, err
 	}
 
 	// List operations
