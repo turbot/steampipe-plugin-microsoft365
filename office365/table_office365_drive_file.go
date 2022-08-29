@@ -34,7 +34,7 @@ func driveFileColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
 }
@@ -93,7 +93,7 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 
 		item := pageItem.(models.DriveItemable)
 
-		resultFiles = append(resultFiles, Office365DriveItemInfo{item, driveID})
+		resultFiles = append(resultFiles, Office365DriveItemInfo{item, driveID, userIdentifier})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
 			childData, err := expandDriveFolders(ctx, client, adapter, item, userIdentifier, driveID)
 			if err != nil {
@@ -140,7 +140,7 @@ func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient,
 
 		item := pageItem.(models.DriveItemable)
 
-		data = append(data, Office365DriveItemInfo{item, driveID})
+		data = append(data, Office365DriveItemInfo{item, driveID, userID})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
 			childData, err := expandDriveFolders(ctx, c, a, item, userID, driveID)
 			if err != nil {

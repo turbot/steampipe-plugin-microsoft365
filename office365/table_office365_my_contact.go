@@ -75,7 +75,7 @@ func listOffice365MyContacts(ctx context.Context, d *plugin.QueryData, h *plugin
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
-		d.StreamListItem(ctx, &Office365ContactInfo{contact})
+		d.StreamListItem(ctx, &Office365ContactInfo{contact, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

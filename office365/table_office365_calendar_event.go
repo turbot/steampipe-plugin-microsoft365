@@ -18,7 +18,6 @@ import (
 func calendarEventColumns() []*plugin.Column {
 	return []*plugin.Column{
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the event.", Transform: transform.FromMethod("GetId")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
 		{Name: "subject", Type: proto.ColumnType_STRING, Description: "The text of the event's subject line.", Transform: transform.FromMethod("GetSubject")},
 		{Name: "online_meeting_url", Type: proto.ColumnType_STRING, Description: "A URL for an online meeting. The property is set only when an organizer specifies in Outlook that an event is an online meeting such as Skype.", Transform: transform.FromMethod("GetOnlineMeetingUrl")},
 		{Name: "is_all_day", Type: proto.ColumnType_BOOL, Description: "True if the event lasts all day. If true, regardless of whether it's a single-day or multi-day event, start and end time must be set to midnight and be in the same time zone.", Transform: transform.FromMethod("GetIsAllDay")},
@@ -67,6 +66,7 @@ func calendarEventColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
 	}
 }
 
@@ -188,7 +188,7 @@ func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *pl
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
 
-		d.StreamListItem(ctx, &Office365CalendarEventInfo{event})
+		d.StreamListItem(ctx, &Office365CalendarEventInfo{event, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

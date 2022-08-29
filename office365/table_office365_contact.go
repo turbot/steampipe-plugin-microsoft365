@@ -54,7 +54,7 @@ func contactColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
 }
@@ -123,7 +123,7 @@ func listOffice365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
-		d.StreamListItem(ctx, &Office365ContactInfo{contact})
+		d.StreamListItem(ctx, &Office365ContactInfo{contact, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

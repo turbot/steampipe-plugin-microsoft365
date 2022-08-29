@@ -9,23 +9,28 @@ type Office365CalendarInfo struct {
 
 type Office365CalendarEventInfo struct {
 	models.Eventable
+	UserIdentifier string
 }
 
 type Office365ContactInfo struct {
 	models.Contactable
+	UserIdentifier string
 }
 
 type Office365DriveInfo struct {
 	models.Driveable
+	UserIdentifier string
 }
 
 type Office365DriveItemInfo struct {
 	models.DriveItemable
 	DriveID string
+	UserIdentifier string
 }
 
 type Office365MailMessageInfo struct {
 	models.Messageable
+	UserIdentifier string
 }
 
 type Office365TeamInfo struct {
@@ -36,6 +41,7 @@ type Office365TeamInfo struct {
 type Office365TeamChannelInfo struct {
 	models.Channelable
 	TeamID string
+	UserIdentifier string
 }
 
 func (calendar *Office365CalendarInfo) CalendarColor() string {

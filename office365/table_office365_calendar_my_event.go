@@ -131,7 +131,7 @@ func listOffice365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, h *
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
 
-		d.StreamListItem(ctx, &Office365CalendarEventInfo{event})
+		d.StreamListItem(ctx, &Office365CalendarEventInfo{event, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

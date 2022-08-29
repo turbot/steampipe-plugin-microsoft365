@@ -7,9 +7,9 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/microsoft/kiota-authentication-azure-go v0.3.1
-	github.com/microsoftgraph/msgraph-sdk-go v0.34.0
+	github.com/microsoftgraph/msgraph-sdk-go v0.35.0
 	github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0
-	github.com/turbot/steampipe-plugin-sdk/v4 v4.0.1
+	github.com/turbot/steampipe-plugin-sdk/v4 v4.1.4
 )
 
 require (

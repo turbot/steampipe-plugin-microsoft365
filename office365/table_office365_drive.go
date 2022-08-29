@@ -37,7 +37,7 @@ func driveColumns() []*plugin.Column {
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
 	}
 }
 
@@ -115,7 +115,7 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
 
-		d.StreamListItem(ctx, &Office365DriveInfo{drive})
+		d.StreamListItem(ctx, &Office365DriveInfo{drive, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

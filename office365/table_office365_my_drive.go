@@ -83,7 +83,7 @@ func listOffice365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugin.H
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
 
-		d.StreamListItem(ctx, &Office365DriveInfo{drive})
+		d.StreamListItem(ctx, &Office365DriveInfo{drive, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

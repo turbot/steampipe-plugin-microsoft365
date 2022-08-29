@@ -326,8 +326,8 @@ github.com/microsoft/kiota-serialization-json-go v0.5.5 h1:B0iKBKOdi+9NKFlormLRq
 github.com/microsoft/kiota-serialization-json-go v0.5.5/go.mod h1:GI9vrssO1EvqzDtvMKuhjALn40phZOWkeeaMgtCk6xE=
 github.com/microsoft/kiota-serialization-text-go v0.4.1 h1:6QPH7+geUPCpaSZkKCQw0Scngx2IF0vKodrvvWWiu2A=
 github.com/microsoft/kiota-serialization-text-go v0.4.1/go.mod h1:DsriFnVBDCc4D84qxG3j8q/1Sxu16JILfhxMZm3kdfw=
-github.com/microsoftgraph/msgraph-sdk-go v0.34.0 h1:AXPTyCUKaxy4i0qSLBuUbaZTw4thoZTMS2i8KWCItlo=
-github.com/microsoftgraph/msgraph-sdk-go v0.34.0/go.mod h1:5KCKGk0dKyEK17M40vCHTnyaayUe/SqIOh9aww0ECpU=
+github.com/microsoftgraph/msgraph-sdk-go v0.35.0 h1:51ggUMssm1Ff2igpxbL408Za1+D/9VyOwvM3sg5k5Io=
+github.com/microsoftgraph/msgraph-sdk-go v0.35.0/go.mod h1:5KCKGk0dKyEK17M40vCHTnyaayUe/SqIOh9aww0ECpU=
 github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0 h1:FqKddh8nTTbNyUtRCCmPKtgxSNGz944Kw8Q+WU/H+lo=
 github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0/go.mod h1:kcTY0sEZ/LOJiSj/1OMxcs0T51uodJ/bOeVfWo4lo/s=
 github.com/mitchellh/go-testing-interface v1.0.0 h1:fzU/JVNcaqHQEcVFAKeR41fkiLdIPrefOvVG1VZ96U0=
@@ -446,8 +446,8 @@ github.com/tkrajina/go-reflector v0.5.4 h1:dS9aJEa/eYNQU/fwsb5CSiATOxcNyA/gG/A7a
 github.com/tkrajina/go-reflector v0.5.4/go.mod h1:9PyLgEOzc78ey/JmQQHbW8cQJ1oucLlNQsg8yFvkVk8=
 github.com/turbot/go-kit v0.4.0 h1:EdD7Bf2EGAjvHRGQxRiWpDawzZSk3T+eghqbj74qiSc=
 github.com/turbot/go-kit v0.4.0/go.mod h1:SBdPRngbEfYubiR81iAVtO43oPkg1+ASr+XxvgbH7/k=
-github.com/turbot/steampipe-plugin-sdk/v4 v4.0.1 h1:dgKLkXPQ71MtC6H58p4tJl4GSeKzxJ8jUGEi1UEWUak=
-github.com/turbot/steampipe-plugin-sdk/v4 v4.0.1/go.mod h1:W6QjUrkeWyDgfnAt1qzckI7YEEY4x8WOevxKsVSWLM4=
+github.com/turbot/steampipe-plugin-sdk/v4 v4.1.4 h1:14guaqs/qxcaoncmtlXfUzdGiaTARnaXKo64XJSGm7U=
+github.com/turbot/steampipe-plugin-sdk/v4 v4.1.4/go.mod h1:W6QjUrkeWyDgfnAt1qzckI7YEEY4x8WOevxKsVSWLM4=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
 github.com/yosida95/uritemplate/v3 v3.0.2 h1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=

@@ -55,7 +55,7 @@ func mailMessageColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: "", Transform: transform.FromQual("user_identifier")},
+		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
@@ -157,7 +157,7 @@ func listOffice365MailMessages(ctx context.Context, d *plugin.QueryData, _ *plug
 	err = pageIterator.Iterate(func(pageItem interface{}) bool {
 		message := pageItem.(models.Messageable)
 
-		d.StreamListItem(ctx, &Office365MailMessageInfo{message})
+		d.StreamListItem(ctx, &Office365MailMessageInfo{message, userIdentifier})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0

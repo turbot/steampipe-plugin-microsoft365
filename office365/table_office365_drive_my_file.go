@@ -67,7 +67,7 @@ func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plug
 
 		item := pageItem.(models.DriveItemable)
 
-		resultFiles = append(resultFiles, Office365DriveItemInfo{item, driveID})
+		resultFiles = append(resultFiles, Office365DriveItemInfo{item, driveID, userIdentifier})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
 			childData, err := expandDriveFolders(ctx, client, adapter, item, userIdentifier, driveID)
 			if err != nil {
