@@ -100,7 +100,7 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Drives().GetWithRequestConfigurationAndResponseHandler(options, nil)
+	result, err := client.UsersById(userIdentifier).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -112,7 +112,7 @@ func listOffice365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.Hyd
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
 
 		d.StreamListItem(ctx, &Office365DriveInfo{drive, userIdentifier})

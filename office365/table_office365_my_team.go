@@ -30,7 +30,7 @@ func tableOffice365MyTeam(_ context.Context) *plugin.Table {
 
 func listOffice365MyTeams(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
-	
+
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
@@ -43,7 +43,7 @@ func listOffice365MyTeams(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
 	}
 
-	result, err := client.UsersById(userIdentifier).JoinedTeams().Get()
+	result, err := client.UsersById(userIdentifier).JoinedTeams().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -55,7 +55,7 @@ func listOffice365MyTeams(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		team := pageItem.(models.Teamable)
 
 		d.StreamListItem(ctx, &Office365TeamInfo{team, userIdentifier})

@@ -72,7 +72,7 @@ func listOffice365Calendars(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	}
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
 
-	result, err := client.UsersById(userIdentifier).Calendar().Get()
+	result, err := client.UsersById(userIdentifier).Calendar().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -95,7 +95,7 @@ func listOffice365CalendarPermissions(ctx context.Context, d *plugin.QueryData, 
 	}
 
 	var permissions []map[string]interface{}
-	result, err := client.UsersById(calendarData.UserIdentifier).Calendar().CalendarPermissions().Get()
+	result, err := client.UsersById(calendarData.UserIdentifier).Calendar().CalendarPermissions().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -107,7 +107,7 @@ func listOffice365CalendarPermissions(ctx context.Context, d *plugin.QueryData, 
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		perms := pageItem.(models.CalendarPermissionable)
 
 		data := map[string]interface{}{

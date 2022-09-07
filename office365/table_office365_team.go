@@ -69,7 +69,7 @@ func listOffice365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydr
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).JoinedTeams().Get()
+	result, err := client.UsersById(userIdentifier).JoinedTeams().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -81,7 +81,7 @@ func listOffice365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydr
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		team := pageItem.(models.Teamable)
 
 		d.StreamListItem(ctx, &Office365TeamInfo{team, userIdentifier})
@@ -128,7 +128,7 @@ func listOffice365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugi
 	}
 
 	memberIds := []*string{}
-	members, err := client.GroupsById(*teamID).Members().GetWithRequestConfigurationAndResponseHandler(config, nil)
+	members, err := client.GroupsById(*teamID).Members().Get(ctx, config)
 	if err != nil {
 		errObj := getErrorObject(err)
 		plugin.Logger(ctx).Error("listOffice365TeamMembers", "get_team_members_error", errObj)
@@ -141,7 +141,7 @@ func listOffice365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		member := pageItem.(models.DirectoryObjectable)
 		memberIds = append(memberIds, member.GetId())
 

@@ -96,7 +96,7 @@ func listOffice365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *pl
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).Messages().GetWithRequestConfigurationAndResponseHandler(options, nil)
+	result, err := client.UsersById(userIdentifier).Messages().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -108,7 +108,7 @@ func listOffice365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *pl
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		message := pageItem.(models.Messageable)
 
 		d.StreamListItem(ctx, &Office365MailMessageInfo{message, userIdentifier})

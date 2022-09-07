@@ -50,7 +50,7 @@ func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plug
 		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
 	}
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get()
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -62,7 +62,7 @@ func listOffice365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plug
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		var resultFiles []Office365DriveItemInfo
 
 		item := pageItem.(models.DriveItemable)

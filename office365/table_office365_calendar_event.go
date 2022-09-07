@@ -166,13 +166,13 @@ func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *pl
 			QueryParameters: input,
 		}
 
-		result, err = client.UsersById(userIdentifier).CalendarView().GetWithRequestConfigurationAndResponseHandler(options, nil)
+		result, err = client.UsersById(userIdentifier).CalendarView().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
 		}
 	} else {
-		result, err = client.UsersById(userIdentifier).Events().Get()
+		result, err = client.UsersById(userIdentifier).Events().Get(ctx, nil)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
@@ -185,7 +185,7 @@ func listOffice365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ *pl
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
 
 		d.StreamListItem(ctx, &Office365CalendarEventInfo{event, userIdentifier})

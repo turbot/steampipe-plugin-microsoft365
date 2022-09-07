@@ -76,7 +76,7 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get()
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -88,7 +88,7 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		var resultFiles []Office365DriveItemInfo
 
 		item := pageItem.(models.DriveItemable)
@@ -123,7 +123,7 @@ func listOffice365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin
 
 func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient, a *msgraphsdkgo.GraphRequestAdapter, data models.DriveItemable, userID string, driveID string) ([]Office365DriveItemInfo, error) {
 	var items []Office365DriveItemInfo
-	result, err := c.UsersById(userID).DrivesById(driveID).ItemsById(*data.GetId()).Children().Get()
+	result, err := c.UsersById(userID).DrivesById(driveID).ItemsById(*data.GetId()).Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -135,7 +135,7 @@ func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient,
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		var data []Office365DriveItemInfo
 
 		item := pageItem.(models.DriveItemable)

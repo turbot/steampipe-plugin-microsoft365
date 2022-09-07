@@ -108,7 +108,7 @@ func listOffice365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	}
 
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Contacts().GetWithRequestConfigurationAndResponseHandler(options, nil)
+	result, err := client.UsersById(userIdentifier).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -120,7 +120,7 @@ func listOffice365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
 		d.StreamListItem(ctx, &Office365ContactInfo{contact, userIdentifier})

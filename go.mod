@@ -8,8 +8,8 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/microsoft/kiota-authentication-azure-go v0.3.1
 	github.com/microsoftgraph/msgraph-beta-sdk-go v0.37.0
-	github.com/microsoftgraph/msgraph-sdk-go v0.35.0
-	github.com/microsoftgraph/msgraph-sdk-go-core v0.27.0
+	github.com/microsoftgraph/msgraph-sdk-go v0.38.0
+	github.com/microsoftgraph/msgraph-sdk-go-core v0.28.0
 	github.com/turbot/steampipe-plugin-sdk/v4 v4.1.4
 )
 
@@ -53,10 +53,10 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/microsoft/kiota-abstractions-go v0.8.2 // indirect
-	github.com/microsoft/kiota-http-go v0.5.2 // indirect
-	github.com/microsoft/kiota-serialization-json-go v0.5.5 // indirect
-	github.com/microsoft/kiota-serialization-text-go v0.4.1 // indirect
+	github.com/microsoft/kiota-abstractions-go v0.9.1 // indirect
+	github.com/microsoft/kiota-http-go v0.7.0 // indirect
+	github.com/microsoft/kiota-serialization-json-go v0.5.6 // indirect
+	github.com/microsoft/kiota-serialization-text-go v0.4.2 // indirect
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect

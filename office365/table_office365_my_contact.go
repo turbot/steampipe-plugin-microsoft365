@@ -60,7 +60,7 @@ func listOffice365MyContacts(ctx context.Context, d *plugin.QueryData, h *plugin
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).Contacts().GetWithRequestConfigurationAndResponseHandler(options, nil)
+	result, err := client.UsersById(userIdentifier).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -72,7 +72,7 @@ func listOffice365MyContacts(ctx context.Context, d *plugin.QueryData, h *plugin
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
 		d.StreamListItem(ctx, &Office365ContactInfo{contact, userIdentifier})
