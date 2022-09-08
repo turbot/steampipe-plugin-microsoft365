@@ -13,7 +13,7 @@ import (
 func tableOffice365SharePointSetting(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "office365_sharepoint_setting",
-		Description: "",
+		Description: "Represents the tenant-level settings for SharePoint and OneDrive",
 		List: &plugin.ListConfig{
 			Hydrate: listOffice365SharePointSettings,
 		},
@@ -69,7 +69,7 @@ func listOffice365SharePointSettings(ctx context.Context, d *plugin.QueryData, _
 		return nil, err
 	}
 
-	result, err := client.Admin().Sharepoint().Settings().Get()
+	result, err := client.Admin().Sharepoint().Settings().Get(ctx, nil)
 	if err != nil {
 		errObj := getBetaErrorObject(err)
 		return nil, errObj
