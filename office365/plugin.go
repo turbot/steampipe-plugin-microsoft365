@@ -28,6 +28,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"office365_drive_my_file":      tableOffice365DriveMyFile(ctx),
 			"office365_mail_message":       tableOffice365MailMessage(ctx),
 			"office365_mail_my_message":    tableOffice365MailMyMessage(ctx),
+			"office365_my_calendar":        tableOffice365MyCalendar(ctx),
 			"office365_my_contact":         tableOffice365MyContact(ctx),
 			"office365_my_drive":           tableOffice365MyDrive(ctx),
 			"office365_my_team":            tableOffice365MyTeam(ctx),
