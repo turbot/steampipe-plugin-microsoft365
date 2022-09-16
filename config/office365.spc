@@ -15,7 +15,6 @@ connection "office365" {
   # client_secret = "ZZZZZZZZZZZZZZZZZZZZZZZZ"
 
   # Use client certificate authentication (https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#option-1-upload-a-certificate)
-  # required options:
   # tenant_id            = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   # client_id            = "YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY"
   # certificate_path     = "~/home/azure_cert.pem"

@@ -1,12 +1,11 @@
 ![image](https://hub.steampipe.io/images/plugins/turbot/office365-social-graphic.png)
 
-# Microsoft Office 365 Plugin for Steampipe
+# Office 365 Plugin for Steampipe
 
-Use SQL to query infrastructure including user's calendar, mailbox messages and more from Microsoft Office 365.
+Use SQL to query calendars, contacts, drives, mailboxes and more from Office 365.
 
 - **[Get started →](https://hub.steampipe.io/plugins/turbot/office365)**
 - Documentation: [Table definitions & examples](https://hub.steampipe.io/plugins/turbot/office365/tables)
-
 - Community: [Slack Channel](https://steampipe.io/community/join)
 - Get involved: [Issues](https://github.com/turbot/steampipe-plugin-office365/issues)
 
@@ -80,4 +79,4 @@ Please see the [contribution guidelines](https://github.com/turbot/steampipe/blo
 `help wanted` issues:
 
 - [Steampipe](https://github.com/turbot/steampipe/labels/help%20wanted)
-- [Microsoft Office 365 Plugin](https://github.com/turbot/steampipe-plugin-office365/labels/help%20wanted)
+- [Office 365 Plugin](https://github.com/turbot/steampipe-plugin-office365/labels/help%20wanted)

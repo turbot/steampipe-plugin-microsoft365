@@ -1,16 +1,16 @@
 ---
 organization: Turbot
-category: ["public cloud"]
+category: ["saas"]
 icon_url: "/images/plugins/turbot/office365.svg"
 brand_color: "#DC3E15"
-display_name: "Microsoft Office 365"
+display_name: "Office 365"
 name: "office365"
-description: "Steampipe plugin for querying user's calendar, mailbox messages and more from Microsoft Office 365."
-og_description: "Query Microsoft Office 365 with SQL! Open source CLI. No DB required."
+description: "Steampipe plugin for querying calendars, contacts, drives, mailboxes and more from Office 365."
+og_description: "Query Office 365 with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/office365-social-graphic.png"
 ---
 
-# Microsoft Office 365 + Steampipe
+# Office 365 + Steampipe
 
 [Microsoft Office 365](https://www.microsoft.com/en-in/microsoft-365) is a suite of cloud-based productivity and collaboration applications that integrates all Microsoft's existing online applications (Outlook, People etc.).
 
@@ -48,7 +48,7 @@ where
 
 ### Install
 
-Download and install the latest Microsoft Office 365 plugin:
+Download and install the latest Office 365 plugin:
 
 ```bash
 steampipe plugin install office365
@@ -59,7 +59,7 @@ steampipe plugin install office365
 | Item        | Description                                                                                                                                                                                                             |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Credentials | Use the `az login` command to setup your [Default Connection](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli)                                                                               |
-| Permissions | Grant the following permissions to your user: <br /><li> `Mail.Read` </li><li> `MailboxSettings.Read` </li><li> `Files.Read.All` </li><li> `Group.Read.All` </li><li> `Calendars.Read` </li><li> `SharePointTenantSettings.Read.All` </li><li> `Team.ReadBasic.All` </li><li> `TeamMember.Read.All` </li><li> `User.Read.All` </li>                                                                                                                                                            |
+| Permissions | Grant the following permissions to your user: <br /><li> `Calendars.Read` </li><li> `Files.Read.All` </li><li> `Group.Read.All` </li><li> `Mail.Read`</li><li> `MailboxSettings.Read` </li><li> `SharePointTenantSettings.Read.All` </li><li> `Team.ReadBasic.All` </li><li> `TeamMember.Read.All` </li><li> `User.Read.All` </li>
 | Radius      | Each connection represents a single Azure Tenant.                                                                                                                                                                       |
 | Resolution  | 1. Credentials explicitly set in a steampipe config file (`~/.steampipe/config/office365.spc`).<br />2. Credentials specified in [environment variables](#credentials-from-environment-variables) e.g. `AZURE_TENANT_ID`. |
 
@@ -82,7 +82,6 @@ connection "office365" {
   # client_secret = "ZZZZZZZZZZZZZZZZZZZZZZZZ"
 
   # Use client certificate authentication (https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#option-1-upload-a-certificate)
-  # required options:
   # tenant_id             = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   # client_id             = "YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY"
   # certificate_path      = "~/home/azure_cert.pem"
@@ -99,16 +98,16 @@ connection "office365" {
 }
 ```
 
-By default, all options are commented out in the default connection, thus Steampipe will resolve your credentials using the same order as mentioned in [Credentials](#credentials). This provides a quick way to get started with Steampipe, but you will probably want to customize your experience using configuration options for querying multiple tenants, [configuring credentials](#configuring-active-directory-credentials) from your Azure CLI, Client Certificate, etc.
+By default, all options are commented out in the default connection, thus Steampipe will resolve your credentials using the same order as mentioned in [Credentials](#credentials). This provides a quick way to get started with Steampipe, but you will probably want to customize your experience using configuration options for querying multiple tenants, [configuring credentials](#configuring-office-365-credentials) from your Azure CLI, Client Certificate, etc.
 
 ## Get involved
 
 - Open source: https://github.com/turbot/steampipe-plugin-office365
 - Community: [Slack Channel](https://steampipe.io/community/join)
 
-## Configuring Microsoft Office 365 Credentials
+## Configuring Office 365 Credentials
 
-The Microsoft Office 365 plugin support multiple formats and authentication mechanisms, and they are tried in the below order:
+The Office 365 plugin support multiple formats and authentication mechanisms, and they are tried in the below order:
 
 1. [Client Secret Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-saml-bearer-assertion#prerequisites) if set; otherwise
 2. [Client Certificate Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-certificate-credentials#register-your-certificate-with-microsoft-identity-platform) if set; otherwise
@@ -182,7 +181,7 @@ connection "office365" {
 
 ### Credentials from Environment Variables
 
-The Microsoft Office 365 plugin will use the standard Azure environment variables to obtain credentials **only if other arguments (`tenant_id`, `client_id`, `client_secret`, `certificate_path`, etc..) are not specified** in the connection:
+The Office 365 plugin will use the standard Azure environment variables to obtain credentials **only if other arguments (`tenant_id`, `client_id`, `client_secret`, `certificate_path`, etc..) are not specified** in the connection:
 
 ```sh
 export AZURE_TENANT_ID="00000000-0000-0000-0000-000000000000"
