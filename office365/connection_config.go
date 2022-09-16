@@ -11,8 +11,8 @@ type office365Config struct {
 	ClientSecret        *string `cty:"client_secret"`
 	CertificatePath     *string `cty:"certificate_path"`
 	CertificatePassword *string `cty:"certificate_password"`
-	EnableMsi           *bool   `cty:"enable_msi"`
-	MsiEndpoint         *string `cty:"msi_endpoint"`
+	EnableMSI           *bool   `cty:"enable_msi"`
+	MSIEndpoint         *string `cty:"msi_endpoint"`
 	Environment         *string `cty:"environment"`
 	UserIdentifier      *string `cty:"user_identifier"`
 }

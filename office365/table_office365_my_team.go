@@ -40,7 +40,7 @@ func listOffice365MyTeams(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 
 	userIdentifier := getUserFromConfig(ctx, d, h)
 	if userIdentifier == "" {
-		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
+		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
 	}
 
 	result, err := client.UsersById(userIdentifier).JoinedTeams().Get(ctx, nil)

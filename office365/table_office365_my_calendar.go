@@ -37,7 +37,7 @@ func listOffice365MyCalendars(ctx context.Context, d *plugin.QueryData, h *plugi
 
 	userIdentifier := getUserFromConfig(ctx, d, h)
 	if userIdentifier == "" {
-		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
+		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
 	}
 
 	result, err := client.UsersById(userIdentifier).Calendar().Get(ctx, nil)

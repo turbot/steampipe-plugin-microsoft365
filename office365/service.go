@@ -94,9 +94,9 @@ func GetGraphClient(ctx context.Context, d *plugin.QueryData) (*msgraphsdkgo.Gra
 		environment = os.Getenv("AZURE_ENVIRONMENT")
 	}
 
-	var enableMsi bool
-	if office365Config.EnableMsi != nil {
-		enableMsi = *office365Config.EnableMsi
+	var enableMSI bool
+	if office365Config.EnableMSI != nil {
+		enableMSI = *office365Config.EnableMSI
 	}
 
 	// 1. Client secret credentials
@@ -194,7 +194,7 @@ func GetGraphClient(ctx context.Context, d *plugin.QueryData) (*msgraphsdkgo.Gra
 			logger.Error("GetGraphClient", "client_certificate_credential_error", err)
 			return nil, nil, err
 		}
-	} else if enableMsi { // Managed identity authentication
+	} else if enableMSI { // Managed identity authentication
 		cred, err = azidentity.NewManagedIdentityCredential(
 			&azidentity.ManagedIdentityCredentialOptions{},
 		)
@@ -245,9 +245,9 @@ func GetGraphBetaClient(ctx context.Context, d *plugin.QueryData) (*msgraphbetas
 		environment = os.Getenv("AZURE_ENVIRONMENT")
 	}
 
-	var enableMsi bool
-	if office365Config.EnableMsi != nil {
-		enableMsi = *office365Config.EnableMsi
+	var enableMSI bool
+	if office365Config.EnableMSI != nil {
+		enableMSI = *office365Config.EnableMSI
 	}
 
 	// 1. Client secret credentials
@@ -345,7 +345,7 @@ func GetGraphBetaClient(ctx context.Context, d *plugin.QueryData) (*msgraphbetas
 			logger.Error("GetGraphBetaClient", "client_certificate_credential_error", err)
 			return nil, nil, err
 		}
-	} else if enableMsi { // Managed identity authentication
+	} else if enableMSI { // Managed identity authentication
 		cred, err = azidentity.NewManagedIdentityCredential(
 			&azidentity.ManagedIdentityCredentialOptions{},
 		)

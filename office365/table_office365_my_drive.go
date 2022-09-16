@@ -42,7 +42,7 @@ func listOffice365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugin.H
 
 	userIdentifier := getUserFromConfig(ctx, d, h)
 	if userIdentifier == "" {
-		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
+		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
 	}
 
 	input := &drives.DrivesRequestBuilderGetQueryParameters{}

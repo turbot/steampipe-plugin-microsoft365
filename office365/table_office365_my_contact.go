@@ -41,7 +41,7 @@ func listOffice365MyContacts(ctx context.Context, d *plugin.QueryData, h *plugin
 
 	userIdentifier := getUserFromConfig(ctx, d, h)
 	if userIdentifier == "" {
-		return nil, fmt.Errorf("userIdentifier must be set in the connection configuration")
+		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
 	}
 
 	// List operations
