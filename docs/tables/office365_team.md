@@ -2,7 +2,7 @@
 
 Get the teams in Microsoft Teams that the specified user is a direct member of.
 
-You must specify the user's Id or email in the where or join clause (`where user_identifier=`, `join office365_team on user_identifier=`).
+You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join office365_team on user_identifier=`).
 
 ## Examples
 

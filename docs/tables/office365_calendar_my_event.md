@@ -4,7 +4,7 @@ List previous and upcoming events scheduled in a specific calendar.
 
 To query events in any calendar, use the `office365_calendar_event` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

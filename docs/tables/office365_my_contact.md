@@ -4,7 +4,7 @@ List contacts of the specified user.
 
 To query contacts of any user, use the `office365_contact` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

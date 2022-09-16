@@ -2,7 +2,7 @@
 
 List previous and upcoming events scheduled in a specific calendar.
 
-The `office365_calendar_event` table can be used to query events from any calendar, if you have access; and **you must specify user's id or email** in the where or join clause (`where user_identifier=`, `join office365_calendar_event on user_identifier=`).
+The `office365_calendar_event` table can be used to query events from any calendar, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join office365_calendar_event on user_identifier=`).
 
 ## Examples
 

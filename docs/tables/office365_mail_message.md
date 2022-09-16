@@ -2,7 +2,7 @@
 
 List messages in a specific user's mailbox.
 
-The `office365_mail_message` table can be used to query user's messages from any mailbox, if you have access; and **you must specify user's id or email** in the where or join clause (`where user_identifier=`, `join office365_mail_message on user_identifier=`).
+The `office365_mail_message` table can be used to query a user's messages from any mailbox, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join office365_mail_message on user_identifier=`).
 
 ## Examples
 

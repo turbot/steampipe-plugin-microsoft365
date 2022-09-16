@@ -4,7 +4,7 @@ Get metadata information for a specific user's calendar.
 
 To query the metadata of any user's calendar, use the `office365_calendar` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

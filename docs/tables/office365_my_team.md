@@ -4,7 +4,7 @@ Get the teams in Microsoft Teams that the specified user is a direct member of.
 
 To query teams that any user is a direct member of, use the `office365_team` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

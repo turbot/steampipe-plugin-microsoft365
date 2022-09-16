@@ -4,7 +4,7 @@ List messages in a specific user's mailbox.
 
 To query messages in any mailbox, use the `office365_mail_message` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

@@ -2,7 +2,7 @@
 
 Get metadata information for a specific user's calendar.
 
-You must specify the user's Id or email in the where or join clause (`where user_identifier=`, `join office365_calendar on user_identifier=`).
+You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join office365_calendar on user_identifier=`).
 
 ## Examples
 

@@ -2,7 +2,7 @@
 
 List the specified user's drives.
 
-You must specify the user's Id or email in the where or join clause (`where user_identifier=`, `join office365_drive on user_identifier=`).
+You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join office365_drive on user_identifier=`).
 
 ## Examples
 

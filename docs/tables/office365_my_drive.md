@@ -4,7 +4,7 @@ List the specified user's drives.
 
 To query events in any user's drive, use the `office365_drive` table.
 
-**Note:** This table requires `user_identifier` argument to be configured in the connection config.
+**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 
