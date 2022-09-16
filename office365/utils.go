@@ -18,7 +18,7 @@ func getTenant(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 	var tenantID string
 	var err error
 
-	// Read tenantID from config, or environment variables
+	// Read tenant ID from config, or environment variables
 	office365Config := GetConfig(d.Connection)
 	if office365Config.TenantID != nil {
 		tenantID = *office365Config.TenantID
@@ -26,7 +26,7 @@ func getTenant(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		tenantID = os.Getenv("AZURE_TENANT_ID")
 	}
 
-	// If not set in config, get tenantID from CLI
+	// If not set in config, get tenant ID from CLI
 	if tenantID == "" {
 		tenantID, err = getTenantFromCLI()
 		if err != nil {
