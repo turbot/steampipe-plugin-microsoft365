@@ -1,7 +1,6 @@
 package office365
 
 import (
-	"github.com/microsoftgraph/msgraph-beta-sdk-go/models/tenantadmin"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
@@ -34,10 +33,6 @@ type Office365DriveItemInfo struct {
 type Office365MailMessageInfo struct {
 	models.Messageable
 	UserIdentifier string
-}
-
-type Office365SharePointSettingInfo struct {
-	tenantadmin.Settingsable
 }
 
 type Office365TeamInfo struct {
@@ -1077,49 +1072,6 @@ func (message *Office365MailMessageInfo) MessageToRecipients() []map[string]inte
 		recipients = append(recipients, recipientInfo)
 	}
 	return recipients
-}
-
-func (sharepointSetting *Office365SharePointSettingInfo) SharePointSettingIdleSessionSignOut() map[string]interface{} {
-	if sharepointSetting.GetIdleSessionSignOut() == nil {
-		return nil
-	}
-	data := map[string]interface{}{}
-
-	if sharepointSetting.GetIdleSessionSignOut().GetIsEnabled() != nil {
-		data["isEnabled"] = *sharepointSetting.GetIdleSessionSignOut().GetIsEnabled()
-	}
-	if sharepointSetting.GetIdleSessionSignOut().GetOdataType() != nil {
-		data["@odata.type"] = *sharepointSetting.GetIdleSessionSignOut().GetOdataType()
-	}
-	if sharepointSetting.GetIdleSessionSignOut().GetSignOutAfterInSeconds() != nil {
-		data["signOutAfterInSeconds"] = *sharepointSetting.GetIdleSessionSignOut().GetSignOutAfterInSeconds()
-	}
-	if sharepointSetting.GetIdleSessionSignOut().GetWarnAfterInSeconds() != nil {
-		data["warnAfterInSeconds"] = *sharepointSetting.GetIdleSessionSignOut().GetWarnAfterInSeconds()
-	}
-
-	return data
-}
-
-func (sharepointSetting *Office365SharePointSettingInfo) SharePointSettingImageTaggingOption() string {
-	if sharepointSetting.GetImageTaggingOption() != nil {
-		return sharepointSetting.GetImageTaggingOption().String()
-	}
-	return ""
-}
-
-func (sharepointSetting *Office365SharePointSettingInfo) SharePointSettingSharingCapability() string {
-	if sharepointSetting.GetSharingCapability() != nil {
-		return sharepointSetting.GetSharingCapability().String()
-	}
-	return ""
-}
-
-func (sharepointSetting *Office365SharePointSettingInfo) SharePointSettingSharingDomainRestrictionMode() string {
-	if sharepointSetting.GetSharingDomainRestrictionMode() != nil {
-		return sharepointSetting.GetSharingDomainRestrictionMode().String()
-	}
-	return ""
 }
 
 func (team *Office365TeamInfo) TeamMembers() interface{} {
