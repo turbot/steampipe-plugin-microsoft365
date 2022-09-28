@@ -1,2 +1,2 @@
 install:
-	go build -o ~/.steampipe/plugins/hub.steampipe.io/plugins/turbot/office365@latest/steampipe-plugin-office365.plugin *.go
+	go build -o ~/.steampipe/plugins/hub.steampipe.io/plugins/turbot/microsoft365@latest/steampipe-plugin-microsoft365.plugin *.go
