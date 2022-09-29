@@ -96,6 +96,13 @@ func tableMicrosoft365CalendarEvent(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound", "UnsupportedQueryOption"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365CalendarEvent,
+			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: calendarEventColumns(),
 	}
 }
@@ -199,6 +206,33 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365CalendarEvent(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	eventID := d.KeyColumnQualString("id")
+	if eventID == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_calendar_event.getMicrosoft365CalendarEvent", "connection_error", err)
+		return nil, err
+	}
+	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+
+	result, err := client.UsersById(userIdentifier).EventsById(eventID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365CalendarEventInfo{result, userIdentifier}, nil
 }
 
 func eventStartTime(_ context.Context, d *transform.TransformData) (interface{}, error) {

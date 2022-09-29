@@ -4,6 +4,10 @@ import (
 	"context"
 	"os"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	a "github.com/microsoft/kiota-authentication-azure-go"
+	msgraphsdkgo "github.com/microsoftgraph/msgraph-sdk-go"
+
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
@@ -46,4 +50,50 @@ func getUserFromConfig(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 	}
 
 	return userIdentifier
+}
+
+func getUserIdentifier(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	getTenantCached := plugin.HydrateFunc(getTenant).WithCache()
+	tenantID, err := getTenantCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create client
+	cred, err := azidentity.NewAzureCLICredential(
+		&azidentity.AzureCLICredentialOptions{
+			TenantID: tenantID.(string),
+		},
+	)
+	if err != nil {
+		logger.Error("getUserIdentifier", "cli_credential_error", err)
+		return nil, err
+	}
+
+	auth, err := a.NewAzureIdentityAuthenticationProvider(cred)
+	if err != nil {
+		logger.Error("getUserIdentifier", "identity_authentication_provider_error", err)
+		return nil, err
+	}
+
+	adapter, err := msgraphsdkgo.NewGraphRequestAdapter(auth)
+	if err != nil {
+		logger.Error("getUserIdentifier", "graph_request_adaptor_error", err)
+		return nil, err
+	}
+	client := msgraphsdkgo.NewGraphServiceClient(adapter)
+
+	result, err := client.Me().Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	if result.GetId() != nil {
+		return *result.GetId(), nil
+	}
+
+	return nil, nil
 }

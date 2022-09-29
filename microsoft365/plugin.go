@@ -32,6 +32,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"microsoft365_my_contact":        tableMicrosoft365MyContact(ctx),
 			"microsoft365_my_drive":          tableMicrosoft365MyDrive(ctx),
 			"microsoft365_my_team":           tableMicrosoft365MyTeam(ctx),
+			"microsoft365_org_contact":       tableMicrosoft365OrgContact(ctx),
 			"microsoft365_team":              tableMicrosoft365Team(ctx),
 		},
 	}

@@ -2,7 +2,6 @@ package microsoft365
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
@@ -36,6 +35,13 @@ func tableMicrosoft365CalendarMyEvent(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound", "UnsupportedQueryOption"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365CalendarMyEvent,
+			KeyColumns: plugin.SingleColumn("id"),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: calendarEventColumns(),
 	}
 }
@@ -51,10 +57,17 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 		logger.Error("microsoft365_calendar_my_event.listMicrosoft365CalendarMyEvents", "connection_error", err)
 		return nil, err
 	}
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier == "" {
-		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	// userIdentifier := getUserFromConfig(ctx, d, h)
+	// if userIdentifier == "" {
+	// 	return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	// }
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
 	}
+	userIdentifier := userID.(string)
 
 	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
 
@@ -142,4 +155,37 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365CalendarMyEvent(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	eventID := d.KeyColumnQualString("id")
+	if eventID == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_calendar_my_event.getMicrosoft365CalendarMyEvent", "connection_error", err)
+		return nil, err
+	}
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	userIdentifier := userID.(string)
+
+	result, err := client.UsersById(userIdentifier).EventsById(eventID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365CalendarEventInfo{result, userIdentifier}, nil
 }

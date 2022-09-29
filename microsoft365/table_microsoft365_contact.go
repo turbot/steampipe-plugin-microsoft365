@@ -75,6 +75,13 @@ func tableMicrosoft365Contact(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365Contact,
+			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: contactColumns(),
 	}
 }
@@ -134,4 +141,31 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365Contact(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	contactID := d.KeyColumnQualString("id")
+	userIdentifier := d.KeyColumnQualString("user_identifier")
+	if contactID == "" || userIdentifier == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_contact.listMicrosoft365Contacts", "connection_error", err)
+		return nil, err
+	}
+
+	result, err := client.UsersById(userIdentifier).ContactsById(contactID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365ContactInfo{result, userIdentifier}, nil
 }

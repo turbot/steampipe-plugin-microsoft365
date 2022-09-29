@@ -35,6 +35,10 @@ type Microsoft365MailMessageInfo struct {
 	UserIdentifier string
 }
 
+type Microsoft365OrgContactInfo struct {
+	models.OrgContactable
+}
+
 type Microsoft365TeamInfo struct {
 	models.Teamable
 	UserIdentifier string
@@ -1072,6 +1076,159 @@ func (message *Microsoft365MailMessageInfo) MessageToRecipients() []map[string]i
 		recipients = append(recipients, recipientInfo)
 	}
 	return recipients
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactAddresses() []map[string]interface{} {
+	if orgContact.GetAddresses() == nil {
+		return nil
+	}
+
+	addresses := []map[string]interface{}{}
+	for _, i := range orgContact.GetAddresses() {
+		data := map[string]interface{}{}
+		if i.GetCity() != nil {
+			data["city"] = *i.GetCity()
+		}
+		if i.GetCountryOrRegion() != nil {
+			data["countryOrRegion"] = *i.GetCountryOrRegion()
+		}
+		if i.GetOfficeLocation() != nil {
+			data["officeLocation"] = *i.GetOfficeLocation()
+		}
+		if i.GetPostalCode() != nil {
+			data["postalCode"] = *i.GetPostalCode()
+		}
+		if i.GetState() != nil {
+			data["state"] = *i.GetState()
+		}
+		if i.GetStreet() != nil {
+			data["street"] = *i.GetStreet()
+		}
+		addresses = append(addresses, data)
+	}
+	return addresses
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactDirectReports() []map[string]interface{} {
+	if orgContact.GetDirectReports() == nil {
+		return nil
+	}
+
+	directReports := []map[string]interface{}{}
+	for _, i := range orgContact.GetDirectReports() {
+		data := map[string]interface{}{}
+		if i.GetId() != nil {
+			data["id"] = *i.GetId()
+		}
+		if i.GetDeletedDateTime() != nil {
+			data["deletedDateTime"] = *i.GetDeletedDateTime()
+		}
+		directReports = append(directReports, data)
+	}
+	return directReports
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactManager() map[string]interface{} {
+	if orgContact.GetManager() == nil {
+		return nil
+	}
+
+	data := map[string]interface{}{}
+	if orgContact.GetManager().GetId() != nil {
+		data["id"] = *orgContact.GetManager().GetId()
+	}
+	if orgContact.GetManager().GetDeletedDateTime() != nil {
+		data["deletedDateTime"] = *orgContact.GetManager().GetDeletedDateTime()
+	}
+	return data
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactMemberOf() []map[string]interface{} {
+	if orgContact.GetMemberOf() == nil {
+		return nil
+	}
+
+	memberOf := []map[string]interface{}{}
+	for _, i := range orgContact.GetMemberOf() {
+		data := map[string]interface{}{}
+		if i.GetId() != nil {
+			data["id"] = *i.GetId()
+		}
+		if i.GetDeletedDateTime() != nil {
+			data["deletedDateTime"] = *i.GetDeletedDateTime()
+		}
+		memberOf = append(memberOf, data)
+	}
+	return memberOf
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactOnPremisesProvisioningErrors() []map[string]interface{} {
+	if orgContact.GetOnPremisesProvisioningErrors() == nil {
+		return nil
+	}
+
+	provisioningErrors := []map[string]interface{}{}
+	for _, i := range orgContact.GetOnPremisesProvisioningErrors() {
+		data := map[string]interface{}{}
+		if i.GetCategory() != nil {
+			data["category"] = *i.GetCategory()
+		}
+		if i.GetOccurredDateTime() != nil {
+			data["occurredDateTime"] = *i.GetOccurredDateTime()
+		}
+		if i.GetPropertyCausingError() != nil {
+			data["propertyCausingError"] = *i.GetPropertyCausingError()
+		}
+		if i.GetValue() != nil {
+			data["value"] = *i.GetValue()
+		}
+		provisioningErrors = append(provisioningErrors, data)
+	}
+	return provisioningErrors
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactPhones() []map[string]interface{} {
+	if orgContact.GetPhones() == nil {
+		return nil
+	}
+
+	phones := []map[string]interface{}{}
+	for _, i := range orgContact.GetPhones() {
+		data := map[string]interface{}{}
+		if i.GetLanguage() != nil {
+			data["language"] = *i.GetLanguage()
+		}
+		if i.GetNumber() != nil {
+			data["number"] = *i.GetNumber()
+		}
+		if i.GetRegion() != nil {
+			data["region"] = *i.GetRegion()
+		}
+		if i.GetType() != nil {
+			data["type"] = i.GetType().String()
+		}
+		phones = append(phones, data)
+	}
+	return phones
+}
+
+func (orgContact *Microsoft365OrgContactInfo) OrgContactTransitiveMemberOf() []map[string]interface{} {
+	if orgContact.GetTransitiveMemberOf() == nil {
+		return nil
+	}
+
+	memberOf := []map[string]interface{}{}
+	for _, i := range orgContact.GetTransitiveMemberOf() {
+		data := map[string]interface{}{}
+		if i.GetId() != nil {
+			data["id"] = *i.GetId()
+		}
+		if i.GetDeletedDateTime() != nil {
+			data["deletedDateTime"] = *i.GetDeletedDateTime()
+		}
+		memberOf = append(memberOf, data)
+	}
+	return memberOf
 }
 
 func (team *Microsoft365TeamInfo) TeamMembers() interface{} {
