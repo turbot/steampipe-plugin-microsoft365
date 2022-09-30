@@ -21,6 +21,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		TableMap: map[string]*plugin.Table{
 			"microsoft365_calendar":             tableMicrosoft365Calendar(ctx),
 			"microsoft365_calendar_event":       tableMicrosoft365CalendarEvent(ctx),
+			"microsoft365_calendar_group":       tableMicrosoft365CalendarGroup(ctx),
 			"microsoft365_calendar_my_event":    tableMicrosoft365CalendarMyEvent(ctx),
 			"microsoft365_contact":              tableMicrosoft365Contact(ctx),
 			"microsoft365_drive":                tableMicrosoft365Drive(ctx),
@@ -29,6 +30,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"microsoft365_mail_message":         tableMicrosoft365MailMessage(ctx),
 			"microsoft365_mail_my_message":      tableMicrosoft365MailMyMessage(ctx),
 			"microsoft365_my_calendar":          tableMicrosoft365MyCalendar(ctx),
+			"microsoft365_my_calendar_group":    tableMicrosoft365MyCalendarGroup(ctx),
 			"microsoft365_my_contact":           tableMicrosoft365MyContact(ctx),
 			"microsoft365_my_drive":             tableMicrosoft365MyDrive(ctx),
 			"microsoft365_my_team":              tableMicrosoft365MyTeam(ctx),

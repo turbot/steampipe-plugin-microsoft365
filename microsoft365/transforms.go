@@ -6,7 +6,8 @@ import (
 
 type Microsoft365CalendarInfo struct {
 	models.Calendarable
-	UserIdentifier string
+	CalendarGroupID string
+	UserIdentifier  string
 }
 
 type Microsoft365CalendarEventInfo struct {
@@ -14,6 +15,10 @@ type Microsoft365CalendarEventInfo struct {
 	UserIdentifier string
 }
 
+type Microsoft365CalendarGroupInfo struct {
+	models.CalendarGroupable
+	UserIdentifier string
+}
 type Microsoft365ContactInfo struct {
 	models.Contactable
 	UserIdentifier string

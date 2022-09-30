@@ -16,6 +16,7 @@ func calendarColumns() []*plugin.Column {
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The calendar's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The calendar name.", Transform: transform.FromMethod("GetName")},
 		{Name: "is_default_calendar", Type: proto.ColumnType_BOOL, Description: "True if this is the default calendar where new events are created by default, false otherwise.", Transform: transform.FromMethod("GetIsDefaultCalendar")},
+		{Name: "calendar_group_id", Type: proto.ColumnType_STRING, Description: "The ID of the group.", Transform: transform.FromField("CalendarGroupID")},
 		{Name: "color", Type: proto.ColumnType_STRING, Description: "Specifies the color theme to distinguish the calendar from other calendars in a UI. The property values are: auto, lightBlue, lightGreen, lightOrange, lightGray, lightYellow, lightTeal, lightPink, lightBrown, lightRed, maxColor.", Transform: transform.FromMethod("CalendarColor")},
 		{Name: "can_view_private_items", Type: proto.ColumnType_BOOL, Description: "True if the user can read calendar items that have been marked private, false otherwise.", Transform: transform.FromMethod("GetCanViewPrivateItems")},
 		{Name: "can_edit", Type: proto.ColumnType_BOOL, Description: "True if the user can write to the calendar, false otherwise.", Transform: transform.FromMethod("GetCanEdit")},
@@ -48,7 +49,8 @@ func tableMicrosoft365Calendar(_ context.Context) *plugin.Table {
 		Name:        "microsoft365_calendar",
 		Description: "Metadata of the specified user's calendar.",
 		List: &plugin.ListConfig{
-			Hydrate: listMicrosoft365Calendars,
+			ParentHydrate: listMicrosoft365CalendarGroups,
+			Hydrate:       listMicrosoft365Calendars,
 			KeyColumns: []*plugin.KeyColumn{
 				{
 					Name:    "user_identifier",
@@ -59,31 +61,86 @@ func tableMicrosoft365Calendar(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365Calendar,
+			KeyColumns: plugin.AllColumns([]string{"user_identifier", "calendar_group_id", "id"}),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: calendarColumns(),
 	}
 }
 
 //// LIST FUNCTION
 
-func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
+	groupData := h.Item.(*Microsoft365CalendarGroupInfo)
+
 	// Create client
-	client, _, err := GetGraphClient(ctx, d)
+	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
 		logger.Error("microsoft365_calendar.listMicrosoft365Calendars", "connection_error", err)
 		return nil, err
 	}
 	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
 
-	result, err := client.UsersById(userIdentifier).Calendar().Get(ctx, nil)
+	result, err := client.UsersById(userIdentifier).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
-	d.StreamListItem(ctx, &Microsoft365CalendarInfo{result, userIdentifier})
+
+	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateCalendarCollectionResponseFromDiscriminatorValue)
+	if err != nil {
+		logger.Error("listMicrosoft365Calendars", "create_iterator_instance_error", err)
+		return nil, err
+	}
+
+	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
+		calendar := pageItem.(models.Calendarable)
+
+		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userIdentifier})
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		return d.QueryStatus.RowsRemaining(ctx) != 0
+	})
+	if err != nil {
+		logger.Error("listMicrosoft365Calendars", "paging_error", err)
+		return nil, err
+	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365Calendar(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	userIdentifier := d.KeyColumnQualString("user_identifier")
+	calendarGroupID := d.KeyColumnQualString("calendar_group_id")
+	id := d.KeyColumnQualString("id")
+	if calendarGroupID == "" || id == "" || userIdentifier == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_calendar.getMicrosoft365Calendar", "connection_error", err)
+		return nil, err
+	}
+
+	result, err := client.UsersById(userIdentifier).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365CalendarInfo{result, calendarGroupID, userIdentifier}, nil
 }
 
 func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
@@ -99,7 +156,7 @@ func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryDat
 	}
 
 	var permissions []map[string]interface{}
-	result, err := client.UsersById(calendarData.UserIdentifier).Calendar().CalendarPermissions().Get(ctx, nil)
+	result, err := client.UsersById(calendarData.UserIdentifier).CalendarGroupsById(calendarData.CalendarGroupID).CalendarsById(*calendarData.GetId()).CalendarPermissions().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
