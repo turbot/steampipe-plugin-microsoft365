@@ -1,13 +1,13 @@
 ---
 organization: Turbot
 category: ["saas"]
-icon_url: "/images/plugins/turbot/office365.svg"
+icon_url: "/images/plugins/turbot/microsoft365.svg"
 brand_color: "#DC3E15"
 display_name: "Microsoft 365"
 name: "microsoft365"
 description: "Steampipe plugin for querying calendars, contacts, drives, mailboxes and more from Microsoft 365."
 og_description: "Query Microsoft 365 with SQL! Open source CLI. No DB required."
-og_image: "/images/plugins/turbot/office365-social-graphic.png"
+og_image: "/images/plugins/turbot/microsoft365-social-graphic.png"
 ---
 
 # Microsoft 365 + Steampipe

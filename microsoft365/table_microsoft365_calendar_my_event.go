@@ -57,10 +57,6 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 		logger.Error("microsoft365_calendar_my_event.listMicrosoft365CalendarMyEvents", "connection_error", err)
 		return nil, err
 	}
-	// userIdentifier := getUserFromConfig(ctx, d, h)
-	// if userIdentifier == "" {
-	// 	return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
-	// }
 
 	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
 	userID, err := getUserIdentifierCached(ctx, d, h)

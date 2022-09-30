@@ -2,7 +2,6 @@ package microsoft365
 
 import (
 	"context"
-	"fmt"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -23,6 +22,13 @@ func tableMicrosoft365MyContact(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365MyContact,
+			KeyColumns: plugin.SingleColumn("id"),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: contactColumns(),
 	}
 }
@@ -39,10 +45,12 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 		return nil, err
 	}
 
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier == "" {
-		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
 	}
+	userIdentifier := userID.(string)
 
 	// List operations
 	input := &contacts.ContactsRequestBuilderGetQueryParameters{}
@@ -86,4 +94,37 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365MyContact(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	contactID := d.KeyColumnQualString("id")
+	if contactID == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_my_contact.getMicrosoft365MyContact", "connection_error", err)
+		return nil, err
+	}
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	userIdentifier := userID.(string)
+
+	result, err := client.UsersById(userIdentifier).ContactsById(contactID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365ContactInfo{result, userIdentifier}, nil
 }

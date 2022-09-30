@@ -1,4 +1,4 @@
-![image](https://hub.steampipe.io/images/plugins/turbot/office365-social-graphic.png)
+![image](https://hub.steampipe.io/images/plugins/turbot/microsoft365-social-graphic.png)
 
 # Microsoft 365 Plugin for Steampipe
 

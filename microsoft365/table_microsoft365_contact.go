@@ -157,7 +157,7 @@ func getMicrosoft365Contact(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_contact.listMicrosoft365Contacts", "connection_error", err)
+		logger.Error("microsoft365_contact.getMicrosoft365Contact", "connection_error", err)
 		return nil, err
 	}
 

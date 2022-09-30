@@ -2,7 +2,6 @@ package microsoft365
 
 import (
 	"context"
-	"fmt"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -19,6 +18,13 @@ func tableMicrosoft365DriveMyFile(_ context.Context) *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate:       listMicrosoft365DriveMyFiles,
 			ParentHydrate: listMicrosoft365MyDrives,
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365DriveMyFile,
+			KeyColumns: plugin.AllColumns([]string{"drive_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -45,10 +51,12 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 		return nil, err
 	}
 
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier == "" {
-		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
 	}
+	userIdentifier := userID.(string)
 
 	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
@@ -93,4 +101,38 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365DriveMyFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	driveID := d.KeyColumnQualString("drive_id")
+	id := d.KeyColumnQualString("id")
+	if driveID == "" || id == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_drive_my_file.getMicrosoft365DriveMyFile", "connection_error", err)
+		return nil, err
+	}
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	userIdentifier := userID.(string)
+
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return Microsoft365DriveItemInfo{result, driveID, userIdentifier}, nil
 }

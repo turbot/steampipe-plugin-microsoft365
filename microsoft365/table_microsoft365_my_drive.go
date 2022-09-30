@@ -2,7 +2,6 @@ package microsoft365
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
@@ -20,6 +19,10 @@ func tableMicrosoft365MyDrive(_ context.Context) *plugin.Table {
 		Description: "Drives defined user's shared drives in the Google Drive.",
 		List: &plugin.ListConfig{
 			Hydrate: listMicrosoft365MyDrives,
+		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365MyDrive,
+			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -40,10 +43,12 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier == "" {
-		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
 	}
+	userIdentifier := userID.(string)
 
 	input := &drives.DrivesRequestBuilderGetQueryParameters{}
 
@@ -94,4 +99,37 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365MyDrive(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	driveID := d.KeyColumnQualString("id")
+	if driveID == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_my_drive.listMicrosoft365MyDrives", "connection_error", err)
+		return nil, err
+	}
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	userIdentifier := userID.(string)
+
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365DriveInfo{result, userIdentifier}, nil
 }

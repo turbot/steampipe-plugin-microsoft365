@@ -2,12 +2,12 @@ package microsoft365
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages/item"
 
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
@@ -34,6 +34,13 @@ func tableMicrosoft365MailMyMessage(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365MailMyMessage,
+			KeyColumns: plugin.SingleColumn("id"),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: mailMessageColumns(),
 	}
 }
@@ -50,10 +57,12 @@ func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h 
 		return nil, err
 	}
 
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier == "" {
-		return nil, fmt.Errorf("user_identifier must be set in the connection configuration")
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
 	}
+	userIdentifier := userID.(string)
 
 	// List operations
 	input := &messages.MessagesRequestBuilderGetQueryParameters{}
@@ -122,4 +131,49 @@ func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h 
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365MailMyMessage(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	id := d.KeyColumnQualString("id")
+	if id == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_mail_my_message.getMicrosoft365MailMyMessage", "connection_error", err)
+		return nil, err
+	}
+
+	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
+	userID, err := getUserIdentifierCached(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	userIdentifier := userID.(string)
+
+	// List operations
+	input := &item.MessageItemRequestBuilderGetQueryParameters{}
+
+	// Check for query context and requests only for queried columns
+	givenColumns := d.QueryContext.Columns
+	selectColumns := buildMailMessageRequestFields(ctx, givenColumns)
+	input.Select = selectColumns
+
+	options := &item.MessageItemRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.UsersById(userIdentifier).MessagesById(id).Get(ctx, options)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365MailMessageInfo{result, userIdentifier}, nil
 }

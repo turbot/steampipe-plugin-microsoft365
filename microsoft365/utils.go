@@ -55,6 +55,14 @@ func getUserFromConfig(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 func getUserIdentifier(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
+	// Get the user from config
+	userIdentifier := getUserFromConfig(ctx, d, h)
+	if userIdentifier != "" {
+		return userIdentifier, nil
+	}
+
+	// If the user is not provided in the config,
+	// get the current authenticated user from CLI
 	getTenantCached := plugin.HydrateFunc(getTenant).WithCache()
 	tenantID, err := getTenantCached(ctx, d, h)
 	if err != nil {

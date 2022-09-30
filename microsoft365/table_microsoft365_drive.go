@@ -60,6 +60,13 @@ func tableMicrosoft365Drive(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365Drive,
+			KeyColumns: plugin.AllColumns([]string{"id", "user_identifier"}),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: driveColumns(),
 	}
 }
@@ -126,6 +133,33 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365Drive(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	driveID := d.KeyColumnQualString("id")
+	userIdentifier := d.KeyColumnQualString("user_identifier")
+	if driveID == "" || userIdentifier == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_my_drive.listMicrosoft365MyDrives", "connection_error", err)
+		return nil, err
+	}
+
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365DriveInfo{result, userIdentifier}, nil
 }
 
 func buildDriveQueryFilter(equalQuals plugin.KeyColumnEqualsQualMap) []string {

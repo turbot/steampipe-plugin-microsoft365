@@ -53,6 +53,13 @@ func tableMicrosoft365DriveFile(_ context.Context) *plugin.Table {
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365DriveFile,
+			KeyColumns: plugin.AllColumns([]string{"id", "drive_id", "user_identifier"}),
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
 		Columns: driveFileColumns(),
 	}
 }
@@ -119,6 +126,34 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	userIdentifier := d.KeyColumnQualString("user_identifier")
+	driveID := d.KeyColumnQualString("drive_id")
+	id := d.KeyColumnQualString("id")
+	if userIdentifier == "" || driveID == "" || id == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_drive_file.listMicrosoft365DriveFiles", "connection_error", err)
+		return nil, err
+	}
+
+	result, err := client.UsersById(userIdentifier).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return Microsoft365DriveItemInfo{result, driveID, userIdentifier}, nil
 }
 
 func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient, a *msgraphsdkgo.GraphRequestAdapter, data models.DriveItemable, userID string, driveID string) ([]Microsoft365DriveItemInfo, error) {

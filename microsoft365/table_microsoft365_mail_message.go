@@ -14,6 +14,7 @@ import (
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages/item"
 )
 
 func mailMessageColumns() []*plugin.Column {
@@ -80,6 +81,13 @@ func tableMicrosoft365MailMessage(_ context.Context) *plugin.Table {
 				{Name: "is_read", Require: plugin.Optional, Operators: []string{"<>", "="}},
 				{Name: "is_draft", Require: plugin.Optional, Operators: []string{"<>", "="}},
 			},
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+			},
+		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365MailMessage,
+			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -168,6 +176,45 @@ func listMicrosoft365MailMessages(ctx context.Context, d *plugin.QueryData, _ *p
 	}
 
 	return nil, nil
+}
+
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365MailMessage(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	userIdentifier := d.KeyColumnQualString("user_identifier")
+	id := d.KeyColumnQualString("id")
+	if userIdentifier == "" || id == "" {
+		return nil, nil
+	}
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_mail_message.listMicrosoft365MailMessages", "connection_error", err)
+		return nil, err
+	}
+
+	// List operations
+	input := &item.MessageItemRequestBuilderGetQueryParameters{}
+
+	// Check for query context and requests only for queried columns
+	givenColumns := d.QueryContext.Columns
+	selectColumns := buildMailMessageRequestFields(ctx, givenColumns)
+	input.Select = selectColumns
+
+	options := &item.MessageItemRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.UsersById(userIdentifier).MessagesById(id).Get(ctx, options)
+	if err != nil {
+		errObj := getErrorObject(err)
+		return nil, errObj
+	}
+
+	return &Microsoft365MailMessageInfo{result, userIdentifier}, nil
 }
 
 func buildMailMessageRequestFields(ctx context.Context, queryColumns []string) []string {

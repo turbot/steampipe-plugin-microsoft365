@@ -7,7 +7,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 )
 
-const pluginName = "steampipe-plugin-office365"
+const pluginName = "steampipe-plugin-microsoft365"
 
 // Plugin creates this (microsoft365) plugin
 func Plugin(ctx context.Context) *plugin.Plugin {
