@@ -15,7 +15,7 @@ import (
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
-func orgContactColumns() []*plugin.Column {
+func organizationContactColumns() []*plugin.Column {
 	return []*plugin.Column{
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The contact's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The contact's display name.", Transform: transform.FromMethod("GetDisplayName")},
@@ -50,12 +50,12 @@ func orgContactColumns() []*plugin.Column {
 
 //// TABLE DEFINITION
 
-func tableMicrosoft365OrgContact(_ context.Context) *plugin.Table {
+func tableMicrosoft365OrganizationContact(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "microsoft365_org_contact",
+		Name:        "microsoft365_organization_contact",
 		Description: "Retrieve the list of organizational contacts for this organization.",
 		List: &plugin.ListConfig{
-			Hydrate: listMicrosoft365OrgContacts,
+			Hydrate: listMicrosoft365OrganizationContacts,
 			KeyColumns: plugin.KeyColumnSlice{
 				// Key fields
 				{Name: "display_name", Require: plugin.Optional},
@@ -68,19 +68,19 @@ func tableMicrosoft365OrgContact(_ context.Context) *plugin.Table {
 			},
 		},
 		Get: &plugin.GetConfig{
-			Hydrate:    getMicrosoft365OrgContact,
+			Hydrate:    getMicrosoft365OrganizationContact,
 			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
-		Columns: orgContactColumns(),
+		Columns: organizationContactColumns(),
 	}
 }
 
 //// LIST FUNCTION
 
-func listMicrosoft365OrgContacts(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listMicrosoft365OrganizationContacts(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	// Create client
@@ -123,7 +123,6 @@ func listMicrosoft365OrgContacts(ctx context.Context, d *plugin.QueryData, _ *pl
 		QueryParameters: input,
 	}
 
-	//userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
 	result, err := client.Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
@@ -154,7 +153,7 @@ func listMicrosoft365OrgContacts(ctx context.Context, d *plugin.QueryData, _ *pl
 
 //// HYDRATE FUNCTIONS
 
-func getMicrosoft365OrgContact(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func getMicrosoft365OrganizationContact(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	contactID := d.KeyColumnQualString("id")

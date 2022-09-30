@@ -41,13 +41,18 @@ type Microsoft365OrgContactInfo struct {
 
 type Microsoft365TeamInfo struct {
 	models.Teamable
-	UserIdentifier string
+	ID string
 }
 
 type Microsoft365TeamChannelInfo struct {
 	models.Channelable
 	TeamID         string
 	UserIdentifier string
+}
+
+type Microsoft365TeamMemberInfo struct {
+	TeamID   string
+	MemberID string
 }
 
 func (calendar *Microsoft365CalendarInfo) CalendarColor() string {

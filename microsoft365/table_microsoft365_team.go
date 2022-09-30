@@ -8,34 +8,32 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
-	"github.com/microsoftgraph/msgraph-sdk-go/groups/item/members"
+	"github.com/microsoftgraph/msgraph-sdk-go/groups"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
 func teamColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromMethod("GetId")},
-		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Transform: transform.FromMethod("GetDescription")},
-		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "A unique ID for the team that has been used in a few places such as the audit log/Office 365 Management Activity API.", Transform: transform.FromMethod("GetInternalId")},
-		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "True if this team is in read-only mode.", Transform: transform.FromMethod("GetIsArchived")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromField("ID")},
+		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDescription")},
+		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "A unique ID for the team that has been used in a few places such as the audit log/Office 365 Management Activity API.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetInternalId")},
+		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "True if this team is in read-only mode.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetIsArchived")},
 
 		// Other fields
-		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "Date and time when the team was created.", Transform: transform.FromMethod("GetCreatedDateTime")},
-		{Name: "classification", Type: proto.ColumnType_STRING, Description: "An optional label. Typically describes the data or business sensitivity of the team. Must match one of a pre-configured set in the tenant's directory.", Transform: transform.FromMethod("GetClassification")},
-		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "A hyperlink that will go to the team in the Microsoft Teams client.", Transform: transform.FromMethod("GetWebUrl")},
-		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The visibility of the group and team. Defaults to Public.", Transform: transform.FromMethod("TeamVisibility"), Default: "Public"},
-		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "Indicates whether the team is intended for a particular use case. Each team specialization has access to unique behaviors and experiences targeted to its use case.", Transform: transform.FromMethod("TeamSpecialization")},
+		{Name: "created_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "Date and time when the team was created.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetCreatedDateTime")},
+		{Name: "classification", Type: proto.ColumnType_STRING, Description: "An optional label. Typically describes the data or business sensitivity of the team. Must match one of a pre-configured set in the tenant's directory.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetClassification")},
+		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "A hyperlink that will go to the team in the Microsoft Teams client.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetWebUrl")},
+		{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The visibility of the group and team. Defaults to Public.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("TeamVisibility"), Default: "Public"},
+		{Name: "specialization", Type: proto.ColumnType_STRING, Description: "Indicates whether the team is intended for a particular use case. Each team specialization has access to unique behaviors and experiences targeted to its use case.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("TeamSpecialization")},
 
 		// JSON fields
-		{Name: "members", Type: proto.ColumnType_JSON, Description: "Members and owners of the team.", Hydrate: listMicrosoft365TeamMembers, Transform: transform.FromValue()},
-		{Name: "summary", Type: proto.ColumnType_JSON, Description: "Specifies the team's summary.", Transform: transform.FromMethod("TeamSummary")},
-		{Name: "template", Type: proto.ColumnType_JSON, Description: "The template this team was created from.", Transform: transform.FromMethod("TeamTemplate")},
+		{Name: "summary", Type: proto.ColumnType_JSON, Description: "Specifies the team's summary.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("TeamSummary")},
+		{Name: "template", Type: proto.ColumnType_JSON, Description: "The template this team was created from.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("TeamTemplate")},
 
 		// Standard columns
-		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Transform: transform.FromMethod("GetTenantId")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
 }
 
@@ -44,10 +42,13 @@ func teamColumns() []*plugin.Column {
 func tableMicrosoft365Team(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "microsoft365_team",
-		Description: "Retrieves the teams that the specified user is a direct member of.",
+		Description: "Retrieves all teams in Microsoft Teams for an organization.",
 		List: &plugin.ListConfig{
-			Hydrate:    listMicrosoft365Teams,
-			KeyColumns: plugin.SingleColumn("user_identifier"),
+			Hydrate: listMicrosoft365Teams,
+		},
+		Get: &plugin.GetConfig{
+			Hydrate:    getMicrosoft365Team,
+			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"NotFound"}),
 			},
@@ -68,89 +69,85 @@ func listMicrosoft365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		return nil, err
 	}
 
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).JoinedTeams().Get(ctx, nil)
+	// List operations
+	input := &groups.GroupsRequestBuilderGetQueryParameters{
+		Select: []string{"id"},
+	}
+
+	// Restrict the limit value to be passed in the query parameter which is not between 1 and 999, otherwise API will throw an error as follow
+	// unexpected status 400 with OData error: Request_UnsupportedQuery: Invalid page size specified: '1000'. Must be between 1 and 999 inclusive.
+	limit := d.QueryContext.Limit
+	if limit != nil {
+		if *limit > 0 && *limit <= 999 {
+			l := int32(*limit)
+			input.Top = &l
+		}
+	}
+
+	// To get a list of all groups in the organization that have teams, get a list of all groups,
+	// and then in code find the ones that have a resourceProvisioningOptions property that contains "Team".
+	filterStr := "resourceProvisioningOptions/Any(x:x eq 'Team')"
+	input.Filter = &filterStr
+
+	options := &groups.GroupsRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.Groups().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
+		plugin.Logger(ctx).Error("listMicrosoft365Teams", "list_team_error", errObj)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateTeamCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateGroupCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		plugin.Logger(ctx).Error("microsoft365_teams.listMicrosoft365Teams", "create_iterator_instance_error", err)
+		plugin.Logger(ctx).Error("listMicrosoft365Teams", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		team := pageItem.(models.Teamable)
+		group := pageItem.(models.Groupable)
 
-		d.StreamListItem(ctx, &Microsoft365TeamInfo{team, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365TeamInfo{
+			ID: *group.GetId(),
+		})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
-		plugin.Logger(ctx).Error("microsoft365_teams.listMicrosoft365Teams", "paging_error", err)
+		plugin.Logger(ctx).Error("listMicrosoft365Teams", "paging_error", err)
 		return nil, err
 	}
 
 	return nil, nil
 }
 
-func listMicrosoft365TeamMembers(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+//// HYDRATE FUNCTIONS
+
+func getMicrosoft365Team(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	data := h.Item.(*Microsoft365TeamInfo)
-	teamID := data.GetId()
-	if teamID == nil || data.UserIdentifier == "" {
-		return nil, nil
+	var teamID string
+	if h.Item != nil {
+		teamID = h.Item.(*Microsoft365TeamInfo).ID
+	} else {
+		teamID = d.KeyColumnQuals["id"].GetStringValue()
 	}
 
 	// Create client
-	client, adapter, err := GetGraphClient(ctx, d)
+	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_team.listMicrosoft365TeamMembers", "connection_error", err)
+		logger.Error("microsoft365_team.getMicrosoft365Team", "connection_error", err)
 		return nil, err
 	}
 
-	headers := map[string]string{
-		"ConsistencyLevel": "eventual",
-	}
-
-	includeCount := true
-	requestParameters := &members.MembersRequestBuilderGetQueryParameters{
-		Count: &includeCount,
-	}
-
-	config := &members.MembersRequestBuilderGetRequestConfiguration{
-		Headers:         headers,
-		QueryParameters: requestParameters,
-	}
-
-	memberIds := []*string{}
-	members, err := client.GroupsById(*teamID).Members().Get(ctx, config)
+	result, err := client.TeamsById(teamID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
-		plugin.Logger(ctx).Error("listMicrosoft365TeamMembers", "get_team_members_error", errObj)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(members, adapter, models.CreateDirectoryObjectCollectionResponseFromDiscriminatorValue)
-	if err != nil {
-		plugin.Logger(ctx).Error("listMicrosoft365TeamMembers", "create_iterator_instance_error", err)
-		return nil, err
-	}
-
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		member := pageItem.(models.DirectoryObjectable)
-		memberIds = append(memberIds, member.GetId())
-
-		return true
-	})
-	if err != nil {
-		plugin.Logger(ctx).Error("listMicrosoft365TeamMembers", "paging_error", err)
-		return nil, err
-	}
-
-	return memberIds, nil
+	return &Microsoft365TeamInfo{result, *result.GetId()}, nil
 }

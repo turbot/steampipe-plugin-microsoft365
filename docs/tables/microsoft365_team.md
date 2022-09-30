@@ -1,8 +1,6 @@
 # Table: microsoft365_team
 
-Get the teams in Microsoft Teams that the specified user is a direct member of.
-
-You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join microsoft365_team on user_identifier=`).
+List all teams in Microsoft Teams for an organization..
 
 ## Examples
 
@@ -17,9 +15,7 @@ select
   created_date_time,
   web_url
 from
-  microsoft365_team
-where
-  user_identifier = 'test@org.onmicrosoft.com';
+  microsoft365_team;
 ```
 
 ### List private teams
@@ -35,8 +31,7 @@ select
 from
   microsoft365_team
 where
-  user_identifier = 'test@org.onmicrosoft.com'
-  and visibility = 'Private';
+  visibility = 'Private';
 ```
 
 ### List archived teams
@@ -52,6 +47,5 @@ select
 from
   microsoft365_team
 where
-  user_identifier = 'test@org.onmicrosoft.com'
-  and is_archived;
+  is_archived;
 ```
