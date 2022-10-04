@@ -72,12 +72,17 @@ func getTenantFromCLI() (string, error) {
 func GetGraphClient(ctx context.Context, d *plugin.QueryData) (*msgraphsdkgo.GraphServiceClient, *msgraphsdkgo.GraphRequestAdapter, error) {
 	logger := plugin.Logger(ctx)
 
+	// Disable caching since it only saves ~.25ms and results in an SDK error
+	// when running consecutive queries for the mail_message and my_mail_message
+	// tables:
+	// Error: rpc error: code = Internal desc = hydrate function listMicrosoft365MyMailMessages failed with panic runtime error: invalid memory address or nil pointer dereference (SQLSTATE HV000)
 	// Have we already created and cached the session?
-	sessionCacheKey := "GetGraphClient"
-	if cachedData, ok := d.ConnectionManager.Cache.Get(sessionCacheKey); ok {
-		return cachedData.(*msgraphsdkgo.GraphServiceClient), nil, nil
-	}
-
+	/*
+		sessionCacheKey := "GetGraphClient"
+		if cachedData, ok := d.ConnectionManager.Cache.Get(sessionCacheKey); ok {
+			return cachedData.(*msgraphsdkgo.GraphServiceClient), nil, nil
+		}
+	*/
 	var tenantID, environment, clientID, clientSecret, certificatePath, certificatePassword string
 
 	microsoft365Config := GetConfig(d.Connection)
@@ -214,8 +219,9 @@ func GetGraphClient(ctx context.Context, d *plugin.QueryData) (*msgraphsdkgo.Gra
 	}
 	client := msgraphsdkgo.NewGraphServiceClient(adapter)
 
+	// See comment above as to why caching is disabled
 	// Save session into cache
-	d.ConnectionManager.Cache.Set(sessionCacheKey, client)
+	//d.ConnectionManager.Cache.Set(sessionCacheKey, client)
 
 	return client, adapter, nil
 }
