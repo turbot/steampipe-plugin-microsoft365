@@ -111,14 +111,16 @@ func listMicrosoft365MailMessages(ctx context.Context, d *plugin.QueryData, _ *p
 	// List operations
 	input := &messages.MessagesRequestBuilderGetQueryParameters{}
 
-	// Restrict the limit value to be passed in the query parameter which is not between 1 and 999, otherwise API will throw an error as follow
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is unknown (tested up to 9999)
+	pageSize := int64(9999)
 	limit := d.QueryContext.Limit
-	if limit != nil {
-		if *limit > 0 && *limit <= 999 {
-			l := int32(*limit)
-			input.Top = &l
-		}
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
 	}
+
+	pageSize32 := int32(pageSize)
+	input.Top = &pageSize32
 
 	// Check for query context and requests only for queried columns
 	givenColumns := d.QueryContext.Columns
