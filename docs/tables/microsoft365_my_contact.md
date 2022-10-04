@@ -1,10 +1,10 @@
 # Table: microsoft365_my_contact
 
-List contacts of the specified user.
+List the user's contacts.
 
 To query contacts of any user, use the `microsoft365_contact` table.
 
-**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

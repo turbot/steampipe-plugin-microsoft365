@@ -11,19 +11,19 @@ import (
 
 //// TABLE DEFINITION
 
-func tableMicrosoft365DriveMyFile(_ context.Context) *plugin.Table {
+func tableMicrosoft365MyDriveFile(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "microsoft365_drive_my_file",
+		Name:        "microsoft365_my_drive_file",
 		Description: "Retrieves file's metadata or content owned by an user.",
 		List: &plugin.ListConfig{
-			Hydrate:       listMicrosoft365DriveMyFiles,
+			Hydrate:       listMicrosoft365MyDriveFiles,
 			ParentHydrate: listMicrosoft365MyDrives,
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
-			Hydrate:    getMicrosoft365DriveMyFile,
+			Hydrate:    getMicrosoft365MyDriveFile,
 			KeyColumns: plugin.AllColumns([]string{"drive_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
@@ -35,7 +35,7 @@ func tableMicrosoft365DriveMyFile(_ context.Context) *plugin.Table {
 
 //// LIST FUNCTION
 
-func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	driveData := h.Item.(*Microsoft365DriveInfo)
 
 	var driveID string
@@ -47,7 +47,7 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_drive_my_file.listMicrosoft365DriveMyFiles", "connection_error", err)
+		logger.Error("microsoft365_my_drive_file.listMicrosoft365MyDriveFiles", "connection_error", err)
 		return nil, err
 	}
 
@@ -66,7 +66,7 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		logger.Error("listMicrosoft365DriveMyFiles", "create_iterator_instance_error", err)
+		logger.Error("listMicrosoft365MyDriveFiles", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
@@ -96,7 +96,7 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 		return true
 	})
 	if err != nil {
-		logger.Error("listMicrosoft365DriveMyFiles", "paging_error", err)
+		logger.Error("listMicrosoft365MyDriveFiles", "paging_error", err)
 		return nil, err
 	}
 
@@ -105,7 +105,7 @@ func listMicrosoft365DriveMyFiles(ctx context.Context, d *plugin.QueryData, h *p
 
 //// HYDRATE FUNCTIONS
 
-func getMicrosoft365DriveMyFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func getMicrosoft365MyDriveFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	driveID := d.KeyColumnQualString("drive_id")
@@ -117,7 +117,7 @@ func getMicrosoft365DriveMyFile(ctx context.Context, d *plugin.QueryData, h *plu
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_drive_my_file.getMicrosoft365DriveMyFile", "connection_error", err)
+		logger.Error("microsoft365_my_drive_file.getMicrosoft365MyDriveFile", "connection_error", err)
 		return nil, err
 	}
 

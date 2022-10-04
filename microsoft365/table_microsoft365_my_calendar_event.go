@@ -13,12 +13,12 @@ import (
 
 //// TABLE DEFINITION
 
-func tableMicrosoft365CalendarMyEvent(_ context.Context) *plugin.Table {
+func tableMicrosoft365MyCalendarEvent(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "microsoft365_calendar_my_event",
+		Name:        "microsoft365_my_calendar_event",
 		Description: "Events scheduled on the specified calendar.",
 		List: &plugin.ListConfig{
-			Hydrate: listMicrosoft365CalendarMyEvents,
+			Hydrate: listMicrosoft365MyCalendarEvents,
 			KeyColumns: []*plugin.KeyColumn{
 				{
 					Name:      "start_time",
@@ -36,7 +36,7 @@ func tableMicrosoft365CalendarMyEvent(_ context.Context) *plugin.Table {
 			},
 		},
 		Get: &plugin.GetConfig{
-			Hydrate:    getMicrosoft365CalendarMyEvent,
+			Hydrate:    getMicrosoft365MyCalendarEvent,
 			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
@@ -48,13 +48,13 @@ func tableMicrosoft365CalendarMyEvent(_ context.Context) *plugin.Table {
 
 //// LIST FUNCTION
 
-func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_calendar_my_event.listMicrosoft365CalendarMyEvents", "connection_error", err)
+		logger.Error("microsoft365_my_calendar_event.listMicrosoft365MyCalendarEvents", "connection_error", err)
 		return nil, err
 	}
 
@@ -133,7 +133,7 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateEventCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		logger.Error("listMicrosoft365CalendarMyEvents", "create_iterator_instance_error", err)
+		logger.Error("listMicrosoft365MyCalendarEvents", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
@@ -146,7 +146,7 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
-		logger.Error("listMicrosoft365CalendarMyEvents", "paging_error", err)
+		logger.Error("listMicrosoft365MyCalendarEvents", "paging_error", err)
 		return nil, err
 	}
 
@@ -155,7 +155,7 @@ func listMicrosoft365CalendarMyEvents(ctx context.Context, d *plugin.QueryData, 
 
 //// HYDRATE FUNCTIONS
 
-func getMicrosoft365CalendarMyEvent(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func getMicrosoft365MyCalendarEvent(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	eventID := d.KeyColumnQualString("id")
@@ -166,7 +166,7 @@ func getMicrosoft365CalendarMyEvent(ctx context.Context, d *plugin.QueryData, h 
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_calendar_my_event.getMicrosoft365CalendarMyEvent", "connection_error", err)
+		logger.Error("microsoft365_my_calendar_event.getMicrosoft365MyCalendarEvent", "connection_error", err)
 		return nil, err
 	}
 

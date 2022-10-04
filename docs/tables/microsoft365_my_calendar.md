@@ -1,10 +1,10 @@
 # Table: microsoft365_my_calendar
 
-Get metadata information for a specific user's calendar.
+Get metadata information for the user's calendar.
 
 To query the metadata of any user's calendar, use the `microsoft365_calendar` table.
 
-**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

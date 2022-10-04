@@ -1,10 +1,10 @@
-# Table: microsoft365_mail_my_message
+# Table: microsoft365_my_mail_message
 
-List messages in a specific user's mailbox.
+List messages in the user's mailbox.
 
 To query messages in any mailbox, use the `microsoft365_mail_message` table.
 
-**Note:** This table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
 
 ## Examples
 

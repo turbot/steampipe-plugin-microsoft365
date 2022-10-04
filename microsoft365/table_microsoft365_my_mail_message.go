@@ -14,12 +14,12 @@ import (
 
 //// TABLE DEFINITION
 
-func tableMicrosoft365MailMyMessage(_ context.Context) *plugin.Table {
+func tableMicrosoft365MyMailMessage(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "microsoft365_mail_my_message",
+		Name:        "microsoft365_my_mail_message",
 		Description: "Retrieves messages in the specified user's mailbox.",
 		List: &plugin.ListConfig{
-			Hydrate: listMicrosoft365MailMyMessages,
+			Hydrate: listMicrosoft365MyMailMessages,
 			KeyColumns: plugin.KeyColumnSlice{
 				// Key fields
 				{Name: "filter", Require: plugin.Optional},
@@ -35,7 +35,7 @@ func tableMicrosoft365MailMyMessage(_ context.Context) *plugin.Table {
 			},
 		},
 		Get: &plugin.GetConfig{
-			Hydrate:    getMicrosoft365MailMyMessage,
+			Hydrate:    getMicrosoft365MyMailMessage,
 			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
@@ -47,13 +47,13 @@ func tableMicrosoft365MailMyMessage(_ context.Context) *plugin.Table {
 
 //// LIST FUNCTION
 
-func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_mail_my_message.listMicrosoft365MailMyMessages", "connection_error", err)
+		logger.Error("microsoft365_my_mail_message.listMicrosoft365MyMailMessages", "connection_error", err)
 		return nil, err
 	}
 
@@ -113,7 +113,7 @@ func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h 
 
 	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateMessageCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		logger.Error("listMicrosoft365MailMyMessages", "create_iterator_instance_error", err)
+		logger.Error("listMicrosoft365MyMailMessages", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
@@ -126,7 +126,7 @@ func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h 
 		return d.QueryStatus.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
-		logger.Error("listMicrosoft365MailMyMessages", "paging_error", err)
+		logger.Error("listMicrosoft365MyMailMessages", "paging_error", err)
 		return nil, err
 	}
 
@@ -135,7 +135,7 @@ func listMicrosoft365MailMyMessages(ctx context.Context, d *plugin.QueryData, h 
 
 //// HYDRATE FUNCTIONS
 
-func getMicrosoft365MailMyMessage(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func getMicrosoft365MyMailMessage(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	id := d.KeyColumnQualString("id")
@@ -146,7 +146,7 @@ func getMicrosoft365MailMyMessage(ctx context.Context, d *plugin.QueryData, h *p
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_mail_my_message.getMicrosoft365MailMyMessage", "connection_error", err)
+		logger.Error("microsoft365_my_mail_message.getMicrosoft365MyMailMessage", "connection_error", err)
 		return nil, err
 	}
 
