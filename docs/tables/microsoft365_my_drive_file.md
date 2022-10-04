@@ -17,7 +17,7 @@ select
   path,
   created_date_time
 from
-  microsoft365_drive_my_file;
+  microsoft365_my_drive_file;
 ```
 
 ### List all empty folders
@@ -29,7 +29,7 @@ select
   path,
   created_date_time
 from
-  microsoft365_drive_my_file
+  microsoft365_my_drive_file
 where
   folder ->> 'childCount' = '0';
 ```
@@ -43,7 +43,7 @@ select
   path,
   created_date_time
 from
-  microsoft365_drive_my_file
+  microsoft365_my_drive_file
 where
   created_date_time > '2021-08-15T00:00:00+05:30';
 ```

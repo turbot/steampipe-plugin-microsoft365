@@ -17,7 +17,7 @@ select
   start_time,
   end_time
 from
-  microsoft365_calendar_my_event
+  microsoft365_my_calendar_event
 order by start_time
 limit 10;
 ```
@@ -31,7 +31,7 @@ select
   start_time,
   end_time
 from
-  microsoft365_calendar_my_event
+  microsoft365_my_calendar_event
 where
   start_time >= current_date
   and end_time <= (current_date + interval '4 days')
@@ -47,7 +47,7 @@ select
   start_time,
   end_time
 from
-  microsoft365_calendar_my_event
+  microsoft365_my_calendar_event
 where
   start_time >= date_trunc('month', current_date)
   and end_time <= date_trunc('month', current_date) + interval '1 month'
@@ -63,7 +63,7 @@ select
   start_time,
   end_time
 from
-  microsoft365_calendar_my_event
+  microsoft365_my_calendar_event
 where
   start_time >= date_trunc('week', current_date)
   and end_time < (date_trunc('week', current_date) + interval '7 days')

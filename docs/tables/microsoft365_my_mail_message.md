@@ -16,7 +16,7 @@ select
   created_date_time,
   body_preview
 from
-  microsoft365_mail_my_message
+  microsoft365_my_mail_message
 order by created_date_time
 limit 10;
 ```
@@ -29,7 +29,7 @@ select
   created_date_time,
   body_preview
 from
-  microsoft365_mail_my_message
+  microsoft365_my_mail_message
 where
   not is_read
 order by created_date_time;
@@ -43,7 +43,7 @@ select
   created_date_time,
   body_preview
 from
-  microsoft365_mail_my_message
+  microsoft365_my_mail_message
 where
   filter = 'importance eq ''high'''
 order by created_date_time;
@@ -57,7 +57,7 @@ select
   created_date_time,
   body_preview
 from
-  microsoft365_mail_my_message
+  microsoft365_my_mail_message
 where
   filter = '(from/emailAddress/address) eq ''test@domain.com'''
 order by created_date_time;
@@ -71,7 +71,7 @@ select
   created_date_time,
   body_preview
 from
-  microsoft365_mail_my_message
+  microsoft365_my_mail_message
 where
   is_draft
 order by created_date_time;
