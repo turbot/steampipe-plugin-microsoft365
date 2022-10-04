@@ -13,8 +13,8 @@ import (
 
 func calendarGroupColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The group's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The group name.", Transform: transform.FromMethod("GetName")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The group's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "change_key", Type: proto.ColumnType_STRING, Description: "Identifies the version of the calendar group. Every time the calendar group is changed, ChangeKey changes as well. This allows Exchange to apply changes to the correct version of the object.", Transform: transform.FromMethod("GetChangeKey")},
 		{Name: "class_id", Type: proto.ColumnType_STRING, Description: "The class identifier.", Transform: transform.FromMethod("GetClassId")},
 

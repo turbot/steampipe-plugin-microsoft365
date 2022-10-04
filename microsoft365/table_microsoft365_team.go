@@ -14,8 +14,8 @@ import (
 
 func teamColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromField("ID")},
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDisplayName")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromField("ID")},
 		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDescription")},
 		{Name: "internal_id", Type: proto.ColumnType_STRING, Description: "A unique ID for the team that has been used in a few places such as the audit log/Office 365 Management Activity API.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetInternalId")},
 		{Name: "is_archived", Type: proto.ColumnType_BOOL, Description: "True if this team is in read-only mode.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetIsArchived")},

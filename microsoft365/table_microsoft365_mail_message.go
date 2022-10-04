@@ -19,8 +19,8 @@ import (
 
 func mailMessageColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the message.", Transform: transform.FromMethod("GetId")},
 		{Name: "subject", Type: proto.ColumnType_STRING, Description: "The subject of the message.", Transform: transform.FromMethod("GetSubject")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the message.", Transform: transform.FromMethod("GetId")},
 		{Name: "body_preview", Type: proto.ColumnType_STRING, Description: "The first 255 characters of the message body in text format.", Transform: transform.FromMethod("GetBodyPreview")},
 		{Name: "is_read", Type: proto.ColumnType_BOOL, Description: "Indicates whether the message has been read.", Transform: transform.FromMethod("GetIsRead")},
 		{Name: "has_attachments", Type: proto.ColumnType_BOOL, Description: "Indicates whether the message has attachments.", Transform: transform.FromMethod("GetHasAttachments")},

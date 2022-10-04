@@ -17,8 +17,8 @@ import (
 
 func driveColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the drive.", Transform: transform.FromMethod("GetId")},
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the item.", Transform: transform.FromMethod("GetName")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the drive.", Transform: transform.FromMethod("GetId")},
 		{Name: "drive_type", Type: proto.ColumnType_STRING, Description: "Describes the type of drive represented by this resource. OneDrive personal drives will return personal. OneDrive for Business will return business. SharePoint document libraries will return documentLibrary.", Transform: transform.FromMethod("GetDriveType")},
 		{Name: "web_url", Type: proto.ColumnType_STRING, Description: "URL that displays the resource in the browser.", Transform: transform.FromMethod("GetWebUrl")},
 		{Name: "description", Type: proto.ColumnType_STRING, Description: "Provide a user-visible description of the drive.", Transform: transform.FromMethod("GetDescription")},

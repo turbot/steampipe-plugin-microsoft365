@@ -17,10 +17,10 @@ import (
 
 func organizationContactColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The contact's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The contact's display name.", Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "given_name", Type: proto.ColumnType_STRING, Description: "The contact's given name.", Transform: transform.FromMethod("GetGivenName")},
 		{Name: "surname", Type: proto.ColumnType_STRING, Description: "The contact's surname.", Transform: transform.FromMethod("GetSurname")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The contact's unique identifier.", Transform: transform.FromMethod("GetId")},
 
 		// Other columns
 		{Name: "company_name", Type: proto.ColumnType_STRING, Description: "The name of the contact's company.", Transform: transform.FromMethod("GetCompanyName")},

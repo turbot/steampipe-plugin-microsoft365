@@ -14,12 +14,11 @@ import (
 
 func contactColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The contact's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The contact's display name.", Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "given_name", Type: proto.ColumnType_STRING, Description: "The contact's given name.", Transform: transform.FromMethod("GetGivenName")},
 		{Name: "middle_name", Type: proto.ColumnType_STRING, Description: "The contact's middle name.", Transform: transform.FromMethod("GetMiddleName")},
 		{Name: "surname", Type: proto.ColumnType_STRING, Description: "The contact's surname.", Transform: transform.FromMethod("GetSurname")},
-		{Name: "mobile_phone", Type: proto.ColumnType_STRING, Description: "The contact's mobile phone number.", Transform: transform.FromMethod("GetMobilePhone")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The contact's unique identifier.", Transform: transform.FromMethod("GetId")},
 
 		// Other columns
 		{Name: "assistant_name", Type: proto.ColumnType_STRING, Description: "The name of the contact's assistant.", Transform: transform.FromMethod("GetAssistantName")},
@@ -32,6 +31,7 @@ func contactColumns() []*plugin.Column {
 		{Name: "initials", Type: proto.ColumnType_STRING, Description: "The contact's initials.", Transform: transform.FromMethod("GetInitials")},
 		{Name: "job_title", Type: proto.ColumnType_STRING, Description: "The contact’s job title.", Transform: transform.FromMethod("GetJobTitle")},
 		{Name: "manager", Type: proto.ColumnType_STRING, Description: "The name of the contact's manager.", Transform: transform.FromMethod("GetManager")},
+		{Name: "mobile_phone", Type: proto.ColumnType_STRING, Description: "The contact's mobile phone number.", Transform: transform.FromMethod("GetMobilePhone")},
 		{Name: "nick_name", Type: proto.ColumnType_STRING, Description: "The contact's nickname.", Transform: transform.FromMethod("GetNickName")},
 		{Name: "parent_folder_id", Type: proto.ColumnType_STRING, Description: "The ID of the contact's parent folder.", Transform: transform.FromMethod("GetParentFolderId")},
 		{Name: "office_location", Type: proto.ColumnType_STRING, Description: "The location of the contact's office.", Transform: transform.FromMethod("GetOfficeLocation")},

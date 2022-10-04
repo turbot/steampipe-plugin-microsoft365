@@ -13,8 +13,8 @@ import (
 
 func calendarColumns() []*plugin.Column {
 	return []*plugin.Column{
-		{Name: "id", Type: proto.ColumnType_STRING, Description: "The calendar's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The calendar name.", Transform: transform.FromMethod("GetName")},
+		{Name: "id", Type: proto.ColumnType_STRING, Description: "The calendar's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "is_default_calendar", Type: proto.ColumnType_BOOL, Description: "True if this is the default calendar where new events are created by default, false otherwise.", Transform: transform.FromMethod("GetIsDefaultCalendar")},
 		{Name: "calendar_group_id", Type: proto.ColumnType_STRING, Description: "The ID of the group.", Transform: transform.FromField("CalendarGroupID")},
 		{Name: "color", Type: proto.ColumnType_STRING, Description: "Specifies the color theme to distinguish the calendar from other calendars in a UI. The property values are: auto, lightBlue, lightGreen, lightOrange, lightGray, lightYellow, lightTeal, lightPink, lightBrown, lightRed, maxColor.", Transform: transform.FromMethod("CalendarColor")},
