@@ -1,6 +1,6 @@
 # Table: microsoft365_contact
 
-List contacts of the specified user.
+List a specific user's contacts.
 
 The `microsoft365_contact` table can be used to query a user's contacts, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join microsoft365_contact on user_identifier=`).
 

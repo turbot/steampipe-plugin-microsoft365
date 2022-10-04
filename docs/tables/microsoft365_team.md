@@ -1,6 +1,6 @@
 # Table: microsoft365_team
 
-List all teams in Microsoft Teams for an organization..
+List all teams in Microsoft Teams for an organization.
 
 ## Examples
 
