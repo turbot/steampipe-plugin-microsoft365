@@ -7,37 +7,37 @@ import (
 type Microsoft365CalendarInfo struct {
 	models.Calendarable
 	CalendarGroupID string
-	UserIdentifier  string
+	UserID  string
 }
 
 type Microsoft365CalendarEventInfo struct {
 	models.Eventable
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365CalendarGroupInfo struct {
 	models.CalendarGroupable
-	UserIdentifier string
+	UserID string
 }
 type Microsoft365ContactInfo struct {
 	models.Contactable
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365DriveInfo struct {
 	models.Driveable
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365DriveItemInfo struct {
 	models.DriveItemable
 	DriveID        string
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365MailMessageInfo struct {
 	models.Messageable
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365OrgContactInfo struct {
@@ -52,7 +52,7 @@ type Microsoft365TeamInfo struct {
 type Microsoft365TeamChannelInfo struct {
 	models.Channelable
 	TeamID         string
-	UserIdentifier string
+	UserID string
 }
 
 type Microsoft365TeamMemberInfo struct {

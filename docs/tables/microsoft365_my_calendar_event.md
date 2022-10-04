@@ -4,7 +4,7 @@ List the user's previous and upcoming events scheduled in a calendar.
 
 To query events in any calendar, use the `microsoft365_calendar_event` table.
 
-**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
 
 ## Examples
 

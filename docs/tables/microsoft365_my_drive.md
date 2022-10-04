@@ -4,7 +4,7 @@ List the specified user's drives.
 
 To query events in any user's drive, use the `microsoft365_drive` table.
 
-**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
 
 ## Examples
 

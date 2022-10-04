@@ -2,7 +2,7 @@
 
 List the specified user's drives.
 
-You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join microsoft365_drive on user_identifier=`).
+You must specify the user's ID or email in the where or join clause (`where user_id=`, `join microsoft365_drive on user_id=`).
 
 ## Examples
 
@@ -18,7 +18,7 @@ select
 from
   microsoft365_drive
 where
-  user_identifier = 'test@org.onmicrosoft.com';
+  user_id = 'test@org.onmicrosoft.com';
 ```
 
 ### List personal drives
@@ -33,7 +33,7 @@ select
 from
   microsoft365_drive
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and drive_type = 'personal';
 ```
 
@@ -49,7 +49,7 @@ select
 from
   microsoft365_drive
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and created_date_time <= current_date - interval '90 days';
 ```
 
@@ -65,6 +65,6 @@ select
 from
   microsoft365_drive
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and filter = 'name eq ''Steampipe''';
 ```

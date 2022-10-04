@@ -1,11 +1,12 @@
 connection "microsoft365" {
   plugin = "microsoft365"
 
+  # User's ID or email used with the microsoft365_my_* tables
+  # Not required if using Azure CLI authentication
+  # user_id = "test@org.domain.com"
+
   # Defaults to "AZUREPUBLICCLOUD". Valid environments are "AZUREPUBLICCLOUD", "AZURECHINACLOUD" and "AZUREUSGOVERNMENTCLOUD"
   # environment = "AZUREPUBLICCLOUD"
-
-  # Use ID or email of a specific user
-  # user_identifier = "test@org.domain.com"
 
   # You can connect to Azure using one of options below:
 

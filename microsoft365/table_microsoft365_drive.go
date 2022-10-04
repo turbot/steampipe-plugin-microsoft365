@@ -37,7 +37,7 @@ func driveColumns() []*plugin.Column {
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 	}
 }
 
@@ -50,7 +50,7 @@ func tableMicrosoft365Drive(_ context.Context) *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate: listMicrosoft365Drives,
 			KeyColumns: []*plugin.KeyColumn{
-				{Name: "user_identifier", Require: plugin.Required},
+				{Name: "user_id", Require: plugin.Required},
 				{Name: "filter", Require: plugin.Optional},
 				{Name: "id", Require: plugin.Optional},
 				{Name: "name", Require: plugin.Optional},
@@ -62,7 +62,7 @@ func tableMicrosoft365Drive(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365Drive,
-			KeyColumns: plugin.AllColumns([]string{"id", "user_identifier"}),
+			KeyColumns: plugin.AllColumns([]string{"id", "user_id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -106,8 +106,8 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		QueryParameters: input,
 	}
 
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Drives().Get(ctx, options)
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	result, err := client.UsersById(userID).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -122,7 +122,7 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
 
-		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -141,8 +141,8 @@ func getMicrosoft365Drive(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 	logger := plugin.Logger(ctx)
 
 	driveID := d.KeyColumnQualString("id")
-	userIdentifier := d.KeyColumnQualString("user_identifier")
-	if driveID == "" || userIdentifier == "" {
+	userID := d.KeyColumnQualString("user_id")
+	if driveID == "" || userID == "" {
 		return nil, nil
 	}
 
@@ -153,13 +153,13 @@ func getMicrosoft365Drive(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 		return nil, err
 	}
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Get(ctx, nil)
+	result, err := client.UsersById(userID).DrivesById(driveID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365DriveInfo{result, userIdentifier}, nil
+	return &Microsoft365DriveInfo{result, userID}, nil
 }
 
 func buildDriveQueryFilter(equalQuals plugin.KeyColumnEqualsQualMap) []string {

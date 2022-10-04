@@ -38,7 +38,7 @@ func calendarColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 	}
 }
 
@@ -53,7 +53,7 @@ func tableMicrosoft365Calendar(_ context.Context) *plugin.Table {
 			Hydrate:       listMicrosoft365Calendars,
 			KeyColumns: []*plugin.KeyColumn{
 				{
-					Name:    "user_identifier",
+					Name:    "user_id",
 					Require: plugin.Required,
 				},
 			},
@@ -63,7 +63,7 @@ func tableMicrosoft365Calendar(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365Calendar,
-			KeyColumns: plugin.AllColumns([]string{"user_identifier", "calendar_group_id", "id"}),
+			KeyColumns: plugin.AllColumns([]string{"user_id", "calendar_group_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -85,9 +85,9 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 		logger.Error("microsoft365_calendar.listMicrosoft365Calendars", "connection_error", err)
 		return nil, err
 	}
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -102,7 +102,7 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		calendar := pageItem.(models.Calendarable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -120,10 +120,10 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 func getMicrosoft365Calendar(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userIdentifier := d.KeyColumnQualString("user_identifier")
+	userID := d.KeyColumnQualString("user_id")
 	calendarGroupID := d.KeyColumnQualString("calendar_group_id")
 	id := d.KeyColumnQualString("id")
-	if calendarGroupID == "" || id == "" || userIdentifier == "" {
+	if calendarGroupID == "" || id == "" || userID == "" {
 		return nil, nil
 	}
 
@@ -134,13 +134,13 @@ func getMicrosoft365Calendar(ctx context.Context, d *plugin.QueryData, h *plugin
 		return nil, err
 	}
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarInfo{result, calendarGroupID, userIdentifier}, nil
+	return &Microsoft365CalendarInfo{result, calendarGroupID, userID}, nil
 }
 
 func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
@@ -156,7 +156,7 @@ func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryDat
 	}
 
 	var permissions []map[string]interface{}
-	result, err := client.UsersById(calendarData.UserIdentifier).CalendarGroupsById(calendarData.CalendarGroupID).CalendarsById(*calendarData.GetId()).CalendarPermissions().Get(ctx, nil)
+	result, err := client.UsersById(calendarData.UserID).CalendarGroupsById(calendarData.CalendarGroupID).CalendarsById(*calendarData.GetId()).CalendarPermissions().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

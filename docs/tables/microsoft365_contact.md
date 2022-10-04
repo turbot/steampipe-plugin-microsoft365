@@ -2,7 +2,7 @@
 
 List a specific user's contacts.
 
-The `microsoft365_contact` table can be used to query a user's contacts, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join microsoft365_contact on user_identifier=`).
+The `microsoft365_contact` table can be used to query a user's contacts, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_id=`, `join microsoft365_contact on user_id=`).
 
 ## Examples
 
@@ -16,7 +16,7 @@ select
 from
   microsoft365_contact
 where
-  user_identifier = 'test@org.onmicrosoft.com';
+  user_id = 'test@org.onmicrosoft.com';
 ```
 
 ### Get a contact by email
@@ -30,7 +30,7 @@ from
   microsoft365_contact,
   jsonb_array_elements(email_addresses) as email
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and email ->> 'address' = 'user@domain.com';
 ```
 
@@ -44,6 +44,6 @@ select
 from
   microsoft365_contact
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and company_name = 'Turbot';
 ```

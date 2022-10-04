@@ -41,14 +41,14 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).CalendarGroups().Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroups().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -63,7 +63,7 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		calendarGroup := pageItem.(models.CalendarGroupable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -93,18 +93,18 @@ func getMicrosoft365MyCalendarGroup(ctx context.Context, d *plugin.QueryData, h 
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarGroupInfo{result, userIdentifier}, nil
+	return &Microsoft365CalendarGroupInfo{result, userID}, nil
 }

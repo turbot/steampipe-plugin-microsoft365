@@ -2,7 +2,7 @@
 
 Get metadata information for a specific user's calendars.
 
-You must specify the user's ID or email in the where or join clause (`where user_identifier=`, `join microsoft365_calendar on user_identifier=`).
+You must specify the user's ID or email in the where or join clause (`where user_id=`, `join microsoft365_calendar on user_id=`).
 
 ## Examples
 
@@ -18,7 +18,7 @@ select
 from
   microsoft365_calendar
 where
-  user_identifier = 'test@org.onmicrosoft.com';
+  user_id = 'test@org.onmicrosoft.com';
 ```
 
 ### List calendars the user can edit
@@ -31,7 +31,7 @@ select
 from
   microsoft365_calendar
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and can_edit;
 ```
 
@@ -50,5 +50,5 @@ from
   microsoft365_calendar as c,
   jsonb_array_elements(permissions) as p
 where
-  c.user_identifier = 'test@org.onmicrosoft.com';
+  c.user_id = 'test@org.onmicrosoft.com';
 ```

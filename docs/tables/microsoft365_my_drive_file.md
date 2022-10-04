@@ -4,7 +4,7 @@ List the user's drive items.
 
 To query files in any user's drive, use the `microsoft365_drive_file` table.
 
-**Note:** If not authenticating with the Azure CLI, this table requires the `user_identifier` argument to be configured in the connection config.
+**Note:** If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
 
 ## Examples
 

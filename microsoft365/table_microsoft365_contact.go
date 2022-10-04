@@ -54,7 +54,7 @@ func contactColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
 }
@@ -69,7 +69,7 @@ func tableMicrosoft365Contact(_ context.Context) *plugin.Table {
 			Hydrate: listMicrosoft365Contacts,
 			KeyColumns: plugin.KeyColumnSlice{
 				// Key fields
-				{Name: "user_identifier", Require: plugin.Required},
+				{Name: "user_id", Require: plugin.Required},
 			},
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
@@ -77,7 +77,7 @@ func tableMicrosoft365Contact(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365Contact,
-			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
+			KeyColumns: plugin.AllColumns([]string{"user_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -116,8 +116,8 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 		QueryParameters: input,
 	}
 
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Contacts().Get(ctx, options)
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	result, err := client.UsersById(userID).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -132,7 +132,7 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
-		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -151,8 +151,8 @@ func getMicrosoft365Contact(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	logger := plugin.Logger(ctx)
 
 	contactID := d.KeyColumnQualString("id")
-	userIdentifier := d.KeyColumnQualString("user_identifier")
-	if contactID == "" || userIdentifier == "" {
+	userID := d.KeyColumnQualString("user_id")
+	if contactID == "" || userID == "" {
 		return nil, nil
 	}
 
@@ -163,11 +163,11 @@ func getMicrosoft365Contact(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		return nil, err
 	}
 
-	result, err := client.UsersById(userIdentifier).ContactsById(contactID).Get(ctx, nil)
+	result, err := client.UsersById(userID).ContactsById(contactID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365ContactInfo{result, userIdentifier}, nil
+	return &Microsoft365ContactInfo{result, userID}, nil
 }

@@ -21,7 +21,7 @@ func calendarGroupColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 	}
 }
 
@@ -35,7 +35,7 @@ func tableMicrosoft365CalendarGroup(_ context.Context) *plugin.Table {
 			Hydrate: listMicrosoft365CalendarGroups,
 			KeyColumns: []*plugin.KeyColumn{
 				{
-					Name:    "user_identifier",
+					Name:    "user_id",
 					Require: plugin.Required,
 				},
 			},
@@ -45,7 +45,7 @@ func tableMicrosoft365CalendarGroup(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365CalendarGroup,
-			KeyColumns: plugin.AllColumns([]string{"id", "user_identifier"}),
+			KeyColumns: plugin.AllColumns([]string{"id", "user_id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -65,9 +65,9 @@ func listMicrosoft365CalendarGroups(ctx context.Context, d *plugin.QueryData, _ 
 		logger.Error("microsoft365_calendar_group.listMicrosoft365CalendarGroups", "connection_error", err)
 		return nil, err
 	}
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
 
-	result, err := client.UsersById(userIdentifier).CalendarGroups().Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroups().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -82,7 +82,7 @@ func listMicrosoft365CalendarGroups(ctx context.Context, d *plugin.QueryData, _ 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		calendarGroup := pageItem.(models.CalendarGroupable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -100,9 +100,9 @@ func listMicrosoft365CalendarGroups(ctx context.Context, d *plugin.QueryData, _ 
 func getMicrosoft365CalendarGroup(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userIdentifier := d.KeyColumnQualString("user_identifier")
+	userID := d.KeyColumnQualString("user_id")
 	id := d.KeyColumnQualString("id")
-	if id == "" || userIdentifier == "" {
+	if id == "" || userID == "" {
 		return nil, nil
 	}
 
@@ -113,11 +113,11 @@ func getMicrosoft365CalendarGroup(ctx context.Context, d *plugin.QueryData, _ *p
 		return nil, err
 	}
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarGroupInfo{result, userIdentifier}, nil
+	return &Microsoft365CalendarGroupInfo{result, userID}, nil
 }

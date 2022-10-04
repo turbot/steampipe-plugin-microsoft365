@@ -51,14 +51,14 @@ func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *p
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get(ctx, nil)
+	result, err := client.UsersById(userID).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -75,9 +75,9 @@ func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *p
 
 		item := pageItem.(models.DriveItemable)
 
-		resultFiles = append(resultFiles, Microsoft365DriveItemInfo{item, driveID, userIdentifier})
+		resultFiles = append(resultFiles, Microsoft365DriveItemInfo{item, driveID, userID})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
-			childData, err := expandDriveFolders(ctx, client, adapter, item, userIdentifier, driveID)
+			childData, err := expandDriveFolders(ctx, client, adapter, item, userID, driveID)
 			if err != nil {
 				return false
 			}
@@ -121,18 +121,18 @@ func getMicrosoft365MyDriveFile(ctx context.Context, d *plugin.QueryData, h *plu
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return Microsoft365DriveItemInfo{result, driveID, userIdentifier}, nil
+	return Microsoft365DriveItemInfo{result, driveID, userID}, nil
 }

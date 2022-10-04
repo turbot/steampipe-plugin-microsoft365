@@ -57,12 +57,12 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
 	// List operations
 	input := &messages.MessagesRequestBuilderGetQueryParameters{}
@@ -107,7 +107,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).Messages().Get(ctx, options)
+	result, err := client.UsersById(userID).Messages().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -122,7 +122,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		message := pageItem.(models.Messageable)
 
-		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -152,12 +152,12 @@ func getMicrosoft365MyMailMessage(ctx context.Context, d *plugin.QueryData, h *p
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
 	// List operations
 	input := &item.MessageItemRequestBuilderGetQueryParameters{}
@@ -171,11 +171,11 @@ func getMicrosoft365MyMailMessage(ctx context.Context, d *plugin.QueryData, h *p
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).MessagesById(id).Get(ctx, options)
+	result, err := client.UsersById(userID).MessagesById(id).Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365MailMessageInfo{result, userIdentifier}, nil
+	return &Microsoft365MailMessageInfo{result, userID}, nil
 }

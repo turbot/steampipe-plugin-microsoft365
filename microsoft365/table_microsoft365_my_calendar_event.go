@@ -58,12 +58,12 @@ func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, 
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
 	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
 
@@ -118,13 +118,13 @@ func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, 
 			QueryParameters: input,
 		}
 
-		result, err = client.UsersById(userIdentifier).CalendarView().Get(ctx, options)
+		result, err = client.UsersById(userID).CalendarView().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
 		}
 	} else {
-		result, err = client.UsersById(userIdentifier).Events().Get(ctx, nil)
+		result, err = client.UsersById(userID).Events().Get(ctx, nil)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
@@ -140,7 +140,7 @@ func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -170,18 +170,18 @@ func getMicrosoft365MyCalendarEvent(ctx context.Context, d *plugin.QueryData, h 
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).EventsById(eventID).Get(ctx, nil)
+	result, err := client.UsersById(userID).EventsById(eventID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarEventInfo{result, userIdentifier}, nil
+	return &Microsoft365CalendarEventInfo{result, userID}, nil
 }

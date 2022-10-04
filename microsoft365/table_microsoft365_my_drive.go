@@ -43,12 +43,12 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
 	input := &drives.DrivesRequestBuilderGetQueryParameters{}
 
@@ -73,7 +73,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).Drives().Get(ctx, options)
+	result, err := client.UsersById(userID).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -88,7 +88,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		drive := pageItem.(models.Driveable)
 
-		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -118,18 +118,18 @@ func getMicrosoft365MyDrive(ctx context.Context, d *plugin.QueryData, h *plugin.
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Get(ctx, nil)
+	result, err := client.UsersById(userID).DrivesById(driveID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365DriveInfo{result, userIdentifier}, nil
+	return &Microsoft365DriveInfo{result, userID}, nil
 }

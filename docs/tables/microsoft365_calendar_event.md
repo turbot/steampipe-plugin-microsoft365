@@ -2,7 +2,7 @@
 
 List previous and upcoming events scheduled in a specific calendar.
 
-The `microsoft365_calendar_event` table can be used to query events from any calendar, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join microsoft365_calendar_event on user_identifier=`).
+The `microsoft365_calendar_event` table can be used to query events from any calendar, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_id=`, `join microsoft365_calendar_event on user_id=`).
 
 ## Examples
 
@@ -17,7 +17,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
 order by start_time
 limit 10;
 ```
@@ -33,7 +33,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= current_date
   and end_time <= (current_date + interval '4 days')
 order by start_time;
@@ -50,7 +50,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= date_trunc('month', current_date)
   and end_time <= date_trunc('month', current_date) + interval '1 month'
 order by start_time;
@@ -67,7 +67,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= date_trunc('week', current_date)
   and end_time < (date_trunc('week', current_date) + interval '7 days')
 order by start_time;

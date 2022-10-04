@@ -45,12 +45,12 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
 	// List operations
 	input := &contacts.ContactsRequestBuilderGetQueryParameters{}
@@ -70,7 +70,7 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).Contacts().Get(ctx, options)
+	result, err := client.UsersById(userID).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -85,7 +85,7 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		contact := pageItem.(models.Contactable)
 
-		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -115,18 +115,18 @@ func getMicrosoft365MyContact(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).ContactsById(contactID).Get(ctx, nil)
+	result, err := client.UsersById(userID).ContactsById(contactID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365ContactInfo{result, userIdentifier}, nil
+	return &Microsoft365ContactInfo{result, userID}, nil
 }

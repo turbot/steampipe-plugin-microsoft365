@@ -66,7 +66,7 @@ func calendarEventColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 	}
 }
 
@@ -78,7 +78,7 @@ func tableMicrosoft365CalendarEvent(_ context.Context) *plugin.Table {
 			Hydrate: listMicrosoft365CalendarEvents,
 			KeyColumns: []*plugin.KeyColumn{
 				{
-					Name:    "user_identifier",
+					Name:    "user_id",
 					Require: plugin.Required,
 				},
 				{
@@ -98,7 +98,7 @@ func tableMicrosoft365CalendarEvent(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365CalendarEvent,
-			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
+			KeyColumns: plugin.AllColumns([]string{"user_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -118,7 +118,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 		logger.Error("microsoft365_calendar_event.listMicrosoft365CalendarEvents", "connection_error", err)
 		return nil, err
 	}
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
 
 	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
 
@@ -173,13 +173,13 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 			QueryParameters: input,
 		}
 
-		result, err = client.UsersById(userIdentifier).CalendarView().Get(ctx, options)
+		result, err = client.UsersById(userID).CalendarView().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
 		}
 	} else {
-		result, err = client.UsersById(userIdentifier).Events().Get(ctx, nil)
+		result, err = client.UsersById(userID).Events().Get(ctx, nil)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
@@ -195,7 +195,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		event := pageItem.(models.Eventable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -224,15 +224,15 @@ func getMicrosoft365CalendarEvent(ctx context.Context, d *plugin.QueryData, _ *p
 		logger.Error("microsoft365_calendar_event.getMicrosoft365CalendarEvent", "connection_error", err)
 		return nil, err
 	}
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
 
-	result, err := client.UsersById(userIdentifier).EventsById(eventID).Get(ctx, nil)
+	result, err := client.UsersById(userID).EventsById(eventID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarEventInfo{result, userIdentifier}, nil
+	return &Microsoft365CalendarEventInfo{result, userID}, nil
 }
 
 func eventStartTime(_ context.Context, d *transform.TransformData) (interface{}, error) {

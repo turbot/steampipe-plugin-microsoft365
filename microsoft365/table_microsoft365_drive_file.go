@@ -34,7 +34,7 @@ func driveFileColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
 }
@@ -48,14 +48,14 @@ func tableMicrosoft365DriveFile(_ context.Context) *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate:       listMicrosoft365DriveFiles,
 			ParentHydrate: listMicrosoft365Drives,
-			KeyColumns:    plugin.SingleColumn("user_identifier"),
+			KeyColumns:    plugin.SingleColumn("user_id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365DriveFile,
-			KeyColumns: plugin.AllColumns([]string{"id", "drive_id", "user_identifier"}),
+			KeyColumns: plugin.AllColumns([]string{"id", "drive_id", "user_id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -82,8 +82,8 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 		return nil, err
 	}
 
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).Root().Children().Get(ctx, nil)
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	result, err := client.UsersById(userID).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -100,9 +100,9 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 
 		item := pageItem.(models.DriveItemable)
 
-		resultFiles = append(resultFiles, Microsoft365DriveItemInfo{item, driveID, userIdentifier})
+		resultFiles = append(resultFiles, Microsoft365DriveItemInfo{item, driveID, userID})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
-			childData, err := expandDriveFolders(ctx, client, adapter, item, userIdentifier, driveID)
+			childData, err := expandDriveFolders(ctx, client, adapter, item, userID, driveID)
 			if err != nil {
 				return false
 			}
@@ -133,10 +133,10 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userIdentifier := d.KeyColumnQualString("user_identifier")
+	userID := d.KeyColumnQualString("user_id")
 	driveID := d.KeyColumnQualString("drive_id")
 	id := d.KeyColumnQualString("id")
-	if userIdentifier == "" || driveID == "" || id == "" {
+	if userID == "" || driveID == "" || id == "" {
 		return nil, nil
 	}
 
@@ -147,13 +147,13 @@ func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	result, err := client.UsersById(userIdentifier).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return Microsoft365DriveItemInfo{result, driveID, userIdentifier}, nil
+	return Microsoft365DriveItemInfo{result, driveID, userID}, nil
 }
 
 func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient, a *msgraphsdkgo.GraphRequestAdapter, data models.DriveItemable, userID string, driveID string) ([]Microsoft365DriveItemInfo, error) {

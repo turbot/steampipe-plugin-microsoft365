@@ -56,7 +56,7 @@ func mailMessageColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
-		{Name: "user_identifier", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserIdentifier},
+		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
 		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 	}
@@ -72,7 +72,7 @@ func tableMicrosoft365MailMessage(_ context.Context) *plugin.Table {
 			Hydrate: listMicrosoft365MailMessages,
 			KeyColumns: plugin.KeyColumnSlice{
 				// Key fields
-				{Name: "user_identifier", Require: plugin.Required},
+				{Name: "user_id", Require: plugin.Required},
 				{Name: "filter", Require: plugin.Optional},
 
 				// Other fields for filtering OData
@@ -87,7 +87,7 @@ func tableMicrosoft365MailMessage(_ context.Context) *plugin.Table {
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365MailMessage,
-			KeyColumns: plugin.AllColumns([]string{"user_identifier", "id"}),
+			KeyColumns: plugin.AllColumns([]string{"user_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
 			},
@@ -151,8 +151,8 @@ func listMicrosoft365MailMessages(ctx context.Context, d *plugin.QueryData, _ *p
 		QueryParameters: input,
 	}
 
-	userIdentifier := d.KeyColumnQuals["user_identifier"].GetStringValue()
-	result, err := client.UsersById(userIdentifier).Messages().Get(ctx, options)
+	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	result, err := client.UsersById(userID).Messages().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -167,7 +167,7 @@ func listMicrosoft365MailMessages(ctx context.Context, d *plugin.QueryData, _ *p
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		message := pageItem.(models.Messageable)
 
-		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -185,9 +185,9 @@ func listMicrosoft365MailMessages(ctx context.Context, d *plugin.QueryData, _ *p
 func getMicrosoft365MailMessage(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userIdentifier := d.KeyColumnQualString("user_identifier")
+	userID := d.KeyColumnQualString("user_id")
 	id := d.KeyColumnQualString("id")
-	if userIdentifier == "" || id == "" {
+	if userID == "" || id == "" {
 		return nil, nil
 	}
 
@@ -210,20 +210,20 @@ func getMicrosoft365MailMessage(ctx context.Context, d *plugin.QueryData, _ *plu
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userIdentifier).MessagesById(id).Get(ctx, options)
+	result, err := client.UsersById(userID).MessagesById(id).Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365MailMessageInfo{result, userIdentifier}, nil
+	return &Microsoft365MailMessageInfo{result, userID}, nil
 }
 
 func buildMailMessageRequestFields(ctx context.Context, queryColumns []string) []string {
 	var selectColumns []string
 
 	for _, columnName := range queryColumns {
-		if columnName == "title" || columnName == "filter" || columnName == "user_identifier" || columnName == "_ctx" || columnName == "tenant_id" {
+		if columnName == "title" || columnName == "filter" || columnName == "user_id" || columnName == "_ctx" || columnName == "tenant_id" {
 			continue
 		}
 		selectColumns = append(selectColumns, strcase.ToLowerCamel(columnName))

@@ -28,7 +28,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= current_date
   and end_time <= (current_date + interval '1 day');
 ```

@@ -27,7 +27,7 @@ select
 from
   microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= current_date
   and end_time <= (current_date + interval '1 day');
 ```
@@ -70,6 +70,10 @@ Installing the latest microsoft365 plugin will create a config file (~/.steampip
 ```hcl
 connection "microsoft365" {
   plugin = "microsoft365"
+
+  # User's ID or email used with the microsoft365_my_* tables
+  # Not required if using Azure CLI authentication
+  # user_id = "test@org.domain.com"
 
   # Defaults to "AZUREPUBLICCLOUD". Valid environments are "AZUREPUBLICCLOUD", "AZURECHINACLOUD" and "AZUREUSGOVERNMENTCLOUD"
   # environment = "AZUREPUBLICCLOUD"

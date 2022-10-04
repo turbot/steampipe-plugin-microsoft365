@@ -46,14 +46,14 @@ func listMicrosoft365MyCalendars(ctx context.Context, d *plugin.QueryData, h *pl
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -68,7 +68,7 @@ func listMicrosoft365MyCalendars(ctx context.Context, d *plugin.QueryData, h *pl
 	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
 		calendar := pageItem.(models.Calendarable)
 
-		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userIdentifier})
+		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.QueryStatus.RowsRemaining(ctx) != 0
@@ -99,18 +99,18 @@ func getMicrosoft365MyCalendar(ctx context.Context, d *plugin.QueryData, h *plug
 		return nil, err
 	}
 
-	getUserIdentifierCached := plugin.HydrateFunc(getUserIdentifier).WithCache()
-	userID, err := getUserIdentifierCached(ctx, d, h)
+	getUserIDCached := plugin.HydrateFunc(getUserID).WithCache()
+	userIDCached, err := getUserIDCached(ctx, d, h)
 	if err != nil {
 		return nil, err
 	}
-	userIdentifier := userID.(string)
+	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userIdentifier).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
+	result, err := client.UsersById(userID).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	return &Microsoft365CalendarInfo{result, calendarGroupID, userIdentifier}, nil
+	return &Microsoft365CalendarInfo{result, calendarGroupID, userID}, nil
 }

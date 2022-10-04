@@ -2,7 +2,7 @@
 
 List messages in a specific user's mailbox.
 
-The `microsoft365_mail_message` table can be used to query a user's messages from any mailbox, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_identifier=`, `join microsoft365_mail_message on user_identifier=`).
+The `microsoft365_mail_message` table can be used to query a user's messages from any mailbox, if you have access; and **you must specify the user's ID or email** in the where or join clause (`where user_id=`, `join microsoft365_mail_message on user_id=`).
 
 ## Examples
 
@@ -16,7 +16,7 @@ select
 from
   microsoft365_mail_message
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
 order by created_date_time
 limit 10;
 ```
@@ -31,7 +31,7 @@ select
 from
   microsoft365_mail_message
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and not is_read
 order by created_date_time;
 ```
@@ -46,7 +46,7 @@ select
 from
   microsoft365_mail_message
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and filter = 'importance eq ''high'''
 order by created_date_time;
 ```
@@ -61,7 +61,7 @@ select
 from
   microsoft365_mail_message
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and filter = '(from/emailAddress/address) eq ''test@domain.com'''
 order by created_date_time;
 ```
@@ -76,7 +76,7 @@ select
 from
   microsoft365_mail_message
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and is_draft
 order by created_date_time;
 ```

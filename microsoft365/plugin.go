@@ -13,7 +13,7 @@ const pluginName = "steampipe-plugin-microsoft365"
 func Plugin(ctx context.Context) *plugin.Plugin {
 	p := &plugin.Plugin{
 		Name:             pluginName,
-		DefaultTransform: transform.FromCamel(),
+		DefaultTransform: transform.FromGo(),
 		ConnectionConfigSchema: &plugin.ConnectionConfigSchema{
 			NewInstance: ConfigInstance,
 			Schema:      ConfigSchema,

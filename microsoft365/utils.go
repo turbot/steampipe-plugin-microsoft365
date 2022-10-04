@@ -15,7 +15,7 @@ const (
 	ColumnDescriptionTenant         = "The Azure Tenant ID where the resource is located."
 	ColumnDescriptionTags           = "A map of tags for the resource."
 	ColumnDescriptionTitle          = "Title of the resource."
-	ColumnDescriptionUserIdentifier = "ID or email of the user."
+	ColumnDescriptionUserID = "ID or email of the user."
 )
 
 func getTenant(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
@@ -42,23 +42,23 @@ func getTenant(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 }
 
 func getUserFromConfig(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) string {
-	var userIdentifier string
+	var userID string
 
 	microsoft365Config := GetConfig(d.Connection)
-	if microsoft365Config.UserIdentifier != nil {
-		userIdentifier = *microsoft365Config.UserIdentifier
+	if microsoft365Config.UserID != nil {
+		userID = *microsoft365Config.UserID
 	}
 
-	return userIdentifier
+	return userID
 }
 
-func getUserIdentifier(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func getUserID(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	// Get the user from config
-	userIdentifier := getUserFromConfig(ctx, d, h)
-	if userIdentifier != "" {
-		return userIdentifier, nil
+	userID := getUserFromConfig(ctx, d, h)
+	if userID != "" {
+		return userID, nil
 	}
 
 	// If the user is not provided in the config,
@@ -76,19 +76,19 @@ func getUserIdentifier(ctx context.Context, d *plugin.QueryData, h *plugin.Hydra
 		},
 	)
 	if err != nil {
-		logger.Error("getUserIdentifier", "cli_credential_error", err)
+		logger.Error("getUserID", "cli_credential_error", err)
 		return nil, err
 	}
 
 	auth, err := a.NewAzureIdentityAuthenticationProvider(cred)
 	if err != nil {
-		logger.Error("getUserIdentifier", "identity_authentication_provider_error", err)
+		logger.Error("getUserID", "identity_authentication_provider_error", err)
 		return nil, err
 	}
 
 	adapter, err := msgraphsdkgo.NewGraphRequestAdapter(auth)
 	if err != nil {
-		logger.Error("getUserIdentifier", "graph_request_adaptor_error", err)
+		logger.Error("getUserID", "graph_request_adaptor_error", err)
 		return nil, err
 	}
 	client := msgraphsdkgo.NewGraphServiceClient(adapter)
