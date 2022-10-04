@@ -1,4 +1,4 @@
-module github.com/turbot/steampipe-plugin-office365
+module github.com/turbot/steampipe-plugin-microsoft365
 
 go 1.19
 

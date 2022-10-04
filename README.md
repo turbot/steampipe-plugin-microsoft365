@@ -1,20 +1,20 @@
-![image](https://hub.steampipe.io/images/plugins/turbot/office365-social-graphic.png)
+![image](https://hub.steampipe.io/images/plugins/turbot/microsoft365-social-graphic.png)
 
-# Office 365 Plugin for Steampipe
+# Microsoft 365 Plugin for Steampipe
 
-Use SQL to query calendars, contacts, drives, mailboxes and more from Office 365.
+Use SQL to query calendars, contacts, drives, mailboxes and more from Microsoft 365.
 
-- **[Get started →](https://hub.steampipe.io/plugins/turbot/office365)**
-- Documentation: [Table definitions & examples](https://hub.steampipe.io/plugins/turbot/office365/tables)
+- **[Get started →](https://hub.steampipe.io/plugins/turbot/microsoft365)**
+- Documentation: [Table definitions & examples](https://hub.steampipe.io/plugins/turbot/microsoft365/tables)
 - Community: [Slack Channel](https://steampipe.io/community/join)
-- Get involved: [Issues](https://github.com/turbot/steampipe-plugin-office365/issues)
+- Get involved: [Issues](https://github.com/turbot/steampipe-plugin-microsoft365/issues)
 
 ## Quick start
 
 Install the plugin with [Steampipe](https://steampipe.io):
 
 ```shell
-steampipe plugin install office365
+steampipe plugin install microsoft365
 ```
 
 Run a query:
@@ -26,9 +26,9 @@ select
   start_time,
   end_time
 from
-  office365_calendar_event
+  microsoft365_calendar_event
 where
-  user_identifier = 'test@org.onmicrosoft.com'
+  user_id = 'test@org.onmicrosoft.com'
   and start_time >= current_date
   and end_time <= (current_date + interval '1 day');
 ```
@@ -43,8 +43,8 @@ Prerequisites:
 Clone:
 
 ```sh
-git clone https://github.com/turbot/steampipe-plugin-office365.git
-cd steampipe-plugin-office365
+git clone https://github.com/turbot/steampipe-plugin-microsoft365.git
+cd steampipe-plugin-microsoft365
 ```
 
 Build, which automatically installs the new version to your `~/.steampipe/plugins` directory:
@@ -57,14 +57,14 @@ Configure the plugin:
 
 ```bash
 cp config/* ~/.steampipe/config
-vi ~/.steampipe/config/office365.spc
+vi ~/.steampipe/config/microsoft365.spc
 ```
 
 Try it!
 
 ```sh
 steampipe query
-> .inspect office365
+> .inspect microsoft365
 ```
 
 Further reading:
@@ -74,9 +74,9 @@ Further reading:
 
 ## Contributing
 
-Please see the [contribution guidelines](https://github.com/turbot/steampipe/blob/main/CONTRIBUTING.md) and our [code of conduct](https://github.com/turbot/steampipe/blob/main/CODE_OF_CONDUCT.md). All contributions are subject to the [Apache 2.0 open source license](https://github.com/turbot/steampipe-plugin-office365/blob/main/LICENSE).
+Please see the [contribution guidelines](https://github.com/turbot/steampipe/blob/main/CONTRIBUTING.md) and our [code of conduct](https://github.com/turbot/steampipe/blob/main/CODE_OF_CONDUCT.md). All contributions are subject to the [Apache 2.0 open source license](https://github.com/turbot/steampipe-plugin-microsoft365/blob/main/LICENSE).
 
 `help wanted` issues:
 
 - [Steampipe](https://github.com/turbot/steampipe/labels/help%20wanted)
-- [Office 365 Plugin](https://github.com/turbot/steampipe-plugin-office365/labels/help%20wanted)
+- [Microsoft 365 Plugin](https://github.com/turbot/steampipe-plugin-microsoft365/labels/help%20wanted)
