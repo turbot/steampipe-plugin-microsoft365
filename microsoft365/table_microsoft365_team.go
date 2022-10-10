@@ -84,9 +84,7 @@ func listMicrosoft365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	if limit != nil && *limit < pageSize {
 		pageSize = *limit
 	}
-
-	pageSize32 := int32(pageSize)
-	input.Top = &pageSize32
+	input.Top = Int32(int32(pageSize))
 
 	// To get a list of all groups in the organization that have teams, get a list of all groups,
 	// and then in code find the ones that have a resourceProvisioningOptions property that contains "Team".

@@ -108,9 +108,7 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 	if limit != nil && *limit < pageSize {
 		pageSize = *limit
 	}
-
-	pageSize32 := int32(pageSize)
-	input.Top = &pageSize32
+	input.Top = Int32(int32(pageSize))
 
 	options := &contacts.ContactsRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,

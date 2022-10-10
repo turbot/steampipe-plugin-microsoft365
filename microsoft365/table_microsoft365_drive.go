@@ -85,6 +85,15 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 
 	input := &drives.DrivesRequestBuilderGetQueryParameters{}
 
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is unknown (tested up to 9999)
+	pageSize := int64(9999)
+	limit := d.QueryContext.Limit
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
+	}
+	input.Top = Int32(int32(pageSize))
+
 	var queryFilter string
 	equalQuals := d.KeyColumnQuals
 	filter := buildDriveQueryFilter(equalQuals)
