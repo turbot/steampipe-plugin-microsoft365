@@ -5,6 +5,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendargroups/item/calendars"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
@@ -53,7 +54,22 @@ func listMicrosoft365MyCalendars(ctx context.Context, d *plugin.QueryData, h *pl
 	}
 	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userID).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, nil)
+	input := &calendars.CalendarsRequestBuilderGetQueryParameters{}
+
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is unknown (tested up to 9999)
+	pageSize := int64(9999)
+	limit := d.QueryContext.Limit
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
+	}
+	input.Top = Int32(int32(pageSize))
+
+	options := &calendars.CalendarsRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.UsersById(userID).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

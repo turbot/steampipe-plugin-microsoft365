@@ -54,6 +54,18 @@ func listMicrosoft365TeamMembers(ctx context.Context, d *plugin.QueryData, h *pl
 		Count: &includeCount,
 	}
 
+	// Restrict the limit value to be passed in the query parameter which is not between 1 and 999, otherwise API will throw an error as follow
+	// unexpected status 400 with OData error: Request_UnsupportedQuery: Invalid page size specified: '1000'. Must be between 1 and 999 inclusive.
+
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is 999
+	pageSize := int64(999)
+	limit := d.QueryContext.Limit
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
+	}
+	requestParameters.Top = Int32(int32(pageSize))
+
 	config := &members.MembersRequestBuilderGetRequestConfiguration{
 		Headers:         headers,
 		QueryParameters: requestParameters,

@@ -11,6 +11,7 @@ import (
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendarview"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/events"
 )
 
 //// TABLE DEFINITION
@@ -122,6 +123,15 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 
 	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
 
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is unknown (tested up to 9999)
+	pageSize := int64(9999)
+	limit := d.QueryContext.Limit
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
+	}
+	input.Top = Int32(int32(pageSize))
+
 	var result models.EventCollectionResponseable
 
 	// Filter event using timestamp
@@ -179,7 +189,22 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 			return nil, errObj
 		}
 	} else {
-		result, err = client.UsersById(userID).Events().Get(ctx, nil)
+		input := &events.EventsRequestBuilderGetQueryParameters{}
+
+		// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+		// Maximum value is unknown (tested up to 9999)
+		pageSize := int64(9999)
+		limit := d.QueryContext.Limit
+		if limit != nil && *limit < pageSize {
+			pageSize = *limit
+		}
+		input.Top = Int32(int32(pageSize))
+
+		options := &events.EventsRequestBuilderGetRequestConfiguration{
+			QueryParameters: input,
+		}
+
+		result, err = client.UsersById(userID).Events().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj

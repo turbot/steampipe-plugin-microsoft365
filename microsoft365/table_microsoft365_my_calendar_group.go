@@ -7,6 +7,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
+	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendargroups"
 )
 
 //// TABLE DEFINITION
@@ -48,7 +49,22 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 	}
 	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userID).CalendarGroups().Get(ctx, nil)
+	input := &calendargroups.CalendarGroupsRequestBuilderGetQueryParameters{}
+
+	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
+	// Maximum value is unknown (tested up to 9999)
+	pageSize := int64(9999)
+	limit := d.QueryContext.Limit
+	if limit != nil && *limit < pageSize {
+		pageSize = *limit
+	}
+	input.Top = Int32(int32(pageSize))
+
+	options := &calendargroups.CalendarGroupsRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+
+	result, err := client.UsersById(userID).CalendarGroups().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

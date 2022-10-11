@@ -74,9 +74,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 	if limit != nil && *limit < pageSize {
 		pageSize = *limit
 	}
-
-	pageSize32 := int32(pageSize)
-	input.Top = &pageSize32
+	input.Top = Int32(int32(pageSize))
 
 	// Check for query context and requests only for queried columns
 	givenColumns := d.QueryContext.Columns
