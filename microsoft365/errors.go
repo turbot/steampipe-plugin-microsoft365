@@ -22,6 +22,7 @@ func (m *RequestError) Error() string {
 	return string(errStr)
 }
 
+// Returns the error object
 func getErrorObject(err error) *RequestError {
 	if oDataError, ok := err.(*odataerrors.ODataError); ok {
 		if terr := oDataError.GetError(); terr != nil {
@@ -32,7 +33,11 @@ func getErrorObject(err error) *RequestError {
 		}
 	}
 
-	return nil
+	// If the type of error is other than ODataError
+	// return the exact error
+	return &RequestError{
+		Message: err.Error(),
+	}
 }
 
 func isIgnorableErrorPredicate(ignoreErrorCodes []string) plugin.ErrorPredicateWithContext {
