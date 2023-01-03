@@ -3,8 +3,10 @@ package microsoft365
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/microsoftgraph/msgraph-sdk-go/models/odataerrors"
 	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
@@ -33,11 +35,28 @@ func getErrorObject(err error) *RequestError {
 		}
 	}
 
-	// If the type of error is other than ODataError
-	// return the exact error
-	return &RequestError{
-		Message: err.Error(),
+	switch err := err.(type) {
+	case *odataerrors.ODataError:
+		if terr := err.GetError(); terr != nil {
+			return &RequestError{
+				Code:    *terr.GetCode(),
+				Message: *terr.GetMessage(),
+			}
+		}
+	case *azidentity.AuthenticationFailedError:
+		return &RequestError{
+			Code:    strconv.Itoa(err.RawResponse.StatusCode),
+			Message: err.Error(),
+		}
+	default:
+		// If the error type is unknown
+		// return the exact error
+		return &RequestError{
+			Message: err.Error(),
+		}
 	}
+
+	return nil
 }
 
 func isIgnorableErrorPredicate(ignoreErrorCodes []string) plugin.ErrorPredicateWithContext {
