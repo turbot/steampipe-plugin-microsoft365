@@ -26,22 +26,12 @@ func (m *RequestError) Error() string {
 
 // Returns the error object
 func getErrorObject(err error) *RequestError {
-	if oDataError, ok := err.(*odataerrors.ODataError); ok {
-		if terr := oDataError.GetError(); terr != nil {
-			return &RequestError{
-				Code:    *terr.GetCode(),
-				Message: *terr.GetMessage(),
-			}
-		}
-	}
-
 	switch err := err.(type) {
 	case *odataerrors.ODataError:
-		if terr := err.GetError(); terr != nil {
-			return &RequestError{
-				Code:    *terr.GetCode(),
-				Message: *terr.GetMessage(),
-			}
+		terr := err.GetError()
+		return &RequestError{
+			Code:    *terr.GetCode(),
+			Message: *terr.GetMessage(),
 		}
 	case *azidentity.AuthenticationFailedError:
 		return &RequestError{
@@ -55,8 +45,6 @@ func getErrorObject(err error) *RequestError {
 			Message: err.Error(),
 		}
 	}
-
-	return nil
 }
 
 func isIgnorableErrorPredicate(ignoreErrorCodes []string) plugin.ErrorPredicateWithContext {
