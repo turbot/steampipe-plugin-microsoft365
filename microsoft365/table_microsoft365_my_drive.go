@@ -24,7 +24,7 @@ func tableMicrosoft365MyDrive(_ context.Context) *plugin.Table {
 			Hydrate:    getMicrosoft365MyDrive,
 			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
 		},
 		Columns: driveColumns(),
