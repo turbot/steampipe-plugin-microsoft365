@@ -19,14 +19,14 @@ func tableMicrosoft365MyCalendar(_ context.Context) *plugin.Table {
 			ParentHydrate: listMicrosoft365MyCalendarGroups,
 			Hydrate:       listMicrosoft365MyCalendars,
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365MyCalendar,
 			KeyColumns: plugin.AllColumns([]string{"calendar_group_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Columns: calendarColumns(),

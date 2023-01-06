@@ -19,14 +19,14 @@ func tableMicrosoft365MyContact(_ context.Context) *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate: listMicrosoft365MyContacts,
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365MyContact,
 			KeyColumns: plugin.SingleColumn("id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Columns: contactColumns(),

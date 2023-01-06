@@ -82,14 +82,14 @@ func tableMicrosoft365MailMessage(_ context.Context) *plugin.Table {
 				{Name: "is_draft", Require: plugin.Optional, Operators: []string{"<>", "="}},
 			},
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365MailMessage,
 			KeyColumns: plugin.AllColumns([]string{"user_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Columns: mailMessageColumns(),

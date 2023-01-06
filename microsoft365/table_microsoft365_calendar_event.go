@@ -94,14 +94,14 @@ func tableMicrosoft365CalendarEvent(_ context.Context) *plugin.Table {
 				},
 			},
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound", "UnsupportedQueryOption"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound", "UnsupportedQueryOption"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365CalendarEvent,
 			KeyColumns: plugin.AllColumns([]string{"user_id", "id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ErrorItemNotFound"}),
 			},
 		},
 		Columns: calendarEventColumns(),

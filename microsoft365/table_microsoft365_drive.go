@@ -57,14 +57,14 @@ func tableMicrosoft365Drive(_ context.Context) *plugin.Table {
 				{Name: "drive_type", Require: plugin.Optional},
 			},
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365Drive,
 			KeyColumns: plugin.AllColumns([]string{"id", "user_id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
 		},
 		Columns: driveColumns(),

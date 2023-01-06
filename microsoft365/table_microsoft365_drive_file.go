@@ -50,14 +50,14 @@ func tableMicrosoft365DriveFile(_ context.Context) *plugin.Table {
 			ParentHydrate: listMicrosoft365Drives,
 			KeyColumns:    plugin.SingleColumn("user_id"),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
 		},
 		Get: &plugin.GetConfig{
 			Hydrate:    getMicrosoft365DriveFile,
 			KeyColumns: plugin.AllColumns([]string{"id", "drive_id", "user_id"}),
 			IgnoreConfig: &plugin.IgnoreConfig{
-				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"ResourceNotFound"}),
+				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
 		},
 		Columns: driveFileColumns(),
