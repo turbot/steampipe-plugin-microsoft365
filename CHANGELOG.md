@@ -1,3 +1,23 @@
+## v0.0.2 [2023-01-06]
+
+_Bug fixes_
+
+- Fixed the following tables to return an empty row instead of an error when attempting to retrieve information for resources that do not or no longer exist: ([#12](https://github.com/turbot/steampipe-plugin-microsoft365/pull/12))
+  - `microsoft365_calendar`
+  - `microsoft365_calendar_event`
+  - `microsoft365_contact`
+  - `microsoft365_drive`
+  - `microsoft365_drive_file`
+  - `microsoft365_mail_message`
+  - `microsoft365_my_calendar`
+  - `microsoft365_my_calendar_event`
+  - `microsoft365_my_contact`
+  - `microsoft365_my_drive`
+  - `microsoft365_my_drive_file`
+  - `microsoft365_my_mail_message`
+  - `microsoft365_organization_contact`
+- Fixed the plugin to return a proper error message instead of `null` when invalid authentication credentials are used in the `microsoft365.spc` file. ([#9](https://github.com/turbot/steampipe-plugin-microsoft365/pull/9))
+
 ## v0.0.1 [2022-10-13]
 
 _What's new?_
