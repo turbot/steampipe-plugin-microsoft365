@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -95,7 +95,7 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	input.Top = Int32(int32(pageSize))
 
 	var queryFilter string
-	equalQuals := d.KeyColumnQuals
+	equalQuals := d.EqualsQuals
 	filter := buildDriveQueryFilter(equalQuals)
 
 	if equalQuals["filter"] != nil {
@@ -115,7 +115,7 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		QueryParameters: input,
 	}
 
-	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	userID := d.EqualsQuals["user_id"].GetStringValue()
 	result, err := client.UsersById(userID).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
@@ -134,7 +134,7 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365Drives", "paging_error", err)
@@ -149,8 +149,8 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 func getMicrosoft365Drive(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	driveID := d.KeyColumnQualString("id")
-	userID := d.KeyColumnQualString("user_id")
+	driveID := d.EqualsQualString("id")
+	userID := d.EqualsQualString("user_id")
 	if driveID == "" || userID == "" {
 		return nil, nil
 	}

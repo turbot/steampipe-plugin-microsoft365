@@ -3,9 +3,9 @@ package microsoft365
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/groups"
@@ -116,7 +116,7 @@ func listMicrosoft365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		plugin.Logger(ctx).Error("listMicrosoft365Teams", "paging_error", err)
@@ -135,7 +135,7 @@ func getMicrosoft365Team(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 	if h.Item != nil {
 		teamID = h.Item.(*Microsoft365TeamInfo).ID
 	} else {
-		teamID = d.KeyColumnQuals["id"].GetStringValue()
+		teamID = d.EqualsQuals["id"].GetStringValue()
 	}
 
 	// Create client

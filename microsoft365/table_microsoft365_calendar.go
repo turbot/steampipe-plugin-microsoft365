@@ -3,9 +3,9 @@ package microsoft365
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -86,7 +86,7 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 		logger.Error("microsoft365_calendar.listMicrosoft365Calendars", "connection_error", err)
 		return nil, err
 	}
-	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	userID := d.EqualsQuals["user_id"].GetStringValue()
 
 	input := &calendars.CalendarsRequestBuilderGetQueryParameters{}
 
@@ -121,7 +121,7 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365Calendars", "paging_error", err)
@@ -136,9 +136,9 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 func getMicrosoft365Calendar(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userID := d.KeyColumnQualString("user_id")
-	calendarGroupID := d.KeyColumnQualString("calendar_group_id")
-	id := d.KeyColumnQualString("id")
+	userID := d.EqualsQualString("user_id")
+	calendarGroupID := d.EqualsQualString("calendar_group_id")
+	id := d.EqualsQualString("id")
 	if calendarGroupID == "" || id == "" || userID == "" {
 		return nil, nil
 	}
@@ -215,7 +215,7 @@ func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryDat
 		permissions = append(permissions, data)
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365CalendarPermissions", "paging_error", err)

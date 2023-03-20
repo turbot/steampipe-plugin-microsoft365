@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -119,7 +119,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 		logger.Error("microsoft365_calendar_event.listMicrosoft365CalendarEvents", "connection_error", err)
 		return nil, err
 	}
-	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	userID := d.EqualsQuals["user_id"].GetStringValue()
 
 	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
 
@@ -223,7 +223,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365CalendarEvents", "paging_error", err)
@@ -238,7 +238,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 func getMicrosoft365CalendarEvent(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	eventID := d.KeyColumnQualString("id")
+	eventID := d.EqualsQualString("id")
 	if eventID == "" {
 		return nil, nil
 	}
@@ -249,7 +249,7 @@ func getMicrosoft365CalendarEvent(ctx context.Context, d *plugin.QueryData, _ *p
 		logger.Error("microsoft365_calendar_event.getMicrosoft365CalendarEvent", "connection_error", err)
 		return nil, err
 	}
-	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	userID := d.EqualsQuals["user_id"].GetStringValue()
 
 	result, err := client.UsersById(userID).EventsById(eventID).Get(ctx, nil)
 	if err != nil {

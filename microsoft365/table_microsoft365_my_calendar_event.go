@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -168,7 +168,7 @@ func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, 
 		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyCalendarEvents", "paging_error", err)
@@ -183,7 +183,7 @@ func listMicrosoft365MyCalendarEvents(ctx context.Context, d *plugin.QueryData, 
 func getMicrosoft365MyCalendarEvent(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	eventID := d.KeyColumnQualString("id")
+	eventID := d.EqualsQualString("id")
 	if eventID == "" {
 		return nil, nil
 	}

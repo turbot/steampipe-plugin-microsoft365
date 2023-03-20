@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/turbot/steampipe-plugin-microsoft365/microsoft365"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 func main() {

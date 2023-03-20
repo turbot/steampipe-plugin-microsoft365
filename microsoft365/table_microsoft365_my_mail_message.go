@@ -9,7 +9,7 @@ import (
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages/item"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 //// TABLE DEFINITION
@@ -81,7 +81,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 	selectColumns := buildMailMessageRequestFields(ctx, givenColumns)
 	input.Select = selectColumns
 
-	equalQuals := d.KeyColumnQuals
+	equalQuals := d.EqualsQuals
 	quals := d.Quals
 
 	var queryFilter string
@@ -123,7 +123,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyMailMessages", "paging_error", err)
@@ -138,7 +138,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 func getMicrosoft365MyMailMessage(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	id := d.KeyColumnQualString("id")
+	id := d.EqualsQualString("id")
 	if id == "" {
 		return nil, nil
 	}
