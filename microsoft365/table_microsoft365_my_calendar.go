@@ -6,7 +6,7 @@ import (
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendargroups/item/calendars"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 //// TABLE DEFINITION
@@ -87,7 +87,7 @@ func listMicrosoft365MyCalendars(ctx context.Context, d *plugin.QueryData, h *pl
 		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyCalendars", "paging_error", err)
@@ -102,8 +102,8 @@ func listMicrosoft365MyCalendars(ctx context.Context, d *plugin.QueryData, h *pl
 func getMicrosoft365MyCalendar(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	calendarGroupID := d.KeyColumnQualString("calendar_group_id")
-	id := d.KeyColumnQualString("id")
+	calendarGroupID := d.EqualsQualString("calendar_group_id")
+	id := d.EqualsQualString("id")
 	if calendarGroupID == "" || id == "" {
 		return nil, nil
 	}

@@ -3,7 +3,7 @@ package microsoft365
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -82,7 +82,7 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyCalendarGroups", "paging_error", err)
@@ -97,7 +97,7 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 func getMicrosoft365MyCalendarGroup(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	id := d.KeyColumnQualString("id")
+	id := d.EqualsQualString("id")
 	if id == "" {
 		return nil, nil
 	}

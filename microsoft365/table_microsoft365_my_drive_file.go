@@ -6,7 +6,7 @@ import (
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 //// TABLE DEFINITION
@@ -88,7 +88,7 @@ func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *p
 			d.StreamListItem(ctx, i)
 
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				break
 			}
 		}
@@ -108,8 +108,8 @@ func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *p
 func getMicrosoft365MyDriveFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	driveID := d.KeyColumnQualString("drive_id")
-	id := d.KeyColumnQualString("id")
+	driveID := d.EqualsQualString("drive_id")
+	id := d.EqualsQualString("id")
 	if driveID == "" || id == "" {
 		return nil, nil
 	}

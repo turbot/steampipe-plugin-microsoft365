@@ -7,7 +7,7 @@ import (
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/contacts"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 //// TABLE DEFINITION
@@ -86,7 +86,7 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyContacts", "paging_error", err)
@@ -101,7 +101,7 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 func getMicrosoft365MyContact(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	contactID := d.KeyColumnQualString("id")
+	contactID := d.EqualsQualString("id")
 	if contactID == "" {
 		return nil, nil
 	}

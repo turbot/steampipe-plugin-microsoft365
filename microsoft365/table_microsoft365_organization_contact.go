@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/contacts"
@@ -94,7 +94,7 @@ func listMicrosoft365OrganizationContacts(ctx context.Context, d *plugin.QueryDa
 	input := &contacts.ContactsRequestBuilderGetQueryParameters{}
 
 	var queryFilter string
-	equalQuals := d.KeyColumnQuals
+	equalQuals := d.EqualsQuals
 	filter := buildOrgContactQueryFilter(equalQuals)
 
 	if equalQuals["filter"] != nil {
@@ -141,7 +141,7 @@ func listMicrosoft365OrganizationContacts(ctx context.Context, d *plugin.QueryDa
 		d.StreamListItem(ctx, &Microsoft365OrgContactInfo{contact})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365Contacts", "paging_error", err)
@@ -156,7 +156,7 @@ func listMicrosoft365OrganizationContacts(ctx context.Context, d *plugin.QueryDa
 func getMicrosoft365OrganizationContact(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	contactID := d.KeyColumnQualString("id")
+	contactID := d.EqualsQualString("id")
 	if contactID == "" {
 		return nil, nil
 	}

@@ -3,9 +3,9 @@ package microsoft365
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	msgraphsdkgo "github.com/microsoftgraph/msgraph-sdk-go"
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
@@ -82,7 +82,7 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 		return nil, err
 	}
 
-	userID := d.KeyColumnQuals["user_id"].GetStringValue()
+	userID := d.EqualsQuals["user_id"].GetStringValue()
 	result, err := client.UsersById(userID).DrivesById(driveID).Root().Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
@@ -113,7 +113,7 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 			d.StreamListItem(ctx, i)
 
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				break
 			}
 		}
@@ -133,9 +133,9 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	userID := d.KeyColumnQualString("user_id")
-	driveID := d.KeyColumnQualString("drive_id")
-	id := d.KeyColumnQualString("id")
+	userID := d.EqualsQualString("user_id")
+	driveID := d.EqualsQualString("drive_id")
+	id := d.EqualsQualString("id")
 	if userID == "" || driveID == "" || id == "" {
 		return nil, nil
 	}

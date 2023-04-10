@@ -8,7 +8,7 @@ import (
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 	"github.com/microsoftgraph/msgraph-sdk-go/users/item/drives"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 //// TABLE DEFINITION
@@ -62,7 +62,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 	input.Top = Int32(int32(pageSize))
 
 	var queryFilter string
-	equalQuals := d.KeyColumnQuals
+	equalQuals := d.EqualsQuals
 	filter := buildDriveQueryFilter(equalQuals)
 
 	if equalQuals["filter"] != nil {
@@ -100,7 +100,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		return d.QueryStatus.RowsRemaining(ctx) != 0
+		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
 		logger.Error("listMicrosoft365MyDrives", "paging_error", err)
@@ -115,7 +115,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 func getMicrosoft365MyDrive(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
-	driveID := d.KeyColumnQualString("id")
+	driveID := d.EqualsQualString("id")
 	if driveID == "" {
 		return nil, nil
 	}
