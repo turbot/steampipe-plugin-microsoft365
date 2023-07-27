@@ -107,7 +107,7 @@ By default, all options are commented out in the default connection, thus Steamp
 ## Get involved
 
 - Open source: https://github.com/turbot/steampipe-plugin-microsoft365
-- Community: [Slack Channel](https://steampipe.io/community/join)
+- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
 
 ## Configuring Microsoft 365 Credentials
 
