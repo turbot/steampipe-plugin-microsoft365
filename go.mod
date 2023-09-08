@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
-	github.com/iancoleman/strcase v0.2.0
+	github.com/iancoleman/strcase v0.3.0
 	github.com/microsoft/kiota-authentication-azure-go v0.4.1
 	github.com/microsoftgraph/msgraph-sdk-go v0.38.0
 	github.com/microsoftgraph/msgraph-sdk-go-core v0.28.0
