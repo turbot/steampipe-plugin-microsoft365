@@ -1,14 +1,20 @@
-# Table: microsoft365_my_calendar
+---
+title: "Steampipe Table: microsoft365_my_calendar - Query Microsoft 365 Calendars using SQL"
+description: "Allows users to query Microsoft 365 Calendars, specifically providing details about user's personal calendar events."
+---
 
-Get metadata information for the user's calendars.
+# Table: microsoft365_my_calendar - Query Microsoft 365 Calendars using SQL
 
-To query the metadata of any user's calendars, use the `microsoft365_calendar` table.
+Microsoft 365 Calendar is a time-management and scheduling calendar service developed by Microsoft. It allows users to view, schedule, and manage appointments and meetings. This service is integrated with Outlook and provides shared calendars, scheduling assistant, and calendar events among its features.
 
-**Note:** If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+## Table Usage Guide
+
+The `microsoft365_my_calendar` table provides insights into personal calendar events within Microsoft 365. As a project manager or team lead, you can explore event-specific details through this table, including event schedules, attendees, and associated metadata. Utilize it to gain a comprehensive view of your personal calendar events, such as meetings, appointments, and reminders.
 
 ## Examples
 
 ### Basic info
+Explore which calendars in your Microsoft 365 account have been set as default and can be edited. This is useful to understand your meeting scheduling preferences and the default online meeting provider.
 
 ```sql
 select
@@ -21,6 +27,7 @@ from
 ```
 
 ### List calendars the user can edit
+Explore which calendars the user has editing permissions for, which can be useful for managing access rights and understanding the default online meeting providers associated with each calendar.
 
 ```sql
 select
@@ -34,6 +41,7 @@ where
 ```
 
 ### List permissions for each calendar
+Discover the segments that have different permissions within each calendar. This can be useful in understanding the access levels of various roles and individuals in your organization, helping to maintain security and control.
 
 ```sql
 select
