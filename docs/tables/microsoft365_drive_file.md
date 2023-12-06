@@ -11,6 +11,9 @@ A Drive File in Microsoft 365 is a digital document or other item stored in a us
 
 The `microsoft365_drive_file` table provides insights into Drive Files within Microsoft 365. As an IT administrator, explore file-specific details through this table, including ownership, sharing permissions, and activity. Utilize it to uncover information about files, such as those shared externally, the access levels granted to different users, and the modification history of files.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_drive_file d on d.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

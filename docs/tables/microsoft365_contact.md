@@ -11,6 +11,9 @@ Microsoft 365 Contacts is a feature within Microsoft 365 that allows users to st
 
 The `microsoft365_contact` table provides insights into contact details within Microsoft 365. As a system administrator, explore contact-specific details through this table, including names, email addresses, phone numbers, and other related metadata. Utilize it to uncover information about contacts, such as their organizational position, department, and the last time their details were modified.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_contact c on c.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

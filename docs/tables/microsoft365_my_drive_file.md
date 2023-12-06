@@ -11,6 +11,9 @@ My Drive Files in Microsoft 365 is a feature that allows users to store, sync, a
 
 The `microsoft365_my_drive_file` table provides insights into My Drive Files within Microsoft 365. As a data analyst or IT administrator, explore file-specific details through this table, including file names, sizes, creation and modification dates, and more. Utilize it to uncover information about file usage, such as which files are taking up the most space, the frequency of file modifications, and the distribution of file types.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info

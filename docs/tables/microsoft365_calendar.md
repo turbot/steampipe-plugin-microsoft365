@@ -11,6 +11,9 @@ Microsoft 365 Calendar is a resource within Microsoft 365 that provides users wi
 
 The `microsoft365_calendar` table provides insights into calendars within Microsoft 365. As an IT administrator, explore calendar-specific details through this table, including event schedules, attendee information, and recurring event patterns. Utilize it to uncover information about user scheduling habits, such as frequent meeting attendees, peak scheduling times, and the distribution of events throughout the week.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_calendar c on c.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

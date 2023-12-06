@@ -11,6 +11,9 @@ Microsoft 365 Mail Messages are individual pieces of electronic mail delivered t
 
 The `microsoft365_mail_message` table provides insights into the details of each mail message in a user's mailbox within Microsoft 365. As an IT administrator or security analyst, explore message-specific details through this table, including sender, recipient, subject, and associated metadata. Utilize it to uncover information about mail messages, such as those with specific keywords, the communication patterns within your organization, and the verification of compliance with communication policies.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_mail_message m on m.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

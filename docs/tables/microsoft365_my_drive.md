@@ -11,6 +11,9 @@ My Drives in Microsoft 365 are personal storage spaces for users where they can 
 
 The `microsoft365_my_drive` table provides insights into individual user drives in Microsoft 365. As a system administrator or security professional, you can utilize this table to explore the details of each user's personal drive, including the total storage space, used space, and the remaining space. This can be particularly useful for monitoring user storage usage, identifying potential storage issues, and ensuring compliance with storage policies.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info

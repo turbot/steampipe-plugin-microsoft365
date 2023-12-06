@@ -11,6 +11,9 @@ Microsoft 365 Calendar is a time-management and scheduling calendar service deve
 
 The `microsoft365_my_calendar` table provides insights into personal calendar events within Microsoft 365. As a project manager or team lead, you can explore event-specific details through this table, including event schedules, attendees, and associated metadata. Utilize it to gain a comprehensive view of your personal calendar events, such as meetings, appointments, and reminders.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info

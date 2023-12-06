@@ -11,6 +11,9 @@ Microsoft 365 Drive is a component of Microsoft 365 that provides cloud storage 
 
 The `microsoft365_drive` table provides insights into individual drives within the Microsoft 365 ecosystem. As a cloud administrator or IT professional, explore drive-specific details through this table, including drive properties, usage patterns, and associated metadata. Utilize it to uncover information about the drives, such as their total size, used space, owner details, and the verification of sharing capabilities.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_drive d on d.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

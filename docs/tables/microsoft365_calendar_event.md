@@ -11,6 +11,9 @@ Microsoft365 Calendar Events are a part of the Microsoft365 suite that enables u
 
 The `microsoft365_calendar_event` table provides insights into Calendar Events within Microsoft365. As an IT Administrator, you can explore event-specific details through this table, including schedules, attendees, and status. This can be utilized to manage and track events, monitor attendee participation, and analyze event patterns within your organization.
 
+**Important Notes**
+- You must specify the `user_id` in the `where` or join clause (`where user_id=`, `join microsoft365_calendar_event c on c.user_id=`) to query this table.
+
 ## Examples
 
 ### Basic info

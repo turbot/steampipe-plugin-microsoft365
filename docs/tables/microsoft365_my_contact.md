@@ -11,6 +11,9 @@ Microsoft 365 Contacts is a feature within the Microsoft 365 suite that allows u
 
 The `microsoft365_my_contact` table provides insights into Contacts within Microsoft 365. As an IT administrator or a security analyst, explore contact-specific details through this table, including names, email addresses, phone numbers, and associated metadata. Utilize it to uncover information about contacts, such as the number of contacts, their details, and the verification of contact information.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info

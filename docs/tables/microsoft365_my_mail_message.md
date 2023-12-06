@@ -11,6 +11,9 @@ Microsoft365 Mail is a service within the Microsoft365 suite that provides users
 
 The `microsoft365_my_mail_message` table provides insights into Mail Messages within Microsoft365. As a security analyst, you can explore message-specific details through this table, including sender, recipient, subject, and body. Utilize it to uncover information about messages, such as those with specific keywords, the interactions between users, and the verification of communication compliance.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info

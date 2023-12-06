@@ -11,6 +11,9 @@ Microsoft365 Calendar is a time-management and scheduling service within Microso
 
 The `microsoft365_my_calendar_event` table provides insights into Calendar Events within Microsoft365. As a project manager or team lead, explore event-specific details through this table, including event schedules, attendees, and locations. Utilize it to manage and track appointments and meetings, ensuring efficient time-management and scheduling.
 
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+
 ## Examples
 
 ### Basic info
