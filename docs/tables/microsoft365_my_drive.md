@@ -19,7 +19,18 @@ The `microsoft365_my_drive` table provides insights into individual user drives 
 ### Basic info
 Explore which types of drives are being used in your Microsoft 365 environment and when they were created, to better understand your storage utilization and trends. This can help in optimizing resources and planning for future storage needs.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_my_drive;
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -33,7 +44,20 @@ from
 ### List personal drives
 Explore which personal drives are available in your Microsoft 365 account. This can be useful for understanding how your storage is being utilized and for identifying any potential issues or misconfigurations.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_my_drive
+where
+  drive_type = 'personal';
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -49,7 +73,7 @@ where
 ### List drives older than 90 days
 Explore which drives in your Microsoft 365 account are older than 90 days. This can help identify outdated or potentially unused drives for cleanup or archival purposes.
 
-```sql
+```sql+postgres
 select
   name,
   id,
@@ -62,10 +86,36 @@ where
   created_date_time <= current_date - interval '90 days';
 ```
 
+```sql+sqlite
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_my_drive
+where
+  created_date_time <= date('now','-90 day');
+```
+
 ### List drives using the filter
 Explore the drives that are named 'Steampipe' to gain insights into their ID, type, creation date, and web URL. This can be useful for managing and organizing your digital resources efficiently.
 
-```sql
+```sql+postgres
+select
+ name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_my_drive
+where
+  filter = 'name eq ''Steampipe''';
+```
+
+```sql+sqlite
 select
  name,
   id,

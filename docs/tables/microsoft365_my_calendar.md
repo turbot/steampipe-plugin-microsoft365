@@ -19,7 +19,17 @@ The `microsoft365_my_calendar` table provides insights into personal calendar ev
 ### Basic info
 Explore which calendars in your Microsoft 365 account have been set as default and can be edited. This is useful to understand your meeting scheduling preferences and the default online meeting provider.
 
-```sql
+```sql+postgres
+select
+  name,
+  is_default_calendar,
+  can_edit,
+  default_online_meeting_provider
+from
+  microsoft365_my_calendar;
+```
+
+```sql+sqlite
 select
   name,
   is_default_calendar,
@@ -32,7 +42,18 @@ from
 ### List calendars the user can edit
 Explore which calendars the user has editing permissions for, which can be useful for managing access rights and understanding the default online meeting providers associated with each calendar.
 
-```sql
+```sql+postgres
+select
+  name,
+  can_edit,
+  default_online_meeting_provider
+from
+  microsoft365_my_calendar
+where
+  can_edit;
+```
+
+```sql+sqlite
 select
   name,
   can_edit,
@@ -46,7 +67,7 @@ where
 ### List permissions for each calendar
 Discover the segments that have different permissions within each calendar. This can be useful in understanding the access levels of various roles and individuals in your organization, helping to maintain security and control.
 
-```sql
+```sql+postgres
 select
   c.name,
   p -> 'allowedRoles' as permission_allowed_roles,
@@ -58,4 +79,18 @@ select
 from
   microsoft365_my_calendar as c,
   jsonb_array_elements(permissions) as p;
+```
+
+```sql+sqlite
+select
+  c.name,
+  json_extract(p.value, '$.allowedRoles') as permission_allowed_roles,
+  json_extract(p.value, '$.emailAddress') as permission_email_address,
+  json_extract(p.value, '$.id') as permission_id,
+  json_extract(p.value, '$.isInsideOrganization') as permission_inside_organization,
+  json_extract(p.value, '$.isRemovable') as permission_is_removable,
+  json_extract(p.value, '$.role') as permission_role
+from
+  microsoft365_my_calendar as c,
+  json_each(c.permissions) as p;
 ```

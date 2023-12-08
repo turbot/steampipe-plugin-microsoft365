@@ -19,7 +19,16 @@ The `microsoft365_my_contact` table provides insights into Contacts within Micro
 ### Basic info
 Explore the basic contact information for individuals within your Microsoft 365 network. This can be particularly useful for quickly accessing contact details or for consolidating and organizing your contacts.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  mobile_phone,
+  email_addresses
+from
+  microsoft365_my_contact;
+```
+
+```sql+sqlite
 select
   display_name,
   mobile_phone,
@@ -31,7 +40,7 @@ from
 ### Get a contact by email
 Discover the details of a specific contact by using their email address. This is useful for quickly accessing important information such as display name and mobile phone number.
 
-```sql
+```sql+postgres
 select
   display_name,
   mobile_phone,
@@ -43,10 +52,33 @@ where
   email ->> 'address' = 'user@domain.com';
 ```
 
+```sql+sqlite
+select
+  display_name,
+  mobile_phone,
+  json_extract(email.value, '$.address') as email_address
+from
+  microsoft365_my_contact,
+  json_each(email_addresses) as email
+where
+  json_extract(email.value, '$.address') = 'user@domain.com';
+```
+
 ### List contacts belonging to the same organization
 Discover the segments that share a common organization in your contacts. This is useful for identifying all the contacts related to a specific company, allowing for more efficient communication and organization.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  mobile_phone,
+  email_addresses
+from
+  microsoft365_my_contact
+where
+  company_name = 'Turbot';
+```
+
+```sql+sqlite
 select
   display_name,
   mobile_phone,

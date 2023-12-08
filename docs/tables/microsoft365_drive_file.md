@@ -19,7 +19,19 @@ The `microsoft365_drive_file` table provides insights into Drive Files within Mi
 ### Basic info
 Explore which files are created by a specific user in Microsoft 365. This helps in auditing and managing user data effectively.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_drive_file
+where
+  user_id = 'test@org.onmicrosoft.com';
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -34,7 +46,7 @@ where
 ### List all empty folders
 Identify instances where certain folders within a Microsoft365 drive are empty, allowing for potential clean-up or reorganization.
 
-```sql
+```sql+postgres
 select
   name,
   id,
@@ -47,10 +59,23 @@ where
   and folder ->> 'childCount' = '0';
 ```
 
+```sql+sqlite
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_drive_file
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and json_extract(folder, '$.childCount') = '0';
+```
+
 ### List files modified after a specific date
 Explore which files have been modified after a specific date to keep track of recent changes and updates within your Microsoft 365 Drive. This can be beneficial for version control, audit trails, or simply staying updated on team activities.
 
-```sql
+```sql+postgres
 select
   name,
   id,
@@ -61,4 +86,17 @@ from
 where
   user_id = 'test@org.onmicrosoft.com'
   and created_date_time > '2021-08-15T00:00:00+05:30';
+```
+
+```sql+sqlite
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_drive_file
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and datetime(created_date_time) > datetime('2021-08-15T00:00:00+05:30');
 ```

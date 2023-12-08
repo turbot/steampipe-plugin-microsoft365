@@ -19,7 +19,18 @@ The `microsoft365_contact` table provides insights into contact details within M
 ### Basic info
 Explore the basic contact information associated with a specific user in a Microsoft 365 organization. This query is useful for quickly accessing key details such as display name, mobile phone number, and email addresses.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  mobile_phone,
+  email_addresses
+from
+  microsoft365_contact
+where
+  user_id = 'test@org.onmicrosoft.com';
+```
+
+```sql+sqlite
 select
   display_name,
   mobile_phone,
@@ -33,7 +44,7 @@ where
 ### Get a contact by email
 Determine the mobile phone number and display name associated with a specific email address in your Microsoft365 contacts. This could be useful for quickly finding contact details when all you have is an email address.
 
-```sql
+```sql+postgres
 select
   display_name,
   mobile_phone,
@@ -46,10 +57,35 @@ where
   and email ->> 'address' = 'user@domain.com';
 ```
 
+```sql+sqlite
+select
+  display_name,
+  mobile_phone,
+  json_extract(email.value, '$.address') as email_address
+from
+  microsoft365_contact,
+  json_each(email_addresses) as email
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and json_extract(email.value, '$.address') = 'user@domain.com';
+```
+
 ### List contacts belonging to the same organization
 Explore which contacts belong to the same organization in your Microsoft 365 account. This is useful for consolidating contact information and understanding the relationships within your network.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  mobile_phone,
+  email_addresses
+from
+  microsoft365_contact
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and company_name = 'Turbot';
+```
+
+```sql+sqlite
 select
   display_name,
   mobile_phone,

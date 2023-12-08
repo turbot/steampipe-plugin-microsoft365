@@ -16,7 +16,19 @@ The `microsoft365_team` table provides insights into Teams within Microsoft 365.
 ### Basic info
 Explore which Microsoft 365 teams are currently active, when they were created, and their visibility settings. This can help in understanding the team's structure and accessibility within your organization.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  id,
+  description,
+  visibility,
+  created_date_time,
+  web_url
+from
+  microsoft365_team;
+```
+
+```sql+sqlite
 select
   display_name,
   id,
@@ -31,7 +43,21 @@ from
 ### List private teams
 Discover the segments that are private within your Microsoft365 teams. This can be useful for reviewing the configuration of your teams to ensure the right privacy settings are in place.
 
-```sql
+```sql+postgres
+select
+  display_name,
+  id,
+  description,
+  visibility,
+  created_date_time,
+  web_url
+from
+  microsoft365_team
+where
+  visibility = 'Private';
+```
+
+```sql+sqlite
 select
   display_name,
   id,
@@ -48,7 +74,7 @@ where
 ### List archived teams
 Uncover the details of archived teams in your Microsoft 365 environment. This is useful for managing and reviewing the status of collaborative projects that are no longer active.
 
-```sql
+```sql+postgres
 select
   display_name,
   id,
@@ -60,4 +86,18 @@ from
   microsoft365_team
 where
   is_archived;
+```
+
+```sql+sqlite
+select
+  display_name,
+  id,
+  description,
+  visibility,
+  created_date_time,
+  web_url
+from
+  microsoft365_team
+where
+  is_archived = 1;
 ```

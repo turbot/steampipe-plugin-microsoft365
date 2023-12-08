@@ -19,7 +19,20 @@ The `microsoft365_drive` table provides insights into individual drives within t
 ### Basic info
 Explore which drives are tied to a specific user within your Microsoft 365 environment, allowing you to better manage and monitor user data storage. This is particularly useful for IT administrators who need to keep track of individual user activities and storage usage.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_drive
+where
+  user_id = 'test@org.onmicrosoft.com';
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -35,7 +48,21 @@ where
 ### List personal drives
 Explore which personal drives are associated with a specific user in Microsoft 365. This can be useful to understand a user's data storage and management habits.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_drive
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and drive_type = 'personal';
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -52,7 +79,7 @@ where
 ### List drives older than 90 days
 Explore which drives in Microsoft 365 are older than 90 days to manage storage and ensure relevant data is archived or deleted. This is particularly useful for maintaining a clean and efficient storage system within a specific user account.
 
-```sql
+```sql+postgres
 select
   name,
   id,
@@ -66,10 +93,38 @@ where
   and created_date_time <= current_date - interval '90 days';
 ```
 
+```sql+sqlite
+select
+  name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_drive
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and created_date_time <= date('now','-90 day');
+```
+
 ### List drives using the filter
 Explore which drives were created under a specific user account and identify instances where the drive name matches 'Steampipe'. This can be useful for managing and organizing your Microsoft365 drives.
 
-```sql
+```sql+postgres
+select
+ name,
+  id,
+  drive_type,
+  created_date_time,
+  web_url
+from
+  microsoft365_drive
+where
+  user_id = 'test@org.onmicrosoft.com'
+  and filter = 'name eq ''Steampipe''';
+```
+
+```sql+sqlite
 select
  name,
   id,
