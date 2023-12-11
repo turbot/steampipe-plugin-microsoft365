@@ -105,11 +105,6 @@ connection "microsoft365" {
 
 By default, all options are commented out in the default connection, thus Steampipe will resolve your credentials using the same order as mentioned in [Credentials](#credentials). This provides a quick way to get started with Steampipe, but you will probably want to customize your experience using configuration options for querying multiple tenants, [configuring credentials](#configuring-microsoft-365-credentials) from your Azure CLI, Client Certificate, etc.
 
-## Get involved
-
-- Open source: https://github.com/turbot/steampipe-plugin-microsoft365
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
-
 ## Configuring Microsoft 365 Credentials
 
 The Microsoft 365 plugin support multiple formats and authentication mechanisms, and they are tried in the below order:
