@@ -8,6 +8,7 @@ name: "microsoft365"
 description: "Steampipe plugin for querying calendars, contacts, drives, mailboxes and more from Microsoft 365."
 og_description: "Query Microsoft 365 with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/microsoft365-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Microsoft 365 + Steampipe
