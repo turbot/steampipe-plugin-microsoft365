@@ -1,16 +1,35 @@
-# Table: microsoft365_my_drive_file
+---
+title: "Steampipe Table: microsoft365_my_drive_file - Query Microsoft 365 My Drive Files using SQL"
+description: "Allows users to query My Drive Files in Microsoft 365, specifically providing information related to file details such as name, size, created and modified dates, and more."
+---
 
-List the user's drive items.
+# Table: microsoft365_my_drive_file - Query Microsoft 365 My Drive Files using SQL
 
-To query files in any user's drive, use the `microsoft365_drive_file` table.
+My Drive Files in Microsoft 365 is a feature that allows users to store, sync, and share their files across devices. It provides a secure platform to access files from anywhere and collaborate with others. My Drive Files also offers features like file versioning, file restore, and the ability to access files offline.
 
-**Note:** If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
+## Table Usage Guide
+
+The `microsoft365_my_drive_file` table provides insights into My Drive Files within Microsoft 365. As a data analyst or IT administrator, explore file-specific details through this table, including file names, sizes, creation and modification dates, and more. Utilize it to uncover information about file usage, such as which files are taking up the most space, the frequency of file modifications, and the distribution of file types.
+
+**Important Notes**
+- If not authenticating with the Azure CLI, this table requires the `user_id` argument to be configured in the connection config.
 
 ## Examples
 
 ### Basic info
+Gain insights into the files present in your Microsoft 365 drive by identifying their names, IDs, paths, and creation dates. This can help manage and organize your files more effectively.
 
-```sql
+```sql+postgres
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_my_drive_file;
+```
+
+```sql+sqlite
 select
   name,
   id,
@@ -21,8 +40,9 @@ from
 ```
 
 ### List all empty folders
+Explore which folders in your Microsoft 365 drive are empty. This can help manage storage and identify unused folders for potential clean-up.
 
-```sql
+```sql+postgres
 select
   name,
   id,
@@ -34,9 +54,22 @@ where
   folder ->> 'childCount' = '0';
 ```
 
-### List files modified after a specific date
+```sql+sqlite
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_my_drive_file
+where
+  json_extract(folder, '$.childCount') = '0';
+```
 
-```sql
+### List files modified after a specific date
+Explore which files have been modified after a specific date to keep track of recent changes and updates, ensuring you're always working with the most current information.
+
+```sql+postgres
 select
   name,
   id,
@@ -46,4 +79,16 @@ from
   microsoft365_my_drive_file
 where
   created_date_time > '2021-08-15T00:00:00+05:30';
+```
+
+```sql+sqlite
+select
+  name,
+  id,
+  path,
+  created_date_time
+from
+  microsoft365_my_drive_file
+where
+  datetime(created_date_time) > datetime('2021-08-15T00:00:00+05:30');
 ```

@@ -8,13 +8,14 @@ name: "microsoft365"
 description: "Steampipe plugin for querying calendars, contacts, drives, mailboxes and more from Microsoft 365."
 og_description: "Query Microsoft 365 with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/microsoft365-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Microsoft 365 + Steampipe
 
 [Microsoft 365](https://www.microsoft.com/en-in/microsoft-365) is a suite of cloud-based productivity and collaboration applications that integrates all Microsoft's existing online applications (Outlook, People etc.).
 
-[Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
+[Steampipe](https://steampipe.io) is an open-source zero-ETL engine to instantly query cloud APIs using SQL.
 
 For example:
 
@@ -103,11 +104,6 @@ connection "microsoft365" {
 ```
 
 By default, all options are commented out in the default connection, thus Steampipe will resolve your credentials using the same order as mentioned in [Credentials](#credentials). This provides a quick way to get started with Steampipe, but you will probably want to customize your experience using configuration options for querying multiple tenants, [configuring credentials](#configuring-microsoft-365-credentials) from your Azure CLI, Client Certificate, etc.
-
-## Get involved
-
-- Open source: https://github.com/turbot/steampipe-plugin-microsoft365
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
 
 ## Configuring Microsoft 365 Credentials
 
