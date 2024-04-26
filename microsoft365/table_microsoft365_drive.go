@@ -16,7 +16,7 @@ import (
 )
 
 func driveColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the item.", Transform: transform.FromMethod("GetName")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the drive.", Transform: transform.FromMethod("GetId")},
 		{Name: "drive_type", Type: proto.ColumnType_STRING, Description: "Describes the type of drive represented by this resource. OneDrive personal drives will return personal. OneDrive for Business will return business. SharePoint document libraries will return documentLibrary.", Transform: transform.FromMethod("GetDriveType")},
@@ -35,10 +35,9 @@ func driveColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-	}
+	})
 }
 
 //// TABLE DEFINITION

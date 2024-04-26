@@ -13,7 +13,7 @@ import (
 )
 
 func teamColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The name of the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique id of the team.", Transform: transform.FromField("ID")},
 		{Name: "description", Type: proto.ColumnType_STRING, Description: "A description for the team.", Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDescription")},
@@ -33,8 +33,7 @@ func teamColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Hydrate: getMicrosoft365Team, Transform: transform.FromMethod("GetDisplayName")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-	}
+	})
 }
 
 //// TABLE DEFINITION

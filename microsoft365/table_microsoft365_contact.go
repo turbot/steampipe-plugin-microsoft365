@@ -13,7 +13,7 @@ import (
 )
 
 func contactColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "display_name", Type: proto.ColumnType_STRING, Description: "The contact's display name.", Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "given_name", Type: proto.ColumnType_STRING, Description: "The contact's given name.", Transform: transform.FromMethod("GetGivenName")},
 		{Name: "middle_name", Type: proto.ColumnType_STRING, Description: "The contact's middle name.", Transform: transform.FromMethod("GetMiddleName")},
@@ -55,8 +55,7 @@ func contactColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-	}
+	})
 }
 
 //// TABLE DEFINITION

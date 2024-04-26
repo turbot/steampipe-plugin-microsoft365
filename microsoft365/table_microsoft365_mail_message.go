@@ -18,7 +18,7 @@ import (
 )
 
 func mailMessageColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "subject", Type: proto.ColumnType_STRING, Description: "The subject of the message.", Transform: transform.FromMethod("GetSubject")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the message.", Transform: transform.FromMethod("GetId")},
 		{Name: "body_preview", Type: proto.ColumnType_STRING, Description: "The first 255 characters of the message body in text format.", Transform: transform.FromMethod("GetBodyPreview")},
@@ -58,8 +58,7 @@ func mailMessageColumns() []*plugin.Column {
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-	}
+	})
 }
 
 //// TABLE DEFINITION

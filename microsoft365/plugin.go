@@ -14,6 +14,12 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 	p := &plugin.Plugin{
 		Name:             pluginName,
 		DefaultTransform: transform.FromGo(),
+		ConnectionKeyColumns: []plugin.ConnectionKeyColumn{
+			{
+				Name:    "tenant_id",
+				Hydrate: getTenant,
+			},
+		},
 		ConnectionConfigSchema: &plugin.ConnectionConfigSchema{
 			NewInstance: ConfigInstance,
 		},

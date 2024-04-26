@@ -13,7 +13,7 @@ import (
 )
 
 func calendarGroupColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The group name.", Transform: transform.FromMethod("GetName")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The group's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "change_key", Type: proto.ColumnType_STRING, Description: "Identifies the version of the calendar group. Every time the calendar group is changed, ChangeKey changes as well. This allows Exchange to apply changes to the correct version of the object.", Transform: transform.FromMethod("GetChangeKey")},
@@ -21,9 +21,8 @@ func calendarGroupColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-	}
+	})
 }
 
 //// TABLE DEFINITION

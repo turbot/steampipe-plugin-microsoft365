@@ -17,7 +17,7 @@ import (
 //// TABLE DEFINITION
 
 func calendarEventColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "subject", Type: proto.ColumnType_STRING, Description: "The text of the event's subject line.", Transform: transform.FromMethod("GetSubject")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "Unique identifier for the event.", Transform: transform.FromMethod("GetId")},
 		{Name: "online_meeting_url", Type: proto.ColumnType_STRING, Description: "A URL for an online meeting. The property is set only when an organizer specifies in Outlook that an event is an online meeting such as Skype.", Transform: transform.FromMethod("GetOnlineMeetingUrl")},
@@ -66,9 +66,8 @@ func calendarEventColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetSubject")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-	}
+	})
 }
 
 func tableMicrosoft365CalendarEvent(_ context.Context) *plugin.Table {
