@@ -2,7 +2,7 @@
 
 _Enhancements_
 
-- The `tenant_id` column has now been assigned as a connection key column across all the tables which facilitates more precise and efficient querying across multiple Microsoft 365 tenants. ([#50](https://github.com/turbot/steampipe-plugin-microsoft365/pull/50))
+- The `tenant_id` column has now been assigned as a connection key column across all the tables which facilitates more precise and efficient querying across multiple Microsoft 365 subscriptions. ([#50](https://github.com/turbot/steampipe-plugin-microsoft365/pull/50))
 - The Plugin and the Steampipe Anywhere binaries are now built with the `netgo` package. ([#55](https://github.com/turbot/steampipe-plugin-microsoft365/pull/55))
 - Added the `version` flag to the plugin's Export tool. ([#65](https://github.com/turbot/steampipe-export/pull/65))
 
