@@ -13,7 +13,7 @@ import (
 )
 
 func driveFileColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the item (filename and extension).", Transform: transform.FromMethod("GetName")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the item within the Drive.", Transform: transform.FromMethod("GetId")},
 		{Name: "path", Type: proto.ColumnType_STRING, Description: "URL that displays the resource in the browser.", Transform: transform.FromMethod("DriveItemFilePath")},
@@ -35,8 +35,7 @@ func driveFileColumns() []*plugin.Column {
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-	}
+	})
 }
 
 //// TABLE DEFINITION

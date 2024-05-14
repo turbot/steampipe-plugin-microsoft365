@@ -22,11 +22,10 @@ func tableMicrosoft365TeamMember(_ context.Context) *plugin.Table {
 			ParentHydrate: listMicrosoft365Teams,
 			Hydrate:       listMicrosoft365TeamMembers,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{Name: "team_id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the team.", Transform: transform.FromField("TeamID")},
 			{Name: "member_id", Type: proto.ColumnType_STRING, Description: "The unique identifier of the member.", Transform: transform.FromField("MemberID")},
-			{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
-		},
+		}),
 	}
 }
 

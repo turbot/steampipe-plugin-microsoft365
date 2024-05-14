@@ -13,7 +13,7 @@ import (
 )
 
 func calendarColumns() []*plugin.Column {
-	return []*plugin.Column{
+	return commonColumns([]*plugin.Column{
 		{Name: "name", Type: proto.ColumnType_STRING, Description: "The calendar name.", Transform: transform.FromMethod("GetName")},
 		{Name: "id", Type: proto.ColumnType_STRING, Description: "The calendar's unique identifier.", Transform: transform.FromMethod("GetId")},
 		{Name: "is_default_calendar", Type: proto.ColumnType_BOOL, Description: "True if this is the default calendar where new events are created by default, false otherwise.", Transform: transform.FromMethod("GetIsDefaultCalendar")},
@@ -38,9 +38,8 @@ func calendarColumns() []*plugin.Column {
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
-		{Name: "tenant_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTenant, Hydrate: plugin.HydrateFunc(getTenant).WithCache(), Transform: transform.FromValue()},
 		{Name: "user_id", Type: proto.ColumnType_STRING, Description: ColumnDescriptionUserID},
-	}
+	})
 }
 
 //// TABLE DEFINITION
