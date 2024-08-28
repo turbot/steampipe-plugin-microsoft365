@@ -1,8 +1,8 @@
 module github.com/turbot/steampipe-plugin-microsoft365
 
-go 1.21.0
+go 1.22.4
 
-toolchain go1.21.1
+toolchain go1.22.6
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.3
@@ -11,7 +11,7 @@ require (
 	github.com/microsoft/kiota-authentication-azure-go v0.4.1
 	github.com/microsoftgraph/msgraph-sdk-go v0.38.0
 	github.com/microsoftgraph/msgraph-sdk-go-core v0.28.0
-	github.com/turbot/steampipe-plugin-sdk/v5 v5.10.1
+	github.com/turbot/steampipe-plugin-sdk/v5 v5.10.3
 )
 
 require (
