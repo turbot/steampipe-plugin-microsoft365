@@ -12,7 +12,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/drives"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 func driveColumns() []*plugin.Column {
@@ -32,6 +32,13 @@ func driveColumns() []*plugin.Column {
 		{Name: "created_by", Type: proto.ColumnType_JSON, Description: "Identity of the user, device, or application which created the item.", Transform: transform.FromMethod("DriveCreatedBy")},
 		{Name: "last_modified_by", Type: proto.ColumnType_JSON, Description: "Identity of the user, device, and application which last modified the item.", Transform: transform.FromMethod("DriveLastModifiedBy")},
 		{Name: "parent_reference", Type: proto.ColumnType_JSON, Description: "Parent information, if the drive has a parent.", Transform: transform.FromMethod("DriveParentReference")},
+
+		// SharePoint-specific fields
+		{Name: "sharepoint_ids", Type: proto.ColumnType_JSON, Description: "Returns identifiers useful for SharePoint REST compatibility.", Transform: transform.FromMethod("DriveSharepointIds")},
+		{Name: "list", Type: proto.ColumnType_JSON, Description: "For drives in SharePoint, the underlying document library list.", Transform: transform.FromMethod("DriveList")},
+		{Name: "owner", Type: proto.ColumnType_JSON, Description: "Optional. The user account that owns the drive.", Transform: transform.FromMethod("DriveOwner")},
+		{Name: "quota", Type: proto.ColumnType_JSON, Description: "Optional. Information about the drive's storage space quota.", Transform: transform.FromMethod("DriveQuota")},
+		{Name: "system", Type: proto.ColumnType_JSON, Description: "If present, indicates that this is a system-managed drive.", Transform: transform.FromMethod("DriveSystem")},
 
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetName")},
@@ -82,7 +89,7 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		return nil, err
 	}
 
-	input := &drives.DrivesRequestBuilderGetQueryParameters{}
+	input := &users.ItemDrivesRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -110,25 +117,25 @@ func listMicrosoft365Drives(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		input.Filter = &joinStr
 	}
 
-	options := &drives.DrivesRequestBuilderGetRequestConfiguration{
+	options := &users.ItemDrivesRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
 	userID := d.EqualsQuals["user_id"].GetStringValue()
-	result, err := client.UsersById(userID).Drives().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Driveable](result, adapter, models.CreateDriveCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365Drives", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		drive := pageItem.(models.Driveable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Driveable) bool {
+		drive := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
@@ -161,7 +168,7 @@ func getMicrosoft365Drive(ctx context.Context, d *plugin.QueryData, h *plugin.Hy
 		return nil, err
 	}
 
-	result, err := client.UsersById(userID).DrivesById(driveID).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).Drives().ByDriveId(driveID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

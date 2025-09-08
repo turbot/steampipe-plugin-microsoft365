@@ -10,8 +10,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendarview"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/events"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 //// TABLE DEFINITION
@@ -120,7 +119,7 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 	}
 	userID := d.EqualsQuals["user_id"].GetStringValue()
 
-	input := &calendarview.CalendarViewRequestBuilderGetQueryParameters{}
+	input := &users.ItemCalendarViewRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -178,17 +177,17 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 	}
 
 	if startTime != "" || endTime != "" {
-		options := &calendarview.CalendarViewRequestBuilderGetRequestConfiguration{
+		options := &users.ItemCalendarViewRequestBuilderGetRequestConfiguration{
 			QueryParameters: input,
 		}
 
-		result, err = client.UsersById(userID).CalendarView().Get(ctx, options)
+		result, err = client.Users().ByUserId(userID).CalendarView().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
 		}
 	} else {
-		input := &events.EventsRequestBuilderGetQueryParameters{}
+		input := &users.ItemEventsRequestBuilderGetQueryParameters{}
 
 		// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 		// Maximum value is unknown (tested up to 9999)
@@ -199,25 +198,25 @@ func listMicrosoft365CalendarEvents(ctx context.Context, d *plugin.QueryData, _ 
 		}
 		input.Top = Int32(int32(pageSize))
 
-		options := &events.EventsRequestBuilderGetRequestConfiguration{
+		options := &users.ItemEventsRequestBuilderGetRequestConfiguration{
 			QueryParameters: input,
 		}
 
-		result, err = client.UsersById(userID).Events().Get(ctx, options)
+		result, err = client.Users().ByUserId(userID).Events().Get(ctx, options)
 		if err != nil {
 			errObj := getErrorObject(err)
 			return nil, errObj
 		}
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateEventCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Eventable](result, adapter, models.CreateEventCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365CalendarEvents", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		event := pageItem.(models.Eventable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Eventable) bool {
+		event := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365CalendarEventInfo{event, userID})
 
@@ -250,7 +249,7 @@ func getMicrosoft365CalendarEvent(ctx context.Context, d *plugin.QueryData, _ *p
 	}
 	userID := d.EqualsQuals["user_id"].GetStringValue()
 
-	result, err := client.UsersById(userID).EventsById(eventID).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).Events().ByEventId(eventID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

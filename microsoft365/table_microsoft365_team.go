@@ -101,14 +101,14 @@ func listMicrosoft365Teams(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateGroupCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Groupable](result, adapter, models.CreateGroupCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		plugin.Logger(ctx).Error("listMicrosoft365Teams", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		group := pageItem.(models.Groupable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Groupable) bool {
+		group := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365TeamInfo{
 			ID: *group.GetId(),
@@ -144,7 +144,7 @@ func getMicrosoft365Team(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 		return nil, err
 	}
 
-	result, err := client.TeamsById(teamID).Get(ctx, nil)
+	result, err := client.Teams().ByTeamId(teamID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

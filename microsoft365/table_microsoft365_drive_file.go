@@ -9,6 +9,7 @@ import (
 
 	msgraphsdkgo "github.com/microsoftgraph/msgraph-sdk-go"
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
+	"github.com/microsoftgraph/msgraph-sdk-go/drives"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
@@ -82,38 +83,74 @@ func listMicrosoft365DriveFiles(ctx context.Context, d *plugin.QueryData, h *plu
 	}
 
 	userID := d.EqualsQuals["user_id"].GetStringValue()
-	result, err := client.UsersById(userID).DrivesById(driveID).Root().Children().Get(ctx, nil)
+
+	// Get all items with a filter that includes everything
+	input := &drives.ItemItemsRequestBuilderGetQueryParameters{
+		Filter: StringPtr("folder ne null or file ne null"),
+	}
+	options := &drives.ItemItemsRequestBuilderGetRequestConfiguration{
+		QueryParameters: input,
+	}
+	result, err := client.Drives().ByDriveId(driveID).Items().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.DriveItemable](result, adapter, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365DriveFiles", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		var resultFiles []Microsoft365DriveItemInfo
+	// Track processed items to avoid duplicates
+	processedItems := make(map[string]bool)
 
-		item := pageItem.(models.DriveItemable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.DriveItemable) bool {
+		item := pageItem
+		itemID := *item.GetId()
 
-		resultFiles = append(resultFiles, Microsoft365DriveItemInfo{item, driveID, userID})
+		// Skip if we've already processed this item
+		if processedItems[itemID] {
+			return true
+		}
+
+		// Mark as processed
+		processedItems[itemID] = true
+
+		// Stream the current item
+		d.StreamListItem(ctx, Microsoft365DriveItemInfo{item, driveID, userID})
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.RowsRemaining(ctx) == 0 {
+			return false
+		}
+
+		// If this is a folder with children, expand it
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {
 			childData, err := expandDriveFolders(ctx, client, adapter, item, userID, driveID)
 			if err != nil {
 				return false
 			}
-			resultFiles = append(resultFiles, childData...)
-		}
 
-		for _, i := range resultFiles {
-			d.StreamListItem(ctx, i)
+			// Stream all child items
+			for _, childItem := range childData {
+				childID := *childItem.DriveItemable.GetId()
 
-			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.RowsRemaining(ctx) == 0 {
-				break
+				// Skip if we've already processed this child item
+				if processedItems[childID] {
+					continue
+				}
+
+				// Mark as processed
+				processedItems[childID] = true
+
+				d.StreamListItem(ctx, childItem)
+
+				// Context can be cancelled due to manual cancellation or the limit has been hit
+				if d.RowsRemaining(ctx) == 0 {
+					return false
+				}
 			}
 		}
 
@@ -146,7 +183,7 @@ func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, err
 	}
 
-	result, err := client.UsersById(userID).DrivesById(driveID).ItemsById(id).Get(ctx, nil)
+	result, err := client.Drives().ByDriveId(driveID).Items().ByDriveItemId(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -157,22 +194,22 @@ func getMicrosoft365DriveFile(ctx context.Context, d *plugin.QueryData, h *plugi
 
 func expandDriveFolders(ctx context.Context, c *msgraphsdkgo.GraphServiceClient, a *msgraphsdkgo.GraphRequestAdapter, data models.DriveItemable, userID string, driveID string) ([]Microsoft365DriveItemInfo, error) {
 	var items []Microsoft365DriveItemInfo
-	result, err := c.UsersById(userID).DrivesById(driveID).ItemsById(*data.GetId()).Children().Get(ctx, nil)
+	result, err := c.Drives().ByDriveId(driveID).Items().ByDriveItemId(*data.GetId()).Children().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, a, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.DriveItemable](result, a, models.CreateDriveItemCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		plugin.Logger(ctx).Error("expandDriveFolders", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
+	err = pageIterator.Iterate(ctx, func(pageItem models.DriveItemable) bool {
 		var data []Microsoft365DriveItemInfo
 
-		item := pageItem.(models.DriveItemable)
+		item := pageItem
 
 		data = append(data, Microsoft365DriveItemInfo{item, driveID, userID})
 		if item.GetFolder() != nil && item.GetFolder().GetChildCount() != nil && *item.GetFolder().GetChildCount() != 0 {

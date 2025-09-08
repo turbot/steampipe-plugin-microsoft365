@@ -9,7 +9,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendargroups/item/calendars"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 func calendarColumns() []*plugin.Column {
@@ -87,7 +87,7 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 	}
 	userID := d.EqualsQuals["user_id"].GetStringValue()
 
-	input := &calendars.CalendarsRequestBuilderGetQueryParameters{}
+	input := &users.ItemCalendarGroupsItemCalendarsRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -98,24 +98,24 @@ func listMicrosoft365Calendars(ctx context.Context, d *plugin.QueryData, h *plug
 	}
 	input.Top = Int32(int32(pageSize))
 
-	options := &calendars.CalendarsRequestBuilderGetRequestConfiguration{
+	options := &users.ItemCalendarGroupsItemCalendarsRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).CalendarGroupsById(*groupData.GetId()).Calendars().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).CalendarGroups().ByCalendarGroupId(*groupData.GetId()).Calendars().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateCalendarCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Calendarable](result, adapter, models.CreateCalendarCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365Calendars", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		calendar := pageItem.(models.Calendarable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Calendarable) bool {
+		calendar := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365CalendarInfo{calendar, *groupData.GetId(), userID})
 
@@ -149,7 +149,7 @@ func getMicrosoft365Calendar(ctx context.Context, d *plugin.QueryData, h *plugin
 		return nil, err
 	}
 
-	result, err := client.UsersById(userID).CalendarGroupsById(calendarGroupID).CalendarsById(id).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).CalendarGroups().ByCalendarGroupId(calendarGroupID).Calendars().ByCalendarId(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -171,23 +171,23 @@ func listMicrosoft365CalendarPermissions(ctx context.Context, d *plugin.QueryDat
 	}
 
 	var permissions []map[string]interface{}
-	result, err := client.UsersById(calendarData.UserID).CalendarGroupsById(calendarData.CalendarGroupID).CalendarsById(*calendarData.GetId()).CalendarPermissions().Get(ctx, nil)
+	result, err := client.Users().ByUserId(calendarData.UserID).CalendarGroups().ByCalendarGroupId(calendarData.CalendarGroupID).Calendars().ByCalendarId(*calendarData.GetId()).CalendarPermissions().Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateCalendarPermissionCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.CalendarPermissionable](result, adapter, models.CreateCalendarPermissionCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365CalendarPermissions", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		perms := pageItem.(models.CalendarPermissionable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.CalendarPermissionable) bool {
+		perms := pageItem
 
 		data := map[string]interface{}{
-			"allowedRoles": perms.GetAllowedRoles(),
+			"allowedRoles": ConvertCalendarPermissionAllowedRoles(perms.GetAllowedRoles()),
 		}
 		if perms.GetId() != nil {
 			data["id"] = *perms.GetId()

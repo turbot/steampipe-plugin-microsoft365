@@ -6,8 +6,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/messages/item"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -65,7 +64,7 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 	userID := userIDCached.(string)
 
 	// List operations
-	input := &messages.MessagesRequestBuilderGetQueryParameters{}
+	input := &users.ItemMessagesRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -101,24 +100,24 @@ func listMicrosoft365MyMailMessages(ctx context.Context, d *plugin.QueryData, h 
 		input.Filter = &joinStr
 	}
 
-	options := &messages.MessagesRequestBuilderGetRequestConfiguration{
+	options := &users.ItemMessagesRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).Messages().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Messages().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateMessageCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Messageable](result, adapter, models.CreateMessageCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365MyMailMessages", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		message := pageItem.(models.Messageable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Messageable) bool {
+		message := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365MailMessageInfo{message, userID})
 
@@ -158,18 +157,18 @@ func getMicrosoft365MyMailMessage(ctx context.Context, d *plugin.QueryData, h *p
 	userID := userIDCached.(string)
 
 	// List operations
-	input := &item.MessageItemRequestBuilderGetQueryParameters{}
+	input := &users.ItemMessagesMessageItemRequestBuilderGetQueryParameters{}
 
 	// Check for query context and requests only for queried columns
 	givenColumns := d.QueryContext.Columns
 	selectColumns := buildMailMessageRequestFields(ctx, givenColumns)
 	input.Select = selectColumns
 
-	options := &item.MessageItemRequestBuilderGetRequestConfiguration{
+	options := &users.ItemMessagesMessageItemRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).MessagesById(id).Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Messages().ByMessageId(id).Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

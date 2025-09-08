@@ -30,6 +30,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"microsoft365_contact":              tableMicrosoft365Contact(ctx),
 			"microsoft365_drive":                tableMicrosoft365Drive(ctx),
 			"microsoft365_drive_file":           tableMicrosoft365DriveFile(ctx),
+			"microsoft365_list":                 tableMicrosoft365List(ctx),
 			"microsoft365_mail_message":         tableMicrosoft365MailMessage(ctx),
 			"microsoft365_my_calendar":          tableMicrosoft365MyCalendar(ctx),
 			"microsoft365_my_calendar_event":    tableMicrosoft365MyCalendarEvent(ctx),
@@ -39,8 +40,10 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"microsoft365_my_drive_file":        tableMicrosoft365MyDriveFile(ctx),
 			"microsoft365_my_mail_message":      tableMicrosoft365MyMailMessage(ctx),
 			"microsoft365_organization_contact": tableMicrosoft365OrganizationContact(ctx),
+			"microsoft365_site":                 tableMicrosoft365Site(ctx),
 			"microsoft365_team":                 tableMicrosoft365Team(ctx),
 			"microsoft365_team_member":          tableMicrosoft365TeamMember(ctx),
+			"microsoft365_user":                 tableMicrosoft365User(ctx),
 		},
 	}
 

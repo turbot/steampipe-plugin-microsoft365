@@ -128,14 +128,14 @@ func listMicrosoft365OrganizationContacts(ctx context.Context, d *plugin.QueryDa
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateOrgContactCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.OrgContactable](result, adapter, models.CreateOrgContactCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365Contacts", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		contact := pageItem.(models.OrgContactable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.OrgContactable) bool {
+		contact := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365OrgContactInfo{contact})
 
@@ -167,7 +167,7 @@ func getMicrosoft365OrganizationContact(ctx context.Context, d *plugin.QueryData
 		return nil, err
 	}
 
-	result, err := client.ContactsById(contactID).Get(ctx, nil)
+	result, err := client.Contacts().ByOrgContactId(contactID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
