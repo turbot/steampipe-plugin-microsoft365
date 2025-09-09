@@ -112,20 +112,8 @@ func ConvertCalendarPermissionAllowedRoles(allowedRoles []models.CalendarRoleTyp
 	var roles []string
 	for _, role := range allowedRoles {
 		// Convert numeric enum values to string values
-		switch role {
-		case 0:
-			roles = append(roles, "none")
-		case 1:
-			roles = append(roles, "freeBusyRead")
-		case 2:
-			roles = append(roles, "limitedRead")
-		case 3:
-			roles = append(roles, "read")
-		case 4:
-			roles = append(roles, "write")
-		default:
-			roles = append(roles, "none")
-		}
+		roles = append(roles, role.String())
+		
 	}
 	return roles
 }
