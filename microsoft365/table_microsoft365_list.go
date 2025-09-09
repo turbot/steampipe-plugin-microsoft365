@@ -53,6 +53,9 @@ func tableMicrosoft365List(_ context.Context) *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate:       listMicrosoft365Lists,
 			ParentHydrate: listMicrosoft365Sites,
+			KeyColumns: plugin.KeyColumnSlice{
+				{Name: "site_id", Require: plugin.Optional},
+			},
 			IgnoreConfig: &plugin.IgnoreConfig{
 				ShouldIgnoreErrorFunc: isIgnorableErrorPredicate([]string{"itemNotFound"}),
 			},
@@ -78,6 +81,10 @@ func listMicrosoft365Lists(ctx context.Context, d *plugin.QueryData, h *plugin.H
 		siteID = *siteData.GetId()
 	}
 	logger := plugin.Logger(ctx)
+
+	if d.EqualsQualString("site_id") != "" && d.EqualsQualString("site_id") != siteID {
+		return nil, nil
+	}
 
 	// Create client
 	client, adapter, err := GetGraphClient(ctx, d)
