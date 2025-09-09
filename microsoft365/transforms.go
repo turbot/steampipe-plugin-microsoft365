@@ -886,20 +886,22 @@ func (event *Microsoft365CalendarEventInfo) EventRecurrence() map[string]interfa
 		recurrenceInfo["pattern"] = patternInfo
 	}
 	if event.GetRecurrence().GetRangeEscaped() != nil {
-		rangeInfo := map[string]interface{}{
-			"type": event.GetRecurrence().GetRangeEscaped().GetTypeEscaped().String(),
+		recurrenceRange := event.GetRecurrence().GetRangeEscaped()
+		rangeInfo := map[string]interface{}{}
+		if recurrenceRange.GetTypeEscaped() != nil {
+			rangeInfo["type"] = recurrenceRange.GetTypeEscaped().String()
 		}
-		if event.GetRecurrence().GetRangeEscaped().GetEndDate() != nil {
-			rangeInfo["endDate"] = *event.GetRecurrence().GetRangeEscaped().GetEndDate()
+		if recurrenceRange.GetEndDate() != nil {
+			rangeInfo["endDate"] = *recurrenceRange.GetEndDate()
 		}
-		if event.GetRecurrence().GetRangeEscaped().GetNumberOfOccurrences() != nil {
-			rangeInfo["numberOfOccurrences"] = *event.GetRecurrence().GetRangeEscaped().GetNumberOfOccurrences()
+		if recurrenceRange.GetNumberOfOccurrences() != nil {
+			rangeInfo["numberOfOccurrences"] = *recurrenceRange.GetNumberOfOccurrences()
 		}
-		if event.GetRecurrence().GetRangeEscaped().GetRecurrenceTimeZone() != nil {
-			rangeInfo["recurrenceTimeZone"] = event.GetRecurrence().GetRangeEscaped().GetRecurrenceTimeZone()
+		if recurrenceRange.GetRecurrenceTimeZone() != nil {
+			rangeInfo["recurrenceTimeZone"] = recurrenceRange.GetRecurrenceTimeZone()
 		}
-		if event.GetRecurrence().GetRangeEscaped().GetStartDate() != nil {
-			rangeInfo["startDate"] = *event.GetRecurrence().GetRangeEscaped().GetStartDate()
+		if recurrenceRange.GetStartDate() != nil {
+			rangeInfo["startDate"] = *recurrenceRange.GetStartDate()
 		}
 		recurrenceInfo["range"] = rangeInfo
 	}
@@ -2897,16 +2899,12 @@ func (security *Microsoft365SecuritySettingsInfo) SecuritySettingsConditionalAcc
 		}
 		if policy.GetGrantControls().GetCustomAuthenticationFactors() != nil {
 			var factors []string
-			for _, factor := range policy.GetGrantControls().GetCustomAuthenticationFactors() {
-				factors = append(factors, factor)
-			}
+			factors = append(factors, policy.GetGrantControls().GetCustomAuthenticationFactors()...)
 			grantControls["custom_authentication_factors"] = factors
 		}
 		if policy.GetGrantControls().GetTermsOfUse() != nil {
 			var terms []string
-			for _, term := range policy.GetGrantControls().GetTermsOfUse() {
-				terms = append(terms, term)
-			}
+			terms = append(terms, policy.GetGrantControls().GetTermsOfUse()...)
 			grantControls["terms_of_use"] = terms
 		}
 
@@ -3648,22 +3646,22 @@ func (user *Microsoft365UserInfo) UserLicenseDetails() []map[string]interface{} 
 	return details
 }
 
-// User Mailbox Settings transform methods
-func (user *Microsoft365UserInfo) UserMailboxPurpose() string {
+// User Mailbox Settings transform methods - these will be called on the mailbox settings from hydrate
+func (user *Microsoft365UserInfo) GetUserPurpose() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetUserPurpose() == nil {
 		return ""
 	}
 	return user.MailboxSettings.GetUserPurpose().String()
 }
 
-func (user *Microsoft365UserInfo) UserArchiveFolder() string {
+func (user *Microsoft365UserInfo) GetArchiveFolder() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetArchiveFolder() == nil {
 		return ""
 	}
 	return *user.MailboxSettings.GetArchiveFolder()
 }
 
-func (user *Microsoft365UserInfo) UserAutomaticRepliesSetting() map[string]interface{} {
+func (user *Microsoft365UserInfo) GetAutomaticRepliesSetting() map[string]interface{} {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetAutomaticRepliesSetting() == nil {
 		return nil
 	}
@@ -3690,28 +3688,28 @@ func (user *Microsoft365UserInfo) UserAutomaticRepliesSetting() map[string]inter
 	return setting
 }
 
-func (user *Microsoft365UserInfo) UserDateFormat() string {
+func (user *Microsoft365UserInfo) GetDateFormat() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetDateFormat() == nil {
 		return ""
 	}
 	return *user.MailboxSettings.GetDateFormat()
 }
 
-func (user *Microsoft365UserInfo) UserTimeFormat() string {
+func (user *Microsoft365UserInfo) GetTimeFormat() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetTimeFormat() == nil {
 		return ""
 	}
 	return *user.MailboxSettings.GetTimeFormat()
 }
 
-func (user *Microsoft365UserInfo) UserTimeZone() string {
+func (user *Microsoft365UserInfo) GetTimeZone() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetTimeZone() == nil {
 		return ""
 	}
 	return *user.MailboxSettings.GetTimeZone()
 }
 
-func (user *Microsoft365UserInfo) UserLanguage() map[string]interface{} {
+func (user *Microsoft365UserInfo) GetLanguage() map[string]interface{} {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetLanguage() == nil {
 		return nil
 	}
@@ -3726,7 +3724,7 @@ func (user *Microsoft365UserInfo) UserLanguage() map[string]interface{} {
 	return language
 }
 
-func (user *Microsoft365UserInfo) UserWorkingHours() map[string]interface{} {
+func (user *Microsoft365UserInfo) GetWorkingHours() map[string]interface{} {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetWorkingHours() == nil {
 		return nil
 	}
@@ -3751,7 +3749,7 @@ func (user *Microsoft365UserInfo) UserWorkingHours() map[string]interface{} {
 	return workingHours
 }
 
-func (user *Microsoft365UserInfo) UserDelegateMeetingMessageDeliveryOptions() string {
+func (user *Microsoft365UserInfo) GetDelegateMeetingMessageDeliveryOptions() string {
 	if user.MailboxSettings == nil || user.MailboxSettings.GetDelegateMeetingMessageDeliveryOptions() == nil {
 		return ""
 	}

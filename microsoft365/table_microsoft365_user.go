@@ -202,14 +202,7 @@ func listMicrosoft365Users(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	err = pageIterator.Iterate(ctx, func(pageItem models.Userable) bool {
 		user := pageItem
 
-		// Get mailbox settings for this user
-		mailboxSettings, err := client.Users().ByUserId(*user.GetId()).MailboxSettings().Get(ctx, nil)
-		if err != nil {
-			// If we can't get mailbox settings, create user without them
-			d.StreamListItem(ctx, &Microsoft365UserInfo{Userable: user, MailboxSettings: nil})
-		} else {
-			d.StreamListItem(ctx, &Microsoft365UserInfo{Userable: user, MailboxSettings: mailboxSettings})
-		}
+		d.StreamListItem(ctx, &Microsoft365UserInfo{Userable: user, MailboxSettings: nil})
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
 		return d.RowsRemaining(ctx) != 0
