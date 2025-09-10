@@ -307,3 +307,288 @@ where
   account_enabled = 1
   and time_zone is not null;
 ```
+
+### List users by preferred language
+Explore users grouped by their preferred language settings to understand the language distribution across your organization and ensure proper localization support.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  preferred_language,
+  usage_location,
+  preferred_data_location
+from
+  microsoft365_user
+where
+  preferred_language is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  preferred_language,
+  usage_location,
+  preferred_data_location
+from
+  microsoft365_user
+where
+  preferred_language is not null;
+```
+
+### List users with contact information
+Explore users who have provided contact information including phone numbers and addresses to understand the completeness of user profiles in your organization.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  business_phones,
+  mobile_phone,
+  office_location,
+  city,
+  state,
+  country,
+  street_address,
+  postal_code
+from
+  microsoft365_user
+where
+  business_phones is not null
+  or mobile_phone is not null
+  or office_location is not null
+  or city is not null
+  or state is not null
+  or country is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  business_phones,
+  mobile_phone,
+  office_location,
+  city,
+  state,
+  country,
+  street_address,
+  postal_code
+from
+  microsoft365_user
+where
+  business_phones is not null
+  or mobile_phone is not null
+  or office_location is not null
+  or city is not null
+  or state is not null
+  or country is not null;
+```
+
+### List users with on-premises synchronization
+Explore users who are synchronized from on-premises Active Directory to understand your hybrid identity setup and synchronization status.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  on_premises_sync_enabled,
+  on_premises_domain_name,
+  on_premises_user_principal_name,
+  on_premises_last_sync_date_time,
+  on_premises_distinguished_name
+from
+  microsoft365_user
+where
+  on_premises_sync_enabled = true;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  on_premises_sync_enabled,
+  on_premises_domain_name,
+  on_premises_user_principal_name,
+  on_premises_last_sync_date_time,
+  on_premises_distinguished_name
+from
+  microsoft365_user
+where
+  on_premises_sync_enabled = 1;
+```
+
+### List users with multiple email addresses
+Explore users who have multiple email addresses configured, including proxy addresses and other mail addresses, to understand email configuration complexity.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  proxy_addresses,
+  other_mails,
+  im_addresses
+from
+  microsoft365_user
+where
+  proxy_addresses is not null
+  or other_mails is not null
+  or im_addresses is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  proxy_addresses,
+  other_mails,
+  im_addresses
+from
+  microsoft365_user
+where
+  proxy_addresses is not null
+  or other_mails is not null
+  or im_addresses is not null;
+```
+
+### List users with employee information
+Explore users who have employee-related information configured, including hire dates, employee IDs, and employment status.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  employee_id,
+  employee_type,
+  hire_date,
+  employee_hire_date,
+  employee_leave_date_time,
+  job_title,
+  department
+from
+  microsoft365_user
+where
+  employee_id is not null
+  or employee_type is not null
+  or hire_date is not null
+  or employee_hire_date is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  employee_id,
+  employee_type,
+  hire_date,
+  employee_hire_date,
+  employee_leave_date_time,
+  job_title,
+  department
+from
+  microsoft365_user
+where
+  employee_id is not null
+  or employee_type is not null
+  or hire_date is not null
+  or employee_hire_date is not null;
+```
+
+### List users with personal information
+Explore users who have provided personal information such as birthday, interests, skills, and other profile details.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  birthday,
+  about_me,
+  interests,
+  skills,
+  past_projects,
+  responsibilities,
+  schools
+from
+  microsoft365_user
+where
+  birthday is not null
+  or about_me is not null
+  or interests is not null
+  or skills is not null
+  or past_projects is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  birthday,
+  about_me,
+  interests,
+  skills,
+  past_projects,
+  responsibilities,
+  schools
+from
+  microsoft365_user
+where
+  birthday is not null
+  or about_me is not null
+  or interests is not null
+  or skills is not null
+  or past_projects is not null;
+```
+
+### List users with security information
+Explore users with security-related information including password policies, device enrollment limits, and security identifiers.
+
+```sql+postgres
+select
+  display_name,
+  user_principal_name,
+  mail,
+  password_policies,
+  device_enrollment_limit,
+  security_identifier,
+  sign_in_sessions_valid_from_date_time,
+  last_password_change_date_time
+from
+  microsoft365_user
+where
+  password_policies is not null
+  or device_enrollment_limit is not null
+  or security_identifier is not null
+  or sign_in_sessions_valid_from_date_time is not null;
+```
+
+```sql+sqlite
+select
+  display_name,
+  user_principal_name,
+  mail,
+  password_policies,
+  device_enrollment_limit,
+  security_identifier,
+  sign_in_sessions_valid_from_date_time,
+  last_password_change_date_time
+from
+  microsoft365_user
+where
+  password_policies is not null
+  or device_enrollment_limit is not null
+  or security_identifier is not null
+  or sign_in_sessions_valid_from_date_time is not null;
+```
