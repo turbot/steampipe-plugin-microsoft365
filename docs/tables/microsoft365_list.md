@@ -14,7 +14,6 @@ The `microsoft365_list` table provides insights into SharePoint lists within Mic
 ## Examples
 
 ### Basic info
-
 Explore the basic information about SharePoint lists within a specific site to understand their structure and purpose. This is useful for getting an overview of all lists available in a site.
 
 ```sql+postgres
@@ -46,7 +45,6 @@ where
 ```
 
 ### List lists created in the last 30 days
-
 Explore which lists were created within the last 30 days to track recent list creation activity and understand how the site is being used.
 
 ```sql+postgres
@@ -78,7 +76,6 @@ where
 ```
 
 ### Get list details with creator information
-
 Explore detailed information about lists including who created them and when they were last modified. This is useful for understanding list ownership and maintenance.
 
 ```sql+postgres
@@ -114,7 +111,6 @@ limit 10;
 ```
 
 ### List columns for each list
-
 Explore the column definitions for each list to understand the data structure and field types used in your SharePoint lists. Note: Column data may not be available for all lists.
 
 ```sql+postgres
@@ -150,7 +146,6 @@ where
 ```
 
 ### Join with sites to get site information
-
 Explore lists along with their parent site information to understand the relationship between sites and lists in your Microsoft 365 environment.
 
 ```sql+postgres

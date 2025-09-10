@@ -14,7 +14,6 @@ The `microsoft365_site` table provides insights into SharePoint sites within Mic
 ## Examples
 
 ### Basic info
-
 Explore the basic information about SharePoint sites in your Microsoft 365 environment to understand the site landscape and their purposes.
 
 ```sql+postgres
@@ -44,7 +43,6 @@ from
 ```
 
 ### List team sites (non-personal sites)
-
 Explore which sites are team or communication sites (excluding personal sites) to understand the collaborative workspaces in your organization.
 
 ```sql+postgres
@@ -74,7 +72,6 @@ where
 ```
 
 ### List sites created in the last 90 days
-
 Explore which sites were created within the last 90 days to track recent site creation activity and understand how your organization is expanding its collaborative workspaces.
 
 ```sql+postgres
@@ -104,7 +101,6 @@ where
 ```
 
 ### Get site details with creator and modifier information
-
 Explore detailed information about sites including who created them and who last modified them. This is useful for understanding site ownership and maintenance responsibilities.
 
 ```sql+postgres
@@ -134,7 +130,6 @@ from
 ```
 
 ### List sites with specific display name
-
 Explore sites that match a specific display name pattern to find particular sites of interest in your Microsoft 365 environment.
 
 ```sql+postgres
@@ -166,7 +161,6 @@ where
 ```
 
 ### List sites using custom filter
-
 Explore sites using a custom OData filter to find sites that meet specific criteria, such as those created by a particular user or within a specific time range.
 
 ```sql+postgres
@@ -196,7 +190,6 @@ where
 ```
 
 ### Explore site permissions
-
 Explore the permissions associated with each site to understand who has access to different sites in your Microsoft 365 environment.
 
 ```sql+postgres

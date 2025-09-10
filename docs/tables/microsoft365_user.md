@@ -14,7 +14,6 @@ The `microsoft365_user` table provides insights into user accounts within Micros
 ## Examples
 
 ### Basic info
-
 Explore the basic information about users in your Microsoft 365 environment to understand the user landscape and their organizational roles.
 
 ```sql+postgres
@@ -44,7 +43,6 @@ from
 ```
 
 ### List enabled users only
-
 Explore which users have active accounts to understand who can currently access Microsoft 365 services in your organization. Note: account_enabled field may not be populated for all users.
 
 ```sql+postgres
@@ -76,7 +74,6 @@ where
 ```
 
 ### List users by department
-
 Explore users grouped by department to understand the organizational structure and distribution of users across different departments. Note: Department field may not be populated for all users.
 
 ```sql+postgres
@@ -108,7 +105,6 @@ where
 ```
 
 ### List users created in the last 30 days
-
 Explore which user accounts were created within the last 30 days to track recent user onboarding activity and understand growth patterns. Note: created_date_time field may not be populated for all users.
 
 ```sql+postgres
@@ -142,7 +138,6 @@ where
 ```
 
 ### Get user details with contact information
-
 Explore detailed user information including contact details, location, and organizational information to get a comprehensive view of user profiles.
 
 ```sql+postgres
@@ -184,7 +179,6 @@ where
 ```
 
 ### List users with specific user type
-
 Explore users by their type (Member, Guest, etc.) to understand the composition of your user base and identify external users. Note: user_type field may not be populated for all users.
 
 ```sql+postgres
@@ -216,7 +210,6 @@ where
 ```
 
 ### List users using custom filter
-
 Explore users using a custom OData filter to find users that meet specific criteria, such as those in a particular location or with specific job titles.
 
 ```sql+postgres
@@ -248,7 +241,6 @@ where
 ```
 
 ### Explore user license assignments
-
 Explore the licenses assigned to users to understand license usage and ensure proper license allocation across your organization. Note: assigned_licenses field may not be populated for all users.
 
 ```sql+postgres
@@ -280,7 +272,6 @@ where
 ```
 
 ### List users with mailbox settings
-
 Explore users along with their mailbox settings to understand email preferences, time zones, and working hours configuration.
 
 ```sql+postgres
