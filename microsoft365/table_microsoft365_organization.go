@@ -25,7 +25,7 @@ func organizationColumns() []*plugin.Column {
 		// JSON Fields for complex settings with hydrate functions
 		{Name: "sharepoint_settings", Type: proto.ColumnType_JSON, Description: "SharePoint tenant settings", Hydrate: getSharePointSettings, Transform: transform.FromMethod("SharePointSettingsDetails")},
 		{Name: "authentication_settings", Type: proto.ColumnType_JSON, Description: "Authentication methods policy settings", Hydrate: getAuthenticationSettings, Transform: transform.FromMethod("AuthenticationSettingsDetails")},
-		{Name: "security_defaults_settings", Type: proto.ColumnType_JSON, Description: "Security defaults policy settings", Hydrate: getSecurityDefaultsSettings, Transform: transform.FromMethod("SecurityDefaultsSettingsDetails")},
+		{Name: "security_settings", Type: proto.ColumnType_JSON, Description: "Microsoft Security organization settings including alerts, secure scores, and data governance", Hydrate: getSecuritySettings, Transform: transform.FromMethod("SecuritySettingsDetails")},
 
 		// Organization complex fields
 		{Name: "assigned_plans", Type: proto.ColumnType_JSON, Description: "The collection of service plans associated with the tenant.", Transform: transform.FromMethod("OrganizationAssignedPlans")},
@@ -172,4 +172,30 @@ func getSecurityDefaultsSettings(ctx context.Context, d *plugin.QueryData, h *pl
 	}
 
 	return secInfo, nil
+}
+
+// getSecuritySettings retrieves Microsoft Security organization settings
+func getSecuritySettings(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_organization.getSecuritySettings", "connection_error", err)
+		return nil, err
+	}
+
+	// Get Security settings
+	security, err := client.Security().Get(ctx, nil)
+	if err != nil {
+		logger.Error("microsoft365_organization.getSecuritySettings", "get_security_settings_error", err)
+		return nil, nil
+	}
+
+	// Wrap in our info struct
+	securityInfo := &Microsoft365SecurityInfo{
+		Securityable: security,
+	}
+
+	return securityInfo, nil
 }

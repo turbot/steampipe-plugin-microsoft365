@@ -50,6 +50,25 @@ type Microsoft365GroupInfo struct {
 	models.Groupable
 }
 
+type Microsoft365TeamsSettingsInfo struct {
+	TeamsCount int    `json:"teams_count"`
+	Note       string `json:"note"`
+}
+
+type Microsoft365PlannerSettingsInfo struct {
+	PlansCount int    `json:"plans_count"`
+	Note       string `json:"note"`
+}
+
+type Microsoft365TeamworkSettingsInfo struct {
+	WorkforceIntegrationsCount int    `json:"workforce_integrations_count"`
+	Note                       string `json:"note"`
+}
+
+type Microsoft365SecurityInfo struct {
+	models.Securityable
+}
+
 type Microsoft365TeamInfo struct {
 	models.Teamable
 	ID string
@@ -4028,5 +4047,78 @@ func (g *Microsoft365GroupInfo) GroupServiceProvisioningErrors() []map[string]in
 			result = append(result, errorData)
 		}
 	}
+	return result
+}
+
+// Teams Settings transform methods
+func (teams *Microsoft365TeamsSettingsInfo) TeamsSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+	result["teams_count"] = teams.TeamsCount
+	result["note"] = teams.Note
+	return result
+}
+
+// Planner Settings transform methods
+func (planner *Microsoft365PlannerSettingsInfo) PlannerSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+	result["plans_count"] = planner.PlansCount
+	result["note"] = planner.Note
+	return result
+}
+
+// Teamwork Settings transform methods
+func (teamwork *Microsoft365TeamworkSettingsInfo) TeamworkSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+	result["workforce_integrations_count"] = teamwork.WorkforceIntegrationsCount
+	result["note"] = teamwork.Note
+	return result
+}
+
+// Security Settings transform methods
+func (security *Microsoft365SecurityInfo) SecuritySettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+
+	// Get alerts count
+	if security.GetAlerts() != nil {
+		result["alerts_count"] = len(security.GetAlerts())
+	} else {
+		result["alerts_count"] = 0
+	}
+
+	// Get secure scores count
+	if security.GetSecureScores() != nil {
+		result["secure_scores_count"] = len(security.GetSecureScores())
+	} else {
+		result["secure_scores_count"] = 0
+	}
+
+	// Get secure score control profiles count
+	if security.GetSecureScoreControlProfiles() != nil {
+		result["secure_score_control_profiles_count"] = len(security.GetSecureScoreControlProfiles())
+	} else {
+		result["secure_score_control_profiles_count"] = 0
+	}
+
+	// Get subject rights requests count
+	if security.GetSubjectRightsRequests() != nil {
+		result["subject_rights_requests_count"] = len(security.GetSubjectRightsRequests())
+	} else {
+		result["subject_rights_requests_count"] = 0
+	}
+
+	// Check if attack simulation is available
+	if security.GetAttackSimulation() != nil {
+		result["attack_simulation_available"] = true
+	} else {
+		result["attack_simulation_available"] = false
+	}
+
+	// Check if data security and governance is available
+	if security.GetDataSecurityAndGovernance() != nil {
+		result["data_security_and_governance_available"] = true
+	} else {
+		result["data_security_and_governance_available"] = false
+	}
+
 	return result
 }
