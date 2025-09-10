@@ -113,7 +113,7 @@ func ConvertCalendarPermissionAllowedRoles(allowedRoles []models.CalendarRoleTyp
 	for _, role := range allowedRoles {
 		// Convert numeric enum values to string values
 		roles = append(roles, role.String())
-		
+
 	}
 	return roles
 }
@@ -1859,6 +1859,18 @@ type Microsoft365CalendarSettingsInfo struct {
 	models.MailboxSettingsable
 	UserID    string
 	Calendars models.CalendarCollectionResponseable
+}
+
+type Microsoft365SharePointSettingsInfo struct {
+	models.SharepointSettingsable
+}
+
+type Microsoft365AuthenticationSettingsInfo struct {
+	models.AuthenticationMethodsPolicyable
+}
+
+type Microsoft365SecurityDefaultsSettingsInfo struct {
+	models.IdentitySecurityDefaultsEnforcementPolicyable
 }
 
 type Microsoft365SiteInfo struct {
@@ -3754,4 +3766,182 @@ func (user *Microsoft365UserInfo) GetDelegateMeetingMessageDeliveryOptions() str
 		return ""
 	}
 	return user.MailboxSettings.GetDelegateMeetingMessageDeliveryOptions().String()
+}
+
+// SharePoint Settings transform methods
+func (sp *Microsoft365SharePointSettingsInfo) SharePointSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+
+	if sp.GetId() != nil {
+		result["id"] = *sp.GetId()
+	}
+	if sp.GetOdataType() != nil {
+		result["odata_type"] = *sp.GetOdataType()
+	}
+	if sp.GetIsCommentingOnSitePagesEnabled() != nil {
+		result["is_commenting_on_site_pages_enabled"] = *sp.GetIsCommentingOnSitePagesEnabled()
+	}
+	if sp.GetIsFileActivityNotificationEnabled() != nil {
+		result["is_file_activity_notification_enabled"] = *sp.GetIsFileActivityNotificationEnabled()
+	}
+	if sp.GetIsLegacyAuthProtocolsEnabled() != nil {
+		result["is_legacy_auth_protocols_enabled"] = *sp.GetIsLegacyAuthProtocolsEnabled()
+	}
+	if sp.GetIsLoopEnabled() != nil {
+		result["is_loop_enabled"] = *sp.GetIsLoopEnabled()
+	}
+	if sp.GetIsMacSyncAppEnabled() != nil {
+		result["is_mac_sync_app_enabled"] = *sp.GetIsMacSyncAppEnabled()
+	}
+	if sp.GetIsRequireAcceptingUserToMatchInvitedUserEnabled() != nil {
+		result["is_require_accepting_user_to_match_invited_user_enabled"] = *sp.GetIsRequireAcceptingUserToMatchInvitedUserEnabled()
+	}
+	if sp.GetIsResharingByExternalUsersEnabled() != nil {
+		result["is_resharing_by_external_users_enabled"] = *sp.GetIsResharingByExternalUsersEnabled()
+	}
+	if sp.GetIsSharePointMobileNotificationEnabled() != nil {
+		result["is_sharepoint_mobile_notification_enabled"] = *sp.GetIsSharePointMobileNotificationEnabled()
+	}
+	if sp.GetIsSharePointNewsfeedEnabled() != nil {
+		result["is_sharepoint_newsfeed_enabled"] = *sp.GetIsSharePointNewsfeedEnabled()
+	}
+	if sp.GetIsSiteCreationEnabled() != nil {
+		result["is_site_creation_enabled"] = *sp.GetIsSiteCreationEnabled()
+	}
+	if sp.GetIsSiteCreationUIEnabled() != nil {
+		result["is_site_creation_ui_enabled"] = *sp.GetIsSiteCreationUIEnabled()
+	}
+	if sp.GetIsSitePagesCreationEnabled() != nil {
+		result["is_site_pages_creation_enabled"] = *sp.GetIsSitePagesCreationEnabled()
+	}
+	if sp.GetIsSitesStorageLimitAutomatic() != nil {
+		result["is_sites_storage_limit_automatic"] = *sp.GetIsSitesStorageLimitAutomatic()
+	}
+	if sp.GetIsSyncButtonHiddenOnPersonalSite() != nil {
+		result["is_sync_button_hidden_on_personal_site"] = *sp.GetIsSyncButtonHiddenOnPersonalSite()
+	}
+	if sp.GetIsUnmanagedSyncAppForTenantRestricted() != nil {
+		result["is_unmanaged_sync_app_for_tenant_restricted"] = *sp.GetIsUnmanagedSyncAppForTenantRestricted()
+	}
+	if sp.GetPersonalSiteDefaultStorageLimitInMB() != nil {
+		result["personal_site_default_storage_limit_in_mb"] = *sp.GetPersonalSiteDefaultStorageLimitInMB()
+	}
+	if sp.GetSharingAllowedDomainList() != nil {
+		result["sharing_allowed_domain_list"] = sp.GetSharingAllowedDomainList()
+	}
+	if sp.GetSharingBlockedDomainList() != nil {
+		result["sharing_blocked_domain_list"] = sp.GetSharingBlockedDomainList()
+	}
+	if sp.GetSharingCapability() != nil {
+		result["sharing_capability"] = sp.GetSharingCapability().String()
+	}
+	if sp.GetSharingDomainRestrictionMode() != nil {
+		result["sharing_domain_restriction_mode"] = sp.GetSharingDomainRestrictionMode().String()
+	}
+	if sp.GetSiteCreationDefaultManagedPath() != nil {
+		result["site_creation_default_managed_path"] = *sp.GetSiteCreationDefaultManagedPath()
+	}
+	if sp.GetSiteCreationDefaultStorageLimitInMB() != nil {
+		result["site_creation_default_storage_limit_in_mb"] = *sp.GetSiteCreationDefaultStorageLimitInMB()
+	}
+	if sp.GetTenantDefaultTimezone() != nil {
+		result["tenant_default_timezone"] = *sp.GetTenantDefaultTimezone()
+	}
+	if sp.GetAllowedDomainGuidsForSyncApp() != nil {
+		result["allowed_domain_guids_for_sync_app"] = sp.GetAllowedDomainGuidsForSyncApp()
+	}
+	if sp.GetAvailableManagedPathsForSiteCreation() != nil {
+		result["available_managed_paths_for_site_creation"] = sp.GetAvailableManagedPathsForSiteCreation()
+	}
+	if sp.GetDeletedUserPersonalSiteRetentionPeriodInDays() != nil {
+		result["deleted_user_personal_site_retention_period_in_days"] = *sp.GetDeletedUserPersonalSiteRetentionPeriodInDays()
+	}
+	if sp.GetExcludedFileExtensionsForSyncApp() != nil {
+		result["excluded_file_extensions_for_sync_app"] = sp.GetExcludedFileExtensionsForSyncApp()
+	}
+	if sp.GetImageTaggingOption() != nil {
+		result["image_tagging_option"] = sp.GetImageTaggingOption().String()
+	}
+	if sp.GetIdleSessionSignOut() != nil {
+		result["idle_session_sign_out"] = sp.GetIdleSessionSignOut()
+	}
+
+	return result
+}
+
+// Authentication Settings transform methods
+func (auth *Microsoft365AuthenticationSettingsInfo) AuthenticationSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+
+	if auth.GetId() != nil {
+		result["id"] = *auth.GetId()
+	}
+	if auth.GetDescription() != nil {
+		result["description"] = *auth.GetDescription()
+	}
+	if auth.GetDisplayName() != nil {
+		result["display_name"] = *auth.GetDisplayName()
+	}
+	if auth.GetPolicyVersion() != nil {
+		result["policy_version"] = *auth.GetPolicyVersion()
+	}
+	if auth.GetLastModifiedDateTime() != nil {
+		result["last_modified_date_time"] = *auth.GetLastModifiedDateTime()
+	}
+	if auth.GetPolicyMigrationState() != nil {
+		result["policy_migration_state"] = *auth.GetPolicyMigrationState()
+	}
+	if auth.GetRegistrationEnforcement() != nil {
+		registrationEnforcement := map[string]interface{}{}
+		regEnf := auth.GetRegistrationEnforcement()
+		if regEnf.GetOdataType() != nil {
+			registrationEnforcement["odata_type"] = *regEnf.GetOdataType()
+		}
+		if regEnf.GetAuthenticationMethodsRegistrationCampaign() != nil {
+			registrationEnforcement["authentication_methods_registration_campaign"] = regEnf.GetAuthenticationMethodsRegistrationCampaign()
+		}
+		result["registration_enforcement"] = registrationEnforcement
+	}
+	if auth.GetAuthenticationMethodConfigurations() != nil {
+		var authConfigs []map[string]interface{}
+		for _, config := range auth.GetAuthenticationMethodConfigurations() {
+			configData := map[string]interface{}{}
+			if config.GetId() != nil {
+				configData["id"] = *config.GetId()
+			}
+			if config.GetOdataType() != nil {
+				configData["odata_type"] = *config.GetOdataType()
+			}
+			if config.GetState() != nil {
+				configData["state"] = *config.GetState()
+			}
+			if config.GetExcludeTargets() != nil {
+				configData["exclude_targets"] = config.GetExcludeTargets()
+			}
+			authConfigs = append(authConfigs, configData)
+		}
+		result["authentication_method_configurations"] = authConfigs
+	}
+
+	return result
+}
+
+// Security Defaults Settings transform methods
+func (sec *Microsoft365SecurityDefaultsSettingsInfo) SecurityDefaultsSettingsDetails() map[string]interface{} {
+	result := map[string]interface{}{}
+
+	if sec.GetId() != nil {
+		result["id"] = *sec.GetId()
+	}
+	if sec.GetDisplayName() != nil {
+		result["display_name"] = *sec.GetDisplayName()
+	}
+	if sec.GetDescription() != nil {
+		result["description"] = *sec.GetDescription()
+	}
+	if sec.GetIsEnabled() != nil {
+		result["is_enabled"] = *sec.GetIsEnabled()
+	}
+
+	return result
 }
