@@ -105,6 +105,19 @@ func userColumns() []*plugin.Column {
 		{Name: "working_hours", Type: proto.ColumnType_JSON, Description: "The days of the week and hours in a specific time zone that the user works.", Transform: transform.FromMethod("GetWorkingHours"), Hydrate: getUserMailboxSettings},
 		{Name: "delegate_meeting_message_delivery_options", Type: proto.ColumnType_STRING, Description: "If the user has a calendar delegate, this specifies whether the delegate, mailbox owner, or both receive copies of meeting-related messages that are addressed to the user.", Transform: transform.FromMethod("GetDelegateMeetingMessageDeliveryOptions"), Hydrate: getUserMailboxSettings},
 
+		// Authentication Registration Details columns
+		{Name: "is_mfa_capable", Type: proto.ColumnType_BOOL, Description: "Whether the user is capable of using multi-factor authentication.", Transform: transform.FromMethod("GetIsMfaCapable"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_mfa_registered", Type: proto.ColumnType_BOOL, Description: "Whether the user is registered for multi-factor authentication.", Transform: transform.FromMethod("GetIsMfaRegistered"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_passwordless_capable", Type: proto.ColumnType_BOOL, Description: "Whether the user is capable of using passwordless authentication.", Transform: transform.FromMethod("GetIsPasswordlessCapable"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_sspr_capable", Type: proto.ColumnType_BOOL, Description: "Whether the user is capable of using self-service password reset.", Transform: transform.FromMethod("GetIsSsprCapable"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_sspr_enabled", Type: proto.ColumnType_BOOL, Description: "Whether self-service password reset is enabled for the user.", Transform: transform.FromMethod("GetIsSsprEnabled"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_sspr_registered", Type: proto.ColumnType_BOOL, Description: "Whether the user is registered for self-service password reset.", Transform: transform.FromMethod("GetIsSsprRegistered"), Hydrate: getUserRegistrationDetails},
+		{Name: "methods_registered", Type: proto.ColumnType_JSON, Description: "List of authentication methods registered by the user.", Transform: transform.FromMethod("GetMethodsRegistered"), Hydrate: getUserRegistrationDetails},
+		{Name: "system_preferred_authentication_methods", Type: proto.ColumnType_JSON, Description: "List of system-preferred authentication methods.", Transform: transform.FromMethod("GetSystemPreferredAuthenticationMethods"), Hydrate: getUserRegistrationDetails},
+		{Name: "user_preferred_method_for_secondary_authentication", Type: proto.ColumnType_STRING, Description: "The user's preferred method for secondary authentication.", Transform: transform.FromMethod("GetUserPreferredMethodForSecondaryAuthentication"), Hydrate: getUserRegistrationDetails},
+		{Name: "is_system_preferred_authentication_method_enabled", Type: proto.ColumnType_BOOL, Description: "Whether system-preferred authentication method is enabled.", Transform: transform.FromMethod("GetIsSystemPreferredAuthenticationMethodEnabled"), Hydrate: getUserRegistrationDetails},
+		{Name: "registration_last_updated_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time when the user registration details were last updated.", Transform: transform.FromMethod("GetLastUpdatedDateTime"), Hydrate: getUserRegistrationDetails},
+
 		// Standard columns
 		{Name: "title", Type: proto.ColumnType_STRING, Description: ColumnDescriptionTitle, Transform: transform.FromMethod("GetDisplayName")},
 		{Name: "filter", Type: proto.ColumnType_STRING, Transform: transform.FromQual("filter"), Description: "Odata query to search for resources."},
@@ -298,4 +311,37 @@ func getUserMailboxSettings(ctx context.Context, d *plugin.QueryData, h *plugin.
 	}
 
 	return mailboxSettings, nil
+}
+
+func getUserRegistrationDetails(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	user := h.Item.(*Microsoft365UserInfo)
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_user.getUserRegistrationDetails", "connection_error", err)
+		return nil, err
+	}
+
+	// Get user registration details from Reports API
+	// Note: This uses the Reports API endpoint for user registration details
+	userRegistrationDetails, err := client.Reports().AuthenticationMethods().UserRegistrationDetails().Get(ctx, nil)
+	if err != nil {
+		logger.Error("microsoft365_user.getUserRegistrationDetails", "api_error", err)
+		return nil, nil
+	}
+
+	// Find the registration details for this specific user
+	if userRegistrationDetails.GetValue() != nil {
+		for _, detail := range userRegistrationDetails.GetValue() {
+			if detail.GetUserPrincipalName() != nil && *detail.GetUserPrincipalName() == *user.GetUserPrincipalName() {
+				return detail, nil
+			}
+		}
+	}
+
+	// Return nil if no registration details found for this user
+	return nil, nil
 }
