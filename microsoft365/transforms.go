@@ -46,6 +46,10 @@ type Microsoft365OrgContactInfo struct {
 	models.OrgContactable
 }
 
+type Microsoft365GroupInfo struct {
+	models.Groupable
+}
+
 type Microsoft365TeamInfo struct {
 	models.Teamable
 	ID string
@@ -3943,5 +3947,86 @@ func (sec *Microsoft365SecurityDefaultsSettingsInfo) SecurityDefaultsSettingsDet
 		result["is_enabled"] = *sec.GetIsEnabled()
 	}
 
+	return result
+}
+
+// Group transform methods
+func (g *Microsoft365GroupInfo) GroupAssignedLicenses() []map[string]interface{} {
+	var result []map[string]interface{}
+	if g.GetAssignedLicenses() != nil {
+		for _, license := range g.GetAssignedLicenses() {
+			licenseData := map[string]interface{}{}
+			if license.GetDisabledPlans() != nil {
+				licenseData["disabled_plans"] = license.GetDisabledPlans()
+			}
+			if license.GetSkuId() != nil {
+				licenseData["sku_id"] = *license.GetSkuId()
+			}
+			result = append(result, licenseData)
+		}
+	}
+	return result
+}
+
+func (g *Microsoft365GroupInfo) GroupAssignedLabels() []map[string]interface{} {
+	var result []map[string]interface{}
+	if g.GetAssignedLabels() != nil {
+		for _, label := range g.GetAssignedLabels() {
+			labelData := map[string]interface{}{}
+			if label.GetLabelId() != nil {
+				labelData["label_id"] = *label.GetLabelId()
+			}
+			if label.GetDisplayName() != nil {
+				labelData["display_name"] = *label.GetDisplayName()
+			}
+			result = append(result, labelData)
+		}
+	}
+	return result
+}
+
+func (g *Microsoft365GroupInfo) GroupOnPremisesProvisioningErrors() []map[string]interface{} {
+	var result []map[string]interface{}
+	if g.GetOnPremisesProvisioningErrors() != nil {
+		for _, error := range g.GetOnPremisesProvisioningErrors() {
+			errorData := map[string]interface{}{}
+			if error.GetCategory() != nil {
+				errorData["category"] = *error.GetCategory()
+			}
+			if error.GetPropertyCausingError() != nil {
+				errorData["property_causing_error"] = *error.GetPropertyCausingError()
+			}
+			if error.GetValue() != nil {
+				errorData["value"] = *error.GetValue()
+			}
+			if error.GetOccurredDateTime() != nil {
+				errorData["occurred_date_time"] = *error.GetOccurredDateTime()
+			}
+			result = append(result, errorData)
+		}
+	}
+	return result
+}
+
+func (g *Microsoft365GroupInfo) GroupServiceProvisioningErrors() []map[string]interface{} {
+	var result []map[string]interface{}
+	if g.GetServiceProvisioningErrors() != nil {
+		for _, error := range g.GetServiceProvisioningErrors() {
+			errorData := map[string]interface{}{}
+			if error.GetCreatedDateTime() != nil {
+				errorData["created_date_time"] = *error.GetCreatedDateTime()
+			}
+			if error.GetIsResolved() != nil {
+				errorData["is_resolved"] = *error.GetIsResolved()
+			}
+			if error.GetServiceInstance() != nil {
+				errorData["service_instance"] = *error.GetServiceInstance()
+			}
+			if error.GetBackingStore() != nil {
+				errorData["backing_store"] = error.GetBackingStore()
+			}
+			result = append(result, errorData)
+		}
+	}
 	return result
 }

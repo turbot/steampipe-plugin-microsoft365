@@ -30,6 +30,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"microsoft365_contact":              tableMicrosoft365Contact(ctx),
 			"microsoft365_drive":                tableMicrosoft365Drive(ctx),
 			"microsoft365_drive_file":           tableMicrosoft365DriveFile(ctx),
+			"microsoft365_group":                tableMicrosoft365Group(ctx),
 			"microsoft365_list":                 tableMicrosoft365List(ctx),
 			"microsoft365_mail_message":         tableMicrosoft365MailMessage(ctx),
 			"microsoft365_my_calendar":          tableMicrosoft365MyCalendar(ctx),
