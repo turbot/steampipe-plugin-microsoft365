@@ -112,7 +112,7 @@ func getSharePointSettings(ctx context.Context, d *plugin.QueryData, h *plugin.H
 	settings, err := client.Admin().Sharepoint().Settings().Get(ctx, nil)
 	if err != nil {
 		logger.Error("microsoft365_organization.getSharePointSettings", "get_sharepoint_settings_error", err)
-		return nil, nil
+		return nil, err
 	}
 
 	// Wrap in our info struct
@@ -138,7 +138,7 @@ func getAuthenticationSettings(ctx context.Context, d *plugin.QueryData, h *plug
 	policy, err := client.Policies().AuthenticationMethodsPolicy().Get(ctx, nil)
 	if err != nil {
 		logger.Error("microsoft365_organization.getAuthenticationSettings", "get_auth_policy_error", err)
-		return nil, nil
+		return nil, err
 	}
 
 	// Wrap in our info struct
@@ -164,7 +164,7 @@ func getSecurityDefaultEnforcementPolicy(ctx context.Context, d *plugin.QueryDat
 	policy, err := client.Policies().IdentitySecurityDefaultsEnforcementPolicy().Get(ctx, nil)
 	if err != nil {
 		logger.Error("microsoft365_organization.getSecurityDefaultEnforcementPolicy", "get_security_defaults_error", err)
-		return nil, nil
+		return nil, err
 	}
 
 	// Wrap in our info struct
@@ -190,7 +190,7 @@ func getSecuritySettings(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 	security, err := client.Security().Get(ctx, nil)
 	if err != nil {
 		logger.Error("microsoft365_organization.getSecuritySettings", "get_security_settings_error", err)
-		return nil, nil
+		return nil, err
 	}
 
 	// Wrap in our info struct

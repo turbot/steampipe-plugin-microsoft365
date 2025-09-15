@@ -208,7 +208,7 @@ func listMicrosoft365Users(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 
 	pageIterator, err := msgraphcore.NewPageIterator[models.Userable](result, adapter, models.CreateUserCollectionResponseFromDiscriminatorValue)
 	if err != nil {
-		logger.Error("listMicrosoft365Users", "create_iterator_instance_error", err)
+		logger.Error("microsoft365_user.listMicrosoft365Users", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
@@ -221,7 +221,7 @@ func listMicrosoft365Users(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		return d.RowsRemaining(ctx) != 0
 	})
 	if err != nil {
-		logger.Error("listMicrosoft365Users", "paging_error", err)
+		logger.Error("microsoft365_user.listMicrosoft365Users", "paging_error", err)
 		return nil, err
 	}
 
