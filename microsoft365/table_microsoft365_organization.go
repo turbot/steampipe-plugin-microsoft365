@@ -23,9 +23,10 @@ func organizationColumns() []*plugin.Column {
 		{Name: "preferred_language", Type: proto.ColumnType_STRING, Description: "The preferred language for the organization.", Transform: transform.FromMethod("GetPreferredLanguage")},
 
 		// JSON Fields for complex settings with hydrate functions
-		{Name: "sharepoint_settings", Type: proto.ColumnType_JSON, Description: "SharePoint tenant settings", Hydrate: getSharePointSettings, Transform: transform.FromMethod("SharePointSettingsDetails")},
-		{Name: "authentication_settings", Type: proto.ColumnType_JSON, Description: "Authentication methods policy settings", Hydrate: getAuthenticationSettings, Transform: transform.FromMethod("AuthenticationSettingsDetails")},
-		{Name: "security_settings", Type: proto.ColumnType_JSON, Description: "Microsoft Security organization settings including alerts, secure scores, and data governance", Hydrate: getSecuritySettings, Transform: transform.FromMethod("SecuritySettingsDetails")},
+		{Name: "sharepoint_settings", Type: proto.ColumnType_JSON, Description: "SharePoint tenant settings.", Hydrate: getSharePointSettings, Transform: transform.FromMethod("SharePointSettingsDetails")},
+		{Name: "authentication_settings", Type: proto.ColumnType_JSON, Description: "Authentication methods policy settings.", Hydrate: getAuthenticationSettings, Transform: transform.FromMethod("AuthenticationSettingsDetails")},
+		{Name: "security_default_enforcement_policy", Type: proto.ColumnType_JSON, Description: "Identity security defaults enforcement policy.", Hydrate: getSecurityDefaultEnforcementPolicy, Transform: transform.FromMethod("SecurityDefaultsEnforcementPolicyDetails")},
+		{Name: "security_settings", Type: proto.ColumnType_JSON, Description: "Microsoft Security organization settings including alerts, secure scores, and data governance.", Hydrate: getSecuritySettings, Transform: transform.FromMethod("SecuritySettingsDetails")},
 
 		// Organization complex fields
 		{Name: "assigned_plans", Type: proto.ColumnType_JSON, Description: "The collection of service plans associated with the tenant.", Transform: transform.FromMethod("OrganizationAssignedPlans")},
@@ -48,7 +49,7 @@ func organizationColumns() []*plugin.Column {
 func tableMicrosoft365Organization(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "microsoft365_organization",
-		Description: "Microsoft 365 organization information including SharePoint, authentication, and security settings.",
+		Description: "Microsoft 365 organization information including SharePoint, authentication, security defaults, and security settings.",
 		List: &plugin.ListConfig{
 			Hydrate: listMicrosoft365Organization,
 			IgnoreConfig: &plugin.IgnoreConfig{
@@ -148,21 +149,21 @@ func getAuthenticationSettings(ctx context.Context, d *plugin.QueryData, h *plug
 	return authInfo, nil
 }
 
-// getSecurityDefaultsSettings retrieves security defaults policy settings
-func getSecurityDefaultsSettings(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+// getSecurityDefaultEnforcementPolicy retrieves security defaults policy settings
+func getSecurityDefaultEnforcementPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	logger := plugin.Logger(ctx)
 
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_organization.getSecurityDefaultsSettings", "connection_error", err)
+		logger.Error("microsoft365_organization.getSecurityDefaultEnforcementPolicy", "connection_error", err)
 		return nil, err
 	}
 
 	// Get security defaults policy
 	policy, err := client.Policies().IdentitySecurityDefaultsEnforcementPolicy().Get(ctx, nil)
 	if err != nil {
-		logger.Error("microsoft365_organization.getSecurityDefaultsSettings", "get_security_defaults_error", err)
+		logger.Error("microsoft365_organization.getSecurityDefaultEnforcementPolicy", "get_security_defaults_error", err)
 		return nil, nil
 	}
 

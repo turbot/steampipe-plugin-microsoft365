@@ -3950,7 +3950,7 @@ func (auth *Microsoft365AuthenticationSettingsInfo) AuthenticationSettingsDetail
 }
 
 // Security Defaults Settings transform methods
-func (sec *Microsoft365SecurityDefaultsSettingsInfo) SecurityDefaultsSettingsDetails() map[string]interface{} {
+func (sec *Microsoft365SecurityDefaultsSettingsInfo) SecurityDefaultsEnforcementPolicyDetails() map[string]interface{} {
 	result := map[string]interface{}{}
 
 	if sec.GetId() != nil {
@@ -4078,31 +4078,173 @@ func (teamwork *Microsoft365TeamworkSettingsInfo) TeamworkSettingsDetails() map[
 func (security *Microsoft365SecurityInfo) SecuritySettingsDetails() map[string]interface{} {
 	result := map[string]interface{}{}
 
-	// Get alerts count
+	// Get alerts data
 	if security.GetAlerts() != nil {
-		result["alerts_count"] = len(security.GetAlerts())
+		var alerts []map[string]interface{}
+		for _, alert := range security.GetAlerts() {
+			alertData := map[string]interface{}{}
+			if alert.GetId() != nil {
+				alertData["id"] = *alert.GetId()
+			}
+			if alert.GetTitle() != nil {
+				alertData["title"] = *alert.GetTitle()
+			}
+			if alert.GetDescription() != nil {
+				alertData["description"] = *alert.GetDescription()
+			}
+			if alert.GetCategory() != nil {
+				alertData["category"] = *alert.GetCategory()
+			}
+			if alert.GetSeverity() != nil {
+				alertData["severity"] = alert.GetSeverity().String()
+			}
+			if alert.GetStatus() != nil {
+				alertData["status"] = alert.GetStatus().String()
+			}
+			if alert.GetCreatedDateTime() != nil {
+				alertData["created_date_time"] = alert.GetCreatedDateTime()
+			}
+			if alert.GetEventDateTime() != nil {
+				alertData["event_date_time"] = alert.GetEventDateTime()
+			}
+			if alert.GetAssignedTo() != nil {
+				alertData["assigned_to"] = *alert.GetAssignedTo()
+			}
+			alerts = append(alerts, alertData)
+		}
+		result["alerts"] = alerts
+		result["alerts_count"] = len(alerts)
 	} else {
+		result["alerts"] = []map[string]interface{}{}
 		result["alerts_count"] = 0
 	}
 
-	// Get secure scores count
+	// Get secure scores data
 	if security.GetSecureScores() != nil {
-		result["secure_scores_count"] = len(security.GetSecureScores())
+		var secureScores []map[string]interface{}
+		for _, score := range security.GetSecureScores() {
+			scoreData := map[string]interface{}{}
+			if score.GetId() != nil {
+				scoreData["id"] = *score.GetId()
+			}
+			if score.GetCurrentScore() != nil {
+				scoreData["current_score"] = *score.GetCurrentScore()
+			}
+			if score.GetMaxScore() != nil {
+				scoreData["max_score"] = *score.GetMaxScore()
+			}
+			if score.GetActiveUserCount() != nil {
+				scoreData["active_user_count"] = *score.GetActiveUserCount()
+			}
+			if score.GetLicensedUserCount() != nil {
+				scoreData["licensed_user_count"] = *score.GetLicensedUserCount()
+			}
+			if score.GetCreatedDateTime() != nil {
+				scoreData["created_date_time"] = score.GetCreatedDateTime()
+			}
+			if score.GetAzureTenantId() != nil {
+				scoreData["azure_tenant_id"] = *score.GetAzureTenantId()
+			}
+			secureScores = append(secureScores, scoreData)
+		}
+		result["secure_scores"] = secureScores
+		result["secure_scores_count"] = len(secureScores)
 	} else {
+		result["secure_scores"] = []map[string]interface{}{}
 		result["secure_scores_count"] = 0
 	}
 
-	// Get secure score control profiles count
+	// Get secure score control profiles data
 	if security.GetSecureScoreControlProfiles() != nil {
-		result["secure_score_control_profiles_count"] = len(security.GetSecureScoreControlProfiles())
+		var profiles []map[string]interface{}
+		for _, profile := range security.GetSecureScoreControlProfiles() {
+			profileData := map[string]interface{}{}
+			if profile.GetId() != nil {
+				profileData["id"] = *profile.GetId()
+			}
+			if profile.GetTitle() != nil {
+				profileData["title"] = *profile.GetTitle()
+			}
+			if profile.GetUserImpact() != nil {
+				profileData["user_impact"] = *profile.GetUserImpact()
+			}
+			if profile.GetImplementationCost() != nil {
+				profileData["implementation_cost"] = *profile.GetImplementationCost()
+			}
+			if profile.GetControlCategory() != nil {
+				profileData["control_category"] = *profile.GetControlCategory()
+			}
+			if profile.GetService() != nil {
+				profileData["service"] = *profile.GetService()
+			}
+			if profile.GetMaxScore() != nil {
+				profileData["max_score"] = *profile.GetMaxScore()
+			}
+			if profile.GetRank() != nil {
+				profileData["rank"] = *profile.GetRank()
+			}
+			if profile.GetTier() != nil {
+				profileData["tier"] = *profile.GetTier()
+			}
+			if profile.GetActionType() != nil {
+				profileData["action_type"] = *profile.GetActionType()
+			}
+			if profile.GetActionUrl() != nil {
+				profileData["action_url"] = *profile.GetActionUrl()
+			}
+			if profile.GetRemediation() != nil {
+				profileData["remediation"] = *profile.GetRemediation()
+			}
+			if profile.GetRemediationImpact() != nil {
+				profileData["remediation_impact"] = *profile.GetRemediationImpact()
+			}
+			if profile.GetDeprecated() != nil {
+				profileData["deprecated"] = *profile.GetDeprecated()
+			}
+			if profile.GetLastModifiedDateTime() != nil {
+				profileData["last_modified_date_time"] = profile.GetLastModifiedDateTime()
+			}
+			if profile.GetThreats() != nil {
+				profileData["threats"] = profile.GetThreats()
+			}
+			profiles = append(profiles, profileData)
+		}
+		result["secure_score_control_profiles"] = profiles
+		result["secure_score_control_profiles_count"] = len(profiles)
 	} else {
+		result["secure_score_control_profiles"] = []map[string]interface{}{}
 		result["secure_score_control_profiles_count"] = 0
 	}
 
-	// Get subject rights requests count
+	// Get subject rights requests data
 	if security.GetSubjectRightsRequests() != nil {
-		result["subject_rights_requests_count"] = len(security.GetSubjectRightsRequests())
+		var requests []map[string]interface{}
+		for _, request := range security.GetSubjectRightsRequests() {
+			requestData := map[string]interface{}{}
+			if request.GetId() != nil {
+				requestData["id"] = *request.GetId()
+			}
+			if request.GetDisplayName() != nil {
+				requestData["display_name"] = *request.GetDisplayName()
+			}
+			if request.GetDescription() != nil {
+				requestData["description"] = *request.GetDescription()
+			}
+			if request.GetStatus() != nil {
+				requestData["status"] = request.GetStatus().String()
+			}
+			if request.GetCreatedDateTime() != nil {
+				requestData["created_date_time"] = request.GetCreatedDateTime()
+			}
+			if request.GetLastModifiedDateTime() != nil {
+				requestData["last_modified_date_time"] = request.GetLastModifiedDateTime()
+			}
+			requests = append(requests, requestData)
+		}
+		result["subject_rights_requests"] = requests
+		result["subject_rights_requests_count"] = len(requests)
 	} else {
+		result["subject_rights_requests"] = []map[string]interface{}{}
 		result["subject_rights_requests_count"] = 0
 	}
 
