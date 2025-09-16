@@ -151,3 +151,8 @@ func getUserID(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 func Int32(v int32) *int32 {
 	return &v
 }
+
+// StringPtr returns a pointer to the string value passed in.
+func StringPtr(v string) *string {
+	return &v
+}

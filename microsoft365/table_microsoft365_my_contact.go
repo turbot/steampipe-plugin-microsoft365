@@ -5,7 +5,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/contacts"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -53,7 +53,7 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 	userID := userIDCached.(string)
 
 	// List operations
-	input := &contacts.ContactsRequestBuilderGetQueryParameters{}
+	input := &users.ItemContactsRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -64,24 +64,24 @@ func listMicrosoft365MyContacts(ctx context.Context, d *plugin.QueryData, h *plu
 	}
 	input.Top = Int32(int32(pageSize))
 
-	options := &contacts.ContactsRequestBuilderGetRequestConfiguration{
+	options := &users.ItemContactsRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).Contacts().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateContactCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Contactable](result, adapter, models.CreateContactCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365MyContacts", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		contact := pageItem.(models.Contactable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Contactable) bool {
+		contact := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userID})
 
@@ -120,7 +120,7 @@ func getMicrosoft365MyContact(ctx context.Context, d *plugin.QueryData, h *plugi
 	}
 	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userID).ContactsById(contactID).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).Contacts().ByContactId(contactID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

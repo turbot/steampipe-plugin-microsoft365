@@ -7,8 +7,9 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
+	abstractions "github.com/microsoft/kiota-abstractions-go"
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
-	"github.com/microsoftgraph/msgraph-sdk-go/groups/item/members"
+	"github.com/microsoftgraph/msgraph-sdk-go/groups"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 )
 
@@ -44,12 +45,11 @@ func listMicrosoft365TeamMembers(ctx context.Context, d *plugin.QueryData, h *pl
 		return nil, err
 	}
 
-	headers := map[string]string{
-		"ConsistencyLevel": "eventual",
-	}
+	headers := abstractions.NewRequestHeaders()
+	headers.Add("ConsistencyLevel", "eventual")
 
 	includeCount := true
-	requestParameters := &members.MembersRequestBuilderGetQueryParameters{
+	requestParameters := &groups.ItemMembersRequestBuilderGetQueryParameters{
 		Count: &includeCount,
 	}
 
@@ -65,26 +65,26 @@ func listMicrosoft365TeamMembers(ctx context.Context, d *plugin.QueryData, h *pl
 	}
 	requestParameters.Top = Int32(int32(pageSize))
 
-	config := &members.MembersRequestBuilderGetRequestConfiguration{
+	config := &groups.ItemMembersRequestBuilderGetRequestConfiguration{
 		Headers:         headers,
 		QueryParameters: requestParameters,
 	}
 
-	members, err := client.GroupsById(teamID).Members().Get(ctx, config)
+	members, err := client.Groups().ByGroupId(teamID).Members().Get(ctx, config)
 	if err != nil {
 		errObj := getErrorObject(err)
 		plugin.Logger(ctx).Error("listMicrosoft365TeamMembers", "get_team_members_error", errObj)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(members, adapter, models.CreateDirectoryObjectCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.DirectoryObjectable](members, adapter, models.CreateDirectoryObjectCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		plugin.Logger(ctx).Error("listMicrosoft365TeamMembers", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		member := pageItem.(models.DirectoryObjectable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.DirectoryObjectable) bool {
+		member := pageItem
 		d.StreamListItem(ctx, &Microsoft365TeamMemberInfo{
 			TeamID:   teamID,
 			MemberID: *member.GetId(),

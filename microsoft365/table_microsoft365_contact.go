@@ -9,7 +9,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/contacts"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 func contactColumns() []*plugin.Column {
@@ -98,7 +98,7 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 	}
 
 	// List operations
-	input := &contacts.ContactsRequestBuilderGetQueryParameters{}
+	input := &users.ItemContactsRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -109,25 +109,25 @@ func listMicrosoft365Contacts(ctx context.Context, d *plugin.QueryData, _ *plugi
 	}
 	input.Top = Int32(int32(pageSize))
 
-	options := &contacts.ContactsRequestBuilderGetRequestConfiguration{
+	options := &users.ItemContactsRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
 	userID := d.EqualsQuals["user_id"].GetStringValue()
-	result, err := client.UsersById(userID).Contacts().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Contacts().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateContactCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Contactable](result, adapter, models.CreateContactCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365Contacts", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		contact := pageItem.(models.Contactable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Contactable) bool {
+		contact := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365ContactInfo{contact, userID})
 
@@ -160,7 +160,7 @@ func getMicrosoft365Contact(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		return nil, err
 	}
 
-	result, err := client.UsersById(userID).ContactsById(contactID).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).Contacts().ByContactId(contactID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

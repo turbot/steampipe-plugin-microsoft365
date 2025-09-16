@@ -7,7 +7,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/calendargroups"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 //// TABLE DEFINITION
@@ -49,7 +49,7 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 	}
 	userID := userIDCached.(string)
 
-	input := &calendargroups.CalendarGroupsRequestBuilderGetQueryParameters{}
+	input := &users.ItemCalendarGroupsRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -60,24 +60,24 @@ func listMicrosoft365MyCalendarGroups(ctx context.Context, d *plugin.QueryData, 
 	}
 	input.Top = Int32(int32(pageSize))
 
-	options := &calendargroups.CalendarGroupsRequestBuilderGetRequestConfiguration{
+	options := &users.ItemCalendarGroupsRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).CalendarGroups().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).CalendarGroups().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateCalendarGroupCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.CalendarGroupable](result, adapter, models.CreateCalendarGroupCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365MyCalendarGroups", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		calendarGroup := pageItem.(models.CalendarGroupable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.CalendarGroupable) bool {
+		calendarGroup := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365CalendarGroupInfo{calendarGroup, userID})
 
@@ -116,7 +116,7 @@ func getMicrosoft365MyCalendarGroup(ctx context.Context, d *plugin.QueryData, h 
 	}
 	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userID).CalendarGroupsById(id).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).CalendarGroups().ByCalendarGroupId(id).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj

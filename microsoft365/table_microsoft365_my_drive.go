@@ -6,7 +6,7 @@ import (
 
 	msgraphcore "github.com/microsoftgraph/msgraph-sdk-go-core"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users/item/drives"
+	"github.com/microsoftgraph/msgraph-sdk-go/users"
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -50,7 +50,7 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 	}
 	userID := userIDCached.(string)
 
-	input := &drives.DrivesRequestBuilderGetQueryParameters{}
+	input := &users.ItemDrivesRequestBuilderGetQueryParameters{}
 
 	// Minimum value is 1 (this function isn't run if "limit 0" is specified)
 	// Maximum value is unknown (tested up to 9999)
@@ -78,24 +78,24 @@ func listMicrosoft365MyDrives(ctx context.Context, d *plugin.QueryData, h *plugi
 		input.Filter = &joinStr
 	}
 
-	options := &drives.DrivesRequestBuilderGetRequestConfiguration{
+	options := &users.ItemDrivesRequestBuilderGetRequestConfiguration{
 		QueryParameters: input,
 	}
 
-	result, err := client.UsersById(userID).Drives().Get(ctx, options)
+	result, err := client.Users().ByUserId(userID).Drives().Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
 	}
 
-	pageIterator, err := msgraphcore.NewPageIterator(result, adapter, models.CreateDriveCollectionResponseFromDiscriminatorValue)
+	pageIterator, err := msgraphcore.NewPageIterator[models.Driveable](result, adapter, models.CreateDriveCollectionResponseFromDiscriminatorValue)
 	if err != nil {
 		logger.Error("listMicrosoft365MyDrives", "create_iterator_instance_error", err)
 		return nil, err
 	}
 
-	err = pageIterator.Iterate(ctx, func(pageItem interface{}) bool {
-		drive := pageItem.(models.Driveable)
+	err = pageIterator.Iterate(ctx, func(pageItem models.Driveable) bool {
+		drive := pageItem
 
 		d.StreamListItem(ctx, &Microsoft365DriveInfo{drive, userID})
 
@@ -123,7 +123,7 @@ func getMicrosoft365MyDrive(ctx context.Context, d *plugin.QueryData, h *plugin.
 	// Create client
 	client, _, err := GetGraphClient(ctx, d)
 	if err != nil {
-		logger.Error("microsoft365_my_drive.listMicrosoft365MyDrives", "connection_error", err)
+		logger.Error("microsoft365_my_drive.getMicrosoft365MyDrive", "connection_error", err)
 		return nil, err
 	}
 
@@ -134,7 +134,7 @@ func getMicrosoft365MyDrive(ctx context.Context, d *plugin.QueryData, h *plugin.
 	}
 	userID := userIDCached.(string)
 
-	result, err := client.UsersById(userID).DrivesById(driveID).Get(ctx, nil)
+	result, err := client.Users().ByUserId(userID).Drives().ByDriveId(driveID).Get(ctx, nil)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
