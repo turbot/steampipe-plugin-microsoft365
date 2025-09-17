@@ -83,12 +83,12 @@ func userColumns() []*plugin.Column {
 		{Name: "password_policies", Type: proto.ColumnType_STRING, Description: "Specifies password policies for the user.", Transform: transform.FromMethod("GetPasswordPolicies")},
 		// While querying the device_enrollment_limit we will encounter the Forbidden error if the tenant is not have the "Microsoft Intune" license.
 		// 		Intune is bundled with higher-tier SKUs like:
-		// 		Microsoft 365 Business Premium
-		// 		Microsoft 365 E3 / E5
-		// 		Enterprise Mobility + Security (EMS) E3 / E5
-		// 		Microsoft Intune (standalone)
-		//      Enterprise Mobility + Security (EMS) E3 / E5
-		//		Microsoft Intune (standalone)
+		// 		  Microsoft 365 Business Premium
+		// 		  Microsoft 365 E3 / E5
+		// 		  Enterprise Mobility + Security (EMS) E3 / E5
+		// 		  Microsoft Intune (standalone)
+		//        Enterprise Mobility + Security (EMS) E3 / E5
+		//		  Microsoft Intune (standalone)
 		// {Name: "device_enrollment_limit", Type: proto.ColumnType_INT, Description: "The limit on the maximum number of devices that the user is permitted to enroll.", Transform: transform.FromMethod("GetDeviceEnrollmentLimit")},
 
 		// JSON Fields for complex objects
@@ -192,7 +192,6 @@ func listMicrosoft365Users(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	equalQuals := d.EqualsQuals
 
 	// Select specific properties including license-related fields that are not returned by default
-	// According to Microsoft Graph documentation, licenseAssignmentStates and licenseDetails need to be explicitly requested
 	selectFields := buildUserSelectFields(ctx, d)
 	input.Select = selectFields
 
@@ -251,10 +250,9 @@ func getMicrosoft365User(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 	userID := d.EqualsQualString("id")
 	if h.Item != nil {
 		user := h.Item.(*Microsoft365UserInfo)
-	
 		userID = *user.GetId()
 	}
-	
+
 	if userID == "" {
 		return nil, nil
 	}
@@ -270,9 +268,10 @@ func getMicrosoft365User(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 	selectFields := buildUserSelectFields(ctx, d)
 
 	// Appending the selected fields that are only be retrieved via GET API.
+	getAPIFields := []string{"hireDate", "birthday", "schools", "responsibilities", "pastProjects", "preferredName", "interests", "aboutMe", "mySite", "skills"}
 	options := &users.UserItemRequestBuilderGetRequestConfiguration{
 		QueryParameters: &users.UserItemRequestBuilderGetQueryParameters{
-			Select: append(selectFields, []string{"hireDate","birthday","schools","responsibilities","pastProjects","preferredName","interests","aboutMe","mySite","skills"}...),
+			Select: append(selectFields, getAPIFields...),
 		},
 	}
 
@@ -451,7 +450,7 @@ func getUserLicenseDetails(ctx context.Context, d *plugin.QueryData, h *plugin.H
 	return nil, nil
 }
 
-//// BUILD SELECT Input parameter
+////  Build SELECT input parameters
 
 func buildUserSelectFields(ctx context.Context, d *plugin.QueryData) []string {
 	// Always include basic fields that are typically needed
@@ -545,8 +544,8 @@ var userSelectFields = map[string]string{
 	"postal_code":    "postalCode",
 
 	// Security and system information
-	"security_identifier":     "securityIdentifier",
-	"password_policies":       "passwordPolicies",
+	"security_identifier": "securityIdentifier",
+	"password_policies":   "passwordPolicies",
 
 	// License and plan information (returned by list/get APIs)
 	"assigned_licenses":                "assignedLicenses",
