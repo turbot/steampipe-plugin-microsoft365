@@ -3,6 +3,7 @@ package microsoft365
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/iancoleman/strcase"
@@ -59,28 +60,36 @@ func userColumns() []*plugin.Column {
 		{Name: "proxy_addresses", Type: proto.ColumnType_JSON, Description: "For example: ['SMTP: bob@contoso.com', 'smtp: bob@sales.contoso.com'].", Transform: transform.FromMethod("GetProxyAddresses")},
 		{Name: "other_mails", Type: proto.ColumnType_JSON, Description: "A list of additional email addresses for the user.", Transform: transform.FromMethod("GetOtherMails")},
 		{Name: "im_addresses", Type: proto.ColumnType_JSON, Description: "The instant message voice over IP (VOIP) session initiation protocol (SIP) addresses for the user.", Transform: transform.FromMethod("GetImAddresses")},
-		{Name: "about_me", Type: proto.ColumnType_STRING, Description: "A freeform text entry field for the user to describe themselves.", Transform: transform.FromMethod("GetAboutMe")},
-		{Name: "interests", Type: proto.ColumnType_JSON, Description: "A list for the user to describe their interests.", Transform: transform.FromMethod("GetInterests")},
-		{Name: "past_projects", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their past projects.", Transform: transform.FromMethod("GetPastProjects")},
-		{Name: "responsibilities", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their responsibilities.", Transform: transform.FromMethod("GetResponsibilities")},
-		{Name: "schools", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate the schools they have attended.", Transform: transform.FromMethod("GetSchools")},
-		{Name: "skills", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their skills.", Transform: transform.FromMethod("GetSkills")},
-		{Name: "hire_date", Type: proto.ColumnType_TIMESTAMP, Description: "The hire date of the user.", Transform: transform.FromMethod("GetHireDate")},
+		{Name: "about_me", Type: proto.ColumnType_STRING, Description: "A freeform text entry field for the user to describe themselves.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetAboutMe")},
+		{Name: "interests", Type: proto.ColumnType_JSON, Description: "A list for the user to describe their interests.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetInterests")},
+		{Name: "past_projects", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their past projects.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetPastProjects")},
+		{Name: "responsibilities", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their responsibilities.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetResponsibilities")},
+		{Name: "schools", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate the schools they have attended.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetSchools")},
+		{Name: "skills", Type: proto.ColumnType_JSON, Description: "A list for the user to enumerate their skills.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetSkills")},
+		{Name: "hire_date", Type: proto.ColumnType_TIMESTAMP, Description: "The hire date of the user.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetHireDate")},
 		{Name: "employee_hire_date", Type: proto.ColumnType_TIMESTAMP, Description: "The hire date of the user.", Transform: transform.FromMethod("GetEmployeeHireDate")},
 		{Name: "employee_leave_date_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time when the user left or will leave the organization.", Transform: transform.FromMethod("GetEmployeeLeaveDateTime")},
 		{Name: "employee_id", Type: proto.ColumnType_STRING, Description: "The employee identifier assigned to the user by the organization.", Transform: transform.FromMethod("GetEmployeeId")},
 		{Name: "employee_type", Type: proto.ColumnType_STRING, Description: "Captures enterprise worker type.", Transform: transform.FromMethod("GetEmployeeType")},
-		{Name: "birthday", Type: proto.ColumnType_TIMESTAMP, Description: "The birthday of the user.", Transform: transform.FromMethod("GetBirthday")},
+		{Name: "birthday", Type: proto.ColumnType_TIMESTAMP, Description: "The birthday of the user.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetBirthday")},
 		{Name: "city", Type: proto.ColumnType_STRING, Description: "The city in which the user is located.", Transform: transform.FromMethod("GetCity")},
 		{Name: "country", Type: proto.ColumnType_STRING, Description: "The country/region in which the user is located.", Transform: transform.FromMethod("GetCountry")},
 		{Name: "state", Type: proto.ColumnType_STRING, Description: "The state or province in the user's address.", Transform: transform.FromMethod("GetState")},
 		{Name: "street_address", Type: proto.ColumnType_STRING, Description: "The street address of the user's place of business.", Transform: transform.FromMethod("GetStreetAddress")},
 		{Name: "postal_code", Type: proto.ColumnType_STRING, Description: "The postal code for the user's postal address.", Transform: transform.FromMethod("GetPostalCode")},
-		{Name: "my_site", Type: proto.ColumnType_STRING, Description: "The URL for the user's personal site.", Transform: transform.FromMethod("GetMySite")},
-		{Name: "preferred_name", Type: proto.ColumnType_STRING, Description: "The preferred name for the user.", Transform: transform.FromMethod("GetPreferredName")},
+		{Name: "my_site", Type: proto.ColumnType_STRING, Description: "The URL for the user's personal site.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetMySite")},
+		{Name: "preferred_name", Type: proto.ColumnType_STRING, Description: "The preferred name for the user.", Hydrate: getMicrosoft365User, Transform: transform.FromMethod("GetPreferredName")},
 		{Name: "security_identifier", Type: proto.ColumnType_STRING, Description: "Security identifier (SID) of the user.", Transform: transform.FromMethod("GetSecurityIdentifier")},
 		{Name: "password_policies", Type: proto.ColumnType_STRING, Description: "Specifies password policies for the user.", Transform: transform.FromMethod("GetPasswordPolicies")},
-		{Name: "device_enrollment_limit", Type: proto.ColumnType_INT, Description: "The limit on the maximum number of devices that the user is permitted to enroll.", Transform: transform.FromMethod("GetDeviceEnrollmentLimit")},
+		// While querying the device_enrollment_limit we will encounter the Forbidden error if the tenant is not have the "Microsoft Intune" license.
+		// 		Intune is bundled with higher-tier SKUs like:
+		// 		  Microsoft 365 Business Premium
+		// 		  Microsoft 365 E3 / E5
+		// 		  Enterprise Mobility + Security (EMS) E3 / E5
+		// 		  Microsoft Intune (standalone)
+		//        Enterprise Mobility + Security (EMS) E3 / E5
+		//		  Microsoft Intune (standalone)
+		// {Name: "device_enrollment_limit", Type: proto.ColumnType_INT, Description: "The limit on the maximum number of devices that the user is permitted to enroll.", Transform: transform.FromMethod("GetDeviceEnrollmentLimit")},
 
 		// JSON Fields for complex objects
 		{Name: "assigned_licenses", Type: proto.ColumnType_JSON, Description: "The licenses that are assigned to the user.", Transform: transform.FromMethod("UserAssignedLicenses")},
@@ -92,7 +101,7 @@ func userColumns() []*plugin.Column {
 		{Name: "service_provisioning_errors", Type: proto.ColumnType_JSON, Description: "Errors published by a federated service describing a non-transient, service-specific error regarding the properties or link from a user object.", Transform: transform.FromMethod("UserServiceProvisioningErrors")},
 		{Name: "identities", Type: proto.ColumnType_JSON, Description: "Represents the identities that can be used to sign in to this user account.", Transform: transform.FromMethod("UserIdentities")},
 		{Name: "license_assignment_states", Type: proto.ColumnType_JSON, Description: "State of license assignments for this user.", Transform: transform.FromMethod("UserLicenseAssignmentStates")},
-		{Name: "license_details", Type: proto.ColumnType_JSON, Description: "A collection of this user's license details.", Transform: transform.FromMethod("UserLicenseDetails")},
+		{Name: "license_details", Type: proto.ColumnType_JSON, Description: "A collection of this user's license details.", Transform: transform.FromValue(), Hydrate: getUserLicenseDetails},
 
 		// Mailbox Settings columns
 		{Name: "user_purpose", Type: proto.ColumnType_STRING, Description: "The purpose of the mailbox.", Transform: transform.FromMethod("GetUserPurpose"), Hydrate: getUserMailboxSettings},
@@ -181,6 +190,11 @@ func listMicrosoft365Users(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 
 	var queryFilter string
 	equalQuals := d.EqualsQuals
+
+	// Select specific properties including license-related fields that are not returned by default
+	selectFields := buildUserSelectFields(ctx, d)
+	input.Select = selectFields
+
 	filter := buildUserQueryFilter(equalQuals)
 
 	if equalQuals["filter"] != nil {
@@ -234,6 +248,11 @@ func getMicrosoft365User(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 	logger := plugin.Logger(ctx)
 
 	userID := d.EqualsQualString("id")
+	if h.Item != nil {
+		user := h.Item.(*Microsoft365UserInfo)
+		userID = *user.GetId()
+	}
+
 	if userID == "" {
 		return nil, nil
 	}
@@ -245,7 +264,18 @@ func getMicrosoft365User(ctx context.Context, d *plugin.QueryData, h *plugin.Hyd
 		return nil, err
 	}
 
-	result, err := client.Users().ByUserId(userID).Get(ctx, nil)
+	// Select specific properties including license-related fields that are not returned by default
+	selectFields := buildUserSelectFields(ctx, d)
+
+	// Appending the selected fields that are only be retrieved via GET API.
+	getAPIFields := []string{"hireDate", "birthday", "schools", "responsibilities", "pastProjects", "preferredName", "interests", "aboutMe", "mySite", "skills"}
+	options := &users.UserItemRequestBuilderGetRequestConfiguration{
+		QueryParameters: &users.UserItemRequestBuilderGetQueryParameters{
+			Select: append(selectFields, getAPIFields...),
+		},
+	}
+
+	result, err := client.Users().ByUserId(userID).Get(ctx, options)
 	if err != nil {
 		errObj := getErrorObject(err)
 		return nil, errObj
@@ -344,4 +374,190 @@ func getUserRegistrationDetails(ctx context.Context, d *plugin.QueryData, h *plu
 
 	// Return nil if no registration details found for this user
 	return nil, nil
+}
+
+func getUserLicenseDetails(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
+	// Get the user from the hydrate data
+	userInfo := h.Item.(*Microsoft365UserInfo)
+	user := userInfo.Userable
+
+	if user.GetId() == nil {
+		return nil, nil
+	}
+
+	userID := *user.GetId()
+
+	// Create client
+	client, _, err := GetGraphClient(ctx, d)
+	if err != nil {
+		logger.Error("microsoft365_user.getUserLicenseDetails", "connection_error", err)
+		return nil, err
+	}
+
+	// Get license details using the beta endpoint approach
+	// This calls /users/{id}/licenseDetails which is available in beta
+	licenseDetailsResult, err := client.Users().ByUserId(userID).LicenseDetails().Get(ctx, nil)
+	if err != nil {
+		logger.Error("microsoft365_user.getUserLicenseDetails", "api_error", err)
+		return nil, nil // Return nil instead of error to avoid breaking the query
+	}
+
+	// Convert license details to JSON-serializable format
+	if licenseDetailsResult.GetValue() != nil {
+		details := []map[string]interface{}{}
+		for _, detail := range licenseDetailsResult.GetValue() {
+			detailData := map[string]interface{}{}
+
+			if detail.GetId() != nil {
+				detailData["id"] = *detail.GetId()
+			}
+			if detail.GetSkuId() != nil {
+				detailData["sku_id"] = *detail.GetSkuId()
+			}
+			if detail.GetSkuPartNumber() != nil {
+				detailData["sku_part_number"] = *detail.GetSkuPartNumber()
+			}
+
+			// Add service plans
+			if detail.GetServicePlans() != nil {
+				servicePlans := []map[string]interface{}{}
+				for _, plan := range detail.GetServicePlans() {
+					planData := map[string]interface{}{}
+					if plan.GetServicePlanId() != nil {
+						planData["service_plan_id"] = *plan.GetServicePlanId()
+					}
+					if plan.GetServicePlanName() != nil {
+						planData["service_plan_name"] = *plan.GetServicePlanName()
+					}
+					if plan.GetProvisioningStatus() != nil {
+						planData["provisioning_status"] = *plan.GetProvisioningStatus()
+					}
+					if plan.GetAppliesTo() != nil {
+						planData["applies_to"] = *plan.GetAppliesTo()
+					}
+					servicePlans = append(servicePlans, planData)
+				}
+				detailData["service_plans"] = servicePlans
+			}
+
+			details = append(details, detailData)
+		}
+		return details, nil
+	}
+
+	return nil, nil
+}
+
+////  Build SELECT input parameters
+
+func buildUserSelectFields(ctx context.Context, d *plugin.QueryData) []string {
+	// Always include basic fields that are typically needed
+	fieldSelected := []string{
+		"id",
+		"displayName",
+		"userPrincipalName",
+		"mail",
+	}
+
+	// Get the queried columns from the query context
+	givenColumns := d.QueryContext.Columns
+
+	// Process each queried column
+	for _, columnName := range givenColumns {
+		// Skip special columns that are not Graph API fields
+		if columnName == "title" || columnName == "filter" || columnName == "_ctx" || columnName == "tenant_id" || columnName == "sp_connection_name" || columnName == "sp_ctx" {
+			continue
+		}
+
+		// Check if this column has a mapping in our userSelectFields map
+		if selectValue, ok := userSelectFields[columnName]; ok {
+			// Add the mapped Graph API field if not already included
+			if !slices.Contains(fieldSelected, selectValue) {
+				fieldSelected = append(fieldSelected, selectValue)
+			}
+		}
+		// Note: We don't fall back to camelCase conversion anymore to avoid unsupported fields
+	}
+
+	return fieldSelected
+}
+
+// Common fields for list and get API call
+var userSelectFields = map[string]string{
+	// Basic user information
+	"mail_nickname":                         "mailNickname",
+	"given_name":                            "givenName",
+	"surname":                               "surname",
+	"job_title":                             "jobTitle",
+	"department":                            "department",
+	"company_name":                          "companyName",
+	"office_location":                       "officeLocation",
+	"business_phones":                       "businessPhones",
+	"mobile_phone":                          "mobilePhone",
+	"fax_number":                            "faxNumber",
+	"account_enabled":                       "accountEnabled",
+	"user_type":                             "userType",
+	"creation_type":                         "creationType",
+	"created_date_time":                     "createdDateTime",
+	"last_password_change_date_time":        "lastPasswordChangeDateTime",
+	"sign_in_sessions_valid_from_date_time": "signInSessionsValidFromDateTime",
+	"preferred_language":                    "preferredLanguage",
+	"preferred_data_location":               "preferredDataLocation",
+	"usage_location":                        "usageLocation",
+	"age_group":                             "ageGroup",
+	"legal_age_group_classification":        "legalAgeGroupClassification",
+	"consent_provided_for_minor":            "consentProvidedForMinor",
+	"external_user_state":                   "externalUserState",
+	"external_user_state_change_date_time":  "externalUserStateChangeDateTime",
+	"is_management_restricted":              "isManagementRestricted",
+	"is_resource_account":                   "isResourceAccount",
+	"show_in_address_list":                  "showInAddressList",
+
+	// On-premises information
+	"on_premises_sync_enabled":        "onPremisesSyncEnabled",
+	"on_premises_last_sync_date_time": "onPremisesLastSyncDateTime",
+	"on_premises_distinguished_name":  "onPremisesDistinguishedName",
+	"on_premises_domain_name":         "onPremisesDomainName",
+	"on_premises_immutable_id":        "onPremisesImmutableId",
+	"on_premises_sam_account_name":    "onPremisesSamAccountName",
+	"on_premises_security_identifier": "onPremisesSecurityIdentifier",
+	"on_premises_user_principal_name": "onPremisesUserPrincipalName",
+
+	// Contact information
+	"proxy_addresses": "proxyAddresses",
+	"other_mails":     "otherMails",
+	"im_addresses":    "imAddresses",
+
+	// Personal information (available in v1.0 when using $select)
+	"employee_hire_date":       "employeeHireDate",
+	"employee_leave_date_time": "employeeLeaveDateTime",
+	"employee_id":              "employeeId",
+	"employee_type":            "employeeType",
+
+	// Address information
+	"city":           "city",
+	"country":        "country",
+	"state":          "state",
+	"street_address": "streetAddress",
+	"postal_code":    "postalCode",
+
+	// Security and system information
+	"security_identifier": "securityIdentifier",
+	"password_policies":   "passwordPolicies",
+
+	// License and plan information (returned by list/get APIs)
+	"assigned_licenses":                "assignedLicenses",
+	"assigned_plans":                   "assignedPlans",
+	"provisioned_plans":                "provisionedPlans",
+	"password_profile":                 "passwordProfile",
+	"on_premises_extension_attributes": "onPremisesExtensionAttributes",
+	"on_premises_provisioning_errors":  "onPremisesProvisioningErrors",
+	"service_provisioning_errors":      "serviceProvisioningErrors",
+	"identities":                       "identities",
+	"license_assignment_states":        "licenseAssignmentStates",
+
+	// Note: license_details is excluded as it requires a separate API call via hydrate function
+	// Note: mailbox settings columns are excluded as they require separate API calls via hydrate functions
 }
