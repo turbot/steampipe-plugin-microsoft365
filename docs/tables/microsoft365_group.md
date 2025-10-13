@@ -11,17 +11,9 @@ Microsoft 365 Groups are collections of users that can be used to manage access 
 
 The `microsoft365_group` table provides insights into group management and configuration across your Microsoft 365 tenant. As a Microsoft 365 administrator, explore group details through this table to understand group types, membership rules, mail settings, and security configurations. Utilize it to audit group permissions, track group creation and expiration, and monitor group compliance.
 
-**Important Notes**
-
-- This table requires Microsoft Graph API permissions for reading group information
-- Data includes all groups in the tenant (excluding dynamic distribution groups)
-- Some fields may be null for certain group types
-- Dynamic membership rules are supported for security groups
-
 ## Examples
 
 ### Basic group overview
-
 Explore all groups in your organization with their basic information.
 
 ```sql+postgres
@@ -57,7 +49,6 @@ order by
 ```
 
 ### Microsoft 365 groups analysis
-
 Analyze Microsoft 365 groups (unified groups) in your organization.
 
 ```sql+postgres
@@ -97,7 +88,6 @@ order by
 ```
 
 ### Security groups with dynamic membership
-
 Find security groups that use dynamic membership rules.
 
 ```sql+postgres
@@ -133,7 +123,6 @@ order by
 ```
 
 ### Mail-enabled groups analysis
-
 Analyze mail-enabled groups and their configuration.
 
 ```sql+postgres
@@ -173,7 +162,6 @@ order by
 ```
 
 ### Group type distribution
-
 Analyze the distribution of different group types in your organization.
 
 ```sql+postgres
@@ -215,7 +203,6 @@ order by
 ```
 
 ### Groups with external senders allowed
-
 Find groups that allow external users to send messages.
 
 ```sql+postgres
@@ -251,7 +238,6 @@ order by
 ```
 
 ### Groups with assigned licenses
-
 Find groups that have licenses assigned to them.
 
 ```sql+postgres
@@ -285,7 +271,6 @@ order by
 ```
 
 ### Recently created groups
-
 Find groups created in the last 30 days.
 
 ```sql+postgres
@@ -323,7 +308,6 @@ order by
 ```
 
 ### Groups with expiration dates
-
 Find groups that have expiration dates set.
 
 ```sql+postgres
@@ -357,7 +341,6 @@ order by
 ```
 
 ### On-premises synchronized groups
-
 Find groups that are synchronized from on-premises Active Directory.
 
 ```sql+postgres
@@ -393,7 +376,6 @@ order by
 ```
 
 ### Groups with provisioning errors
-
 Find groups that have on-premises or service provisioning errors.
 
 ```sql+postgres
@@ -429,7 +411,6 @@ order by
 ## Troubleshooting
 
 ### Authentication Issues
-
 If you encounter authentication errors:
 
 1. **Verify Permissions**: Ensure the authenticated user has appropriate Microsoft Graph API permissions
@@ -437,13 +418,11 @@ If you encounter authentication errors:
 3. **Admin Consent**: Some data may require admin consent for the application
 
 ### Common Error Messages
-
 - **403 Forbidden**: The user lacks permissions to read group data
 - **401 Unauthorized**: Authentication token is invalid or expired
 - **Connection Error**: Check network connectivity and authentication configuration
 
 ### Filtering by Group Types
-
 The table supports filtering by group types using the `group_types` column:
 
 - **Microsoft 365 Groups**: `group_types = '["Unified"]'`
