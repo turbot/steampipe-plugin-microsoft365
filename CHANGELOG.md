@@ -1,3 +1,33 @@
+## v1.2.0 [2025-10-14]
+
+_What's new?_
+
+- New tables added ([#67](https://github.com/turbot/steampipe-plugin-microsoft365/pull/67))
+  - [microsoft365_group](https://hub.steampipe.io/plugins/turbot/microsoft365/tables/microsoft365_group)
+  - [microsoft365_list](https://hub.steampipe.io/plugins/turbot/microsoft365/tables/microsoft365_list)
+  - [microsoft365_organization](https://hub.steampipe.io/plugins/turbot/microsoft365/tables/microsoft365_organization)
+  - [microsoft365_site](https://hub.steampipe.io/plugins/turbot/microsoft365/tables/microsoft365_site)
+  - [microsoft365_user](https://hub.steampipe.io/plugins/turbot/microsoft365/tables/microsoft365_user)
+
+_Enhancements_
+
+- Added the following columns to the `microsoft365_drive` table: ([#67](https://github.com/turbot/steampipe-plugin-microsoft365/pull/67))
+  - `sharepoint_ids`
+  - `list`
+  - `owner`
+  - `quota`
+  - `system`
+
+_Bug fixes_
+
+- Fixed the `microsoft365_user` table to populate all the column values correctly. ([#68](https://github.com/turbot/steampipe-plugin-microsoft365/pull/68))
+
+_Dependencies_
+
+- Recompiled plugin with [msgraph-sdk-go v1.84.0](https://github.com/microsoftgraph/msgraph-sdk-go/releases/tag/v1.84.0). ([#67](https://github.com/turbot/steampipe-plugin-microsoft365/pull/67))
+- Recompiled plugin with Go version `1.24`. ([#66](https://github.com/turbot/steampipe-plugin-microsoft365/pull/66))
+- Recompiled plugin with [steampipe-plugin-sdk v5.13.1](https://github.com/turbot/steampipe-plugin-sdk/blob/develop/CHANGELOG.md#v5131-2025-09-25) that addresses critical and high vulnerabilities in dependent packages. ([#70](https://github.com/turbot/steampipe-plugin-microsoft365/pull/70))
+
 ## v1.1.1 [2025-04-18]
 
 _Bug fixes_
