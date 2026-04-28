@@ -8,7 +8,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.2
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
 	github.com/iancoleman/strcase v0.3.0
-	github.com/microsoft/kiota-abstractions-go v1.9.3
+	github.com/microsoft/kiota-abstractions-go v1.9.4
 	github.com/microsoft/kiota-authentication-azure-go v1.3.0
 	github.com/microsoftgraph/msgraph-sdk-go v1.84.0
 	github.com/microsoftgraph/msgraph-sdk-go-core v1.3.2
