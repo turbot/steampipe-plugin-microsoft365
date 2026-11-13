@@ -7,7 +7,7 @@ import (
 	"github.com/microsoftgraph/msgraph-sdk-go/drives"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
 
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
 //// TABLE DEFINITION
@@ -110,7 +110,7 @@ func listMicrosoft365MyDriveFiles(ctx context.Context, d *plugin.QueryData, h *p
 
 			// Stream all child items
 			for _, childItem := range childData {
-				childID := *childItem.DriveItemable.GetId()
+				childID := *childItem.GetId()
 
 				// Skip if we've already processed this child item
 				if processedItems[childID] {
