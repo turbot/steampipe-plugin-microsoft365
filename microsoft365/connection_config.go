@@ -1,7 +1,7 @@
 package microsoft365
 
 import (
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
 type microsoft365Config struct {
@@ -22,9 +22,9 @@ func ConfigInstance() interface{} {
 
 // GetConfig :: retrieve and cast connection config from query data
 func GetConfig(connection *plugin.Connection) microsoft365Config {
-	if connection == nil || connection.Config == nil {
+	if connection == nil || connection.GetConfig() == nil {
 		return microsoft365Config{}
 	}
-	config, _ := connection.Config.(microsoft365Config)
+	config, _ := connection.GetConfig().(microsoft365Config)
 	return config
 }
